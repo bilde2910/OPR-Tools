@@ -1,0 +1,5 @@
+.env
+node_modules/
+dist/*
+!dist/*.user.js
+.build.json
