@@ -1,10 +1,17 @@
-import { awaitElement, interceptJson } from "src/utils";
+import { register } from "src/core";
+import { awaitElement } from "src/utils";
 import { Contribution, ContributionStatus, ContributionType, SubmissionsResult } from "src/types";
 
 import "./nomination-stats.css";
 
 export default () => {
-  interceptJson("GET", "/api/v1/vault/manage", parseContributions);
+  register({
+    id: "nomination-stats",
+    defaultConfig: {},
+    initialize: (toolbox, config) => {
+      toolbox.interceptJson("GET", "/api/v1/vault/manage", parseContributions);
+    }
+  });
 };
 
 const parseContributions = (data: SubmissionsResult) => {

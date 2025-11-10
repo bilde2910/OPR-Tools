@@ -1,6 +1,4 @@
-import { response } from "express";
 import type resources from "../assets/resources.json";
-import { ApiResult } from "./types";
 
 //#region resources
 
@@ -89,40 +87,7 @@ export function debounce(callback: () => any, wait: number) {
   };
 }
 
-//#region HTTP utils
-
-export function intercept(method: string, url: string, callback: (e: Event) => any) {
-  (function (open) {
-    XMLHttpRequest.prototype.open = function (m, u) {
-      if (u === url && m == method) {
-        this.addEventListener("load", callback, false);
-      }
-      open.apply(this, arguments);
-    };
-  })(XMLHttpRequest.prototype.open);
-}
-
-export function interceptJson<T>(method: string, url: string, callback: (obj: T) => any) {
-  function handle(_: Event) {
-    try {
-      const resp = this.response;
-      const json: ApiResult<T> = JSON.parse(resp);
-      if (!json) return;
-      if (json.captcha) return;
-      callback(json.result);
-    } catch (e) {
-      console.error(e);
-    }
-  }
-  intercept(method, url, handle);
-}
-
 //#region Storage utils
-
-let userHash = 0;
-export const _setUserHash = (uh: number) => {
-  userHash = uh;
-};
 
 // https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js
 export const cyrb53 = function(str: string, seed: number = 0) {
@@ -136,34 +101,3 @@ export const cyrb53 = function(str: string, seed: number = 0) {
   h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
   return 4294967296 * (2097151 & h2) + (h1>>>0);
 };
-
-export class AddonSettings<T> {
-  key: string;
-  defaults: T;
-
-  constructor(key: string, defaults: T) {
-    this.key = key;
-    this.defaults = defaults;
-  }
-
-  get(key: keyof T): T extends { [key]: infer V } ? V : never {
-    const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
-    const props = JSON.parse(data)[this.key] ?? {};
-    if (Object.prototype.hasOwnProperty.call(props, key)) {
-      return props[key];
-    } else {
-      return this.defaults[key];
-    }
-  }
-
-  set(key: keyof T, value: T extends { [key]: infer V } ? V : never) {
-    const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
-    const props = JSON.parse(data);
-    if (!Object.prototype.hasOwnProperty.call(props, this.key)) {
-      props[this.key] = {};
-    }
-    props[this.key][key] = value;
-    const nData = JSON.stringify(props);
-    localStorage.setItem(`opr-tools-settings-${userHash}`, nData);
-  }
-}

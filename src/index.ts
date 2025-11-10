@@ -1,9 +1,9 @@
 import { buildNumber, scriptInfo } from "./constants";
-import { _setUserHash, addStyle, cyrb53, domLoaded, interceptJson } from "./utils";
-import { UserProperties } from "./types";
+import { addStyle, domLoaded } from "./utils";
 
 import nominationStats from "./scripts/nomination-stats";
 import nominationMap from "./scripts/nomination-map";
+import { initializeUserHash } from "./core";
 
 /** Runs when the userscript is loaded initially */
 async function init() {
@@ -17,10 +17,7 @@ async function init() {
 async function run() {
   try {
     console.log(`Initializing ${scriptInfo.name} v${scriptInfo.version} (#${buildNumber})...`);
-
-    interceptJson("GET", "/api/v1/vault/properties", (props: UserProperties) => {
-      const userHash = props.socialProfile?.email ? cyrb53(props.socialProfile.email) : 0;
-      _setUserHash(userHash);
+    initializeUserHash().then((userHash: number) => {
       console.log(`Initializing OPR Tools for user hash ${userHash}`);
       // TODO: Allow users to toggle which scripts are active using a settings pane
       nominationStats();
