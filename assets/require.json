@@ -1,8 +1,12 @@
 [
   {
-    "pkgName": "@sv443-network/userutils",
-    "path": "dist/index.global.js",
-    "global": "UserUtils"
+    "pkgName": "@googlemaps/markerclusterer",
+    "path": "dist/index.min.js",
+    "global": "markerClusterer"
+  },
+  {
+    "pkgName": "s2-geometry",
+    "path": "src/s2geometry.js",
+    "global": "S2"
   }
 ]
-  

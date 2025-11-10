@@ -5,7 +5,7 @@ import { randomUUID } from "node:crypto";
 import { exec } from "node:child_process";
 import "dotenv/config";
 import { outputDir as rollupCfgOutputDir, outputFile as rollupCfgOutputFile } from "../../rollup.config.mjs";
-import pkg from "../../package.json" assert { type: "json" };
+import pkg from "../../package.json" with { type: "json" };
 import type { RollupArgs } from "../types";
 
 type CliArg<TName extends keyof Required<RollupArgs>> = Required<RollupArgs>[TName];
@@ -22,20 +22,18 @@ const suffix = getCliArg<CliArg<"config-suffix">>("suffix", "");
 //#MARKER settings:
 
 /** Path to the GitHub repo in the format "User/Repo" */
-const repo = "#REPLACE:User/Repo";
+const repo = "bilde2910/OPR-Tools";
 /** Name of the emitted userscript file */
 const userscriptDistFile = `${pkg.userscriptName}${suffix}.user.js`;
 
 /** URL that links directly to the file to update the userscript from */
 const scriptUrl = (() => {
   switch(host) {
-  case "greasyfork":
-    return "https://update.greasyfork.org/scripts/#REPLACE:script_id/#REPLACE:filename.user.js";
-  case "openuserjs":
-    return `https://openuserjs.org/install/#REPLACE:username/${pkg.userscriptName}`;
   case "github":
-  default:
     return `https://raw.githubusercontent.com/${repo}/${branch}/dist/${userscriptDistFile}`;
+  case "dev":
+  default:
+    return "http://localhost:8710/OPR%20Tools.user.js";
   }
 })();
 
@@ -103,15 +101,12 @@ const ringBell = Boolean(env.RING_BELL && (env.RING_BELL.length > 0 && env.RING_
 // @author            ${pkg.author.name}
 // @copyright         ${pkg.author.name} (${pkg.author.url})
 // @icon              ${getResourceUrl("images/logo_48.png", buildNbr)}
-// @match             #REPLACE:Match URL(s) - i.e. *://*.example.com/*
+// @match             https://opr.ingress.com/*
 // @run-at            document-start
 // @downloadURL       ${scriptUrl}
 // @updateURL         ${scriptUrl}
 // @connect           github.com
 // @connect           raw.githubusercontent.com
-// @grant             GM.getValue
-// @grant             GM.setValue
-// @grant             GM.deleteValue
 // @grant             GM.getResourceUrl
 // @grant             GM.xmlHttpRequest
 // @grant             GM.openInTab

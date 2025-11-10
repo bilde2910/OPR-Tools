@@ -6,8 +6,8 @@ import pluginCss from "rollup-plugin-import-css";
 import pluginExecute from "rollup-plugin-execute";
 import typescript from "typescript";
 
-import pkg from "./package.json" assert { type: "json" };
-import requireJson from "./assets/require.json" assert { type: "json" };
+import pkg from "./package.json" with { type: "json" };
+import requireJson from "./assets/require.json" with { type: "json" };
 
 const globalPkgs = requireJson.reduce((acc, pkg) => {
   acc[pkg.pkgName] = pkg.global;
