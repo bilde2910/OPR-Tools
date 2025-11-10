@@ -76,10 +76,10 @@ const AddonUtils = {
 
 export interface Addon<T> {
   id: string,
-  config: T,
+  defaultConfig: T,
   initialize: (toolbox: typeof AddonUtils, config: AddonSettings<T>) => void,
 }
 
 export const register = <T>(addon: Addon<T>) => {
-  addon.initialize(AddonUtils, new AddonSettings(addon.id, addon.config));
+  addon.initialize(AddonUtils, new AddonSettings(addon.id, addon.defaultConfig));
 };

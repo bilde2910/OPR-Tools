@@ -30,7 +30,7 @@ const GRIDS = <DrawnS2Grid[]>[
 export default () => {
   register({
     id: "nomination-map",
-    config: {
+    defaultConfig: {
       loadFirst: true,
     },
     initialize: (toolbox, config) => {
