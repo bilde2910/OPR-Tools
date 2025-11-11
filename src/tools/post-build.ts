@@ -90,6 +90,7 @@ const ringBell = Boolean(env.RING_BELL && (env.RING_BELL.length > 0 && env.RING_
 
 (async () => {
   const buildNbr = await getLastCommitSha();
+  const buildVer = await getVersion();
 
   const resourcesDirectives = await getResourceDirectives(buildNbr);
   const requireDirectives = await getRequireDirectives();
@@ -98,7 +99,7 @@ const ringBell = Boolean(env.RING_BELL && (env.RING_BELL.length > 0 && env.RING_
 // ==UserScript==
 // @name              ${pkg.userscriptName}
 // @namespace         ${pkg.homepage}
-// @version           ${pkg.version}
+// @version           ${buildVer}
 // @description       ${pkg.description}
 // @homepageURL       ${pkg.homepage}#readme
 // @supportURL        ${pkg.bugs.url}
@@ -223,6 +224,18 @@ function getLastCommitSha() {
     exec("git rev-parse --short HEAD", (err, stdout, stderr) => {
       if(err) {
         console.error("\x1b[31mError while checking for last Git commit. Do you have Git installed?\x1b[0m\n", stderr);
+        return rej(err);
+      }
+      return res(String(stdout).replace(/\r?\n/gm, "").trim());
+    });
+  });
+}
+
+function getVersion() {
+  return new Promise<string>((res, rej) => {
+    exec("git describe --long --tags | sed 's/^v//;s/\\([^-]*-g\\)/r\\1/;s/-/./g'", (err, stdout, stderr) => {
+      if(err) {
+        console.error("\x1b[31mError while checking for last Git tag. Do you have Git installed?\x1b[0m\n", stderr);
         return rej(err);
       }
       return res(String(stdout).replace(/\r?\n/gm, "").trim());

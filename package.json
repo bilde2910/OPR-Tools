@@ -1,7 +1,7 @@
 {
   "name": "opr-tools",
   "userscriptName": "OPR Tools",
-  "version": "0.1.0",
+  "version": "0.0.0-dev",
   "description": "Unofficial addons that add extra quality of life features to Niantic Spatial's project OPR.",
   "main": "index.js",
   "type": "module",
