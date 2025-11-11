@@ -39,12 +39,12 @@ jobs:
     - name: List files
       run: ls -laR dist
     - name: Create SSH key
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
       run: |
         mkdir -p ~/.ssh/
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
         echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
         chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
-        ls -laR ~/.ssh
-        cat ~/.ssh/known_hosts
-        env | grep -v SSH_PRIVATE_KEY
         scp dist/* gha-oprtools@varden.info:dist/
