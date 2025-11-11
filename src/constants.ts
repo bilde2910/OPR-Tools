@@ -10,13 +10,14 @@ export const branch = (branchRaw.match(/^#{{.+}}$/) ? "main" : branchRaw) as "ma
 /** Path to the GitHub repo in the format "User/Repo" */
 export const repo = "bilde2910/OPR-Tools";
 /** Which host the userscript was installed from */
-export const host = (hostRaw.match(/^#{{.+}}$/) ? "github" : hostRaw) as "github" | "dev";
+export const host = (hostRaw.match(/^#{{.+}}$/) ? "github" : hostRaw) as "github" | "varden" | "dev";
 /** The build number of the userscript */
 export const buildNumber = (buildNumberRaw.match(/^#{{.+}}$/) ? "BUILD_ERROR!" : buildNumberRaw) as string; // asserted as generic string instead of literal
 
 /** Names of platforms by value of {@linkcode host} */
 export const platformNames: Record<typeof host, string> = {
   github: "GitHub",
+  varden: "Varden server",
   dev: "Local development",
 };
 

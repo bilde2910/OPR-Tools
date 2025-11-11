@@ -2,8 +2,8 @@
 export type RollupArgs = Partial<{
   "config-mode": "development" | "production";
   "config-branch": "main";
-  "config-host": "dev" | "github";
-  "config-assetSource": "local" | "github";
+  "config-host": "dev" | "github" | "varden";
+  "config-assetSource": "local" | "github" | "varden";
   "config-suffix": string;
 }>;
 

@@ -21,7 +21,7 @@ const outputFile = getOutputFileName();
 
 /** @param {string} [suffix] */
 function getOutputFileName(suffix) {
-  return `${pkg.userscriptName}${suffix ?? ""}.user.js`;
+  return `${pkg.name}${suffix ?? ""}.user.js`;
 }
 
 export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async () => {

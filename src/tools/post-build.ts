@@ -15,7 +15,7 @@ const mode = getCliArg<CliArg<"config-mode">>("mode", "development");
 /** The branch on GitHub to use for various URLs */
 const branch = getCliArg<CliArg<"config-branch">>("branch", (mode === "production" ? "main" : "develop"));
 /** Where the userscript will be hosted */
-const host = getCliArg<CliArg<"config-host">>("host", "github");
+const host = getCliArg<CliArg<"config-host">>("host", "dev");
 /** Optional prefix to add between the script name and the file extension */
 const suffix = getCliArg<CliArg<"config-suffix">>("suffix", "");
 
@@ -24,18 +24,23 @@ const suffix = getCliArg<CliArg<"config-suffix">>("suffix", "");
 /** Path to the GitHub repo in the format "User/Repo" */
 const repo = "bilde2910/OPR-Tools";
 /** Name of the emitted userscript file */
-const userscriptDistFile = `${pkg.userscriptName}${suffix}.user.js`;
+const userscriptDistFile = `${pkg.name}${suffix}.user.js`;
+const userscriptMetaFile = `${pkg.name}${suffix}.meta.js`;
 
 /** URL that links directly to the file to update the userscript from */
 const scriptUrl = (() => {
   switch(host) {
   case "github":
     return `https://raw.githubusercontent.com/${repo}/${branch}/dist/${userscriptDistFile}`;
+  case "varden":
+    return `https://static.varden.info/opr-tools/dist/${userscriptDistFile}`;
   case "dev":
   default:
-    return "http://localhost:8710/OPR%20Tools.user.js";
+    return `http://localhost:8710/${userscriptDistFile}`;
   }
 })();
+
+const metaUrl = scriptUrl.substring(0, scriptUrl.length - 8) + ".meta.js";
 
 /** Directives that are only added in dev mode */
 const devDirectives = mode === "development" ? `\
@@ -104,9 +109,7 @@ const ringBell = Boolean(env.RING_BELL && (env.RING_BELL.length > 0 && env.RING_
 // @match             https://opr.ingress.com/*
 // @run-at            document-start
 // @downloadURL       ${scriptUrl}
-// @updateURL         ${scriptUrl}
-// @connect           github.com
-// @connect           raw.githubusercontent.com
+// @updateURL         ${metaUrl}
 // @grant             GM.getResourceUrl
 // @grant             GM.xmlHttpRequest
 // @grant             GM.openInTab
@@ -121,6 +124,7 @@ ${devDirectives ? "\n" + devDirectives : ""}
     const rootPath = join(dirname(fileURLToPath(import.meta.url)), "../../");
 
     const scriptPath = join(rootPath, distFolderPath, userscriptDistFile);
+    const metaPath = join(rootPath, distFolderPath, userscriptMetaFile);
     const globalStylePath = join(rootPath, distFolderPath, "global.css");
     let globalStyle = await exists(globalStylePath) ? String(await readFile(globalStylePath)) : undefined;
     if(mode === "production")
@@ -151,6 +155,7 @@ ${devDirectives ? "\n" + devDirectives : ""}
     const finalUserscript = `${header}\n${userscript}${userscript.endsWith("\n") ? "" : "\n"}`;
 
     await writeFile(scriptPath, finalUserscript);
+    await writeFile(metaPath, header);
 
     const envText = `${mode === "production" ? "\x1b[32m" : "\x1b[33m"}${mode}`;
     const sizeKiB = Number((Buffer.byteLength(finalUserscript, "utf8") / 1024).toFixed(2));
