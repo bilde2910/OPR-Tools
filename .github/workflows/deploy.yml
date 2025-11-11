@@ -28,6 +28,7 @@ jobs:
         overwrite: true
 
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     steps:
     - name: Download build artifacts
@@ -43,4 +44,4 @@ jobs:
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
         echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
-        scp -i gha-oprtools dist/* gha-oprtools@varden.info:dist/
+        scp dist/* gha-oprtools@varden.info:dist/
