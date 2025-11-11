@@ -21,29 +21,10 @@ import { awaitElement, debounce } from "src/utils";
 import { Contribution, ContributionStatus, SubmissionsResult } from "src/types";
 
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
-import S2 from "s2-geometry";
 
 import "./nomination-map.css";
 
-interface DrawnS2Grid {
-  level: number,
-  color: string,
-  thickness?: number,
-  opacity?: number,
-}
-
 const CTRLESS_ZOOM = true;
-const GRIDS = <DrawnS2Grid[]>[
-  {
-    level: 14,
-    color: "red",
-    thickness: 2,
-  },
-  {
-    level: 17,
-    color: "green",
-  }
-];
 
 export default () => {
   register({
@@ -241,8 +222,6 @@ export default () => {
           toolbox.log("Resetting bounds");
           nominationMap.fitBounds(bounds);
         }
-
-        addS2Overlay(nominationMap, GRIDS);
       };
 
       const getIconUrl = (nomination: Contribution) => {
@@ -256,109 +235,6 @@ export default () => {
           [ContributionStatus.REJECTED]: "red",
         };
         return `https://maps.google.com/mapfiles/ms/icons/${colorMap[nomination.status] || "blue"}.png`;
-      };
-
-      class S2Overlay {
-        polyLines: google.maps.Polyline[];
-
-        constructor() {
-          this.polyLines = [];
-        }
-
-        checkMapBoundsReady(map: google.maps.Map) {
-          return !!map && typeof map.getBounds !== "undefined" && typeof map.getBounds() !== "undefined";
-        }
-
-        until(cond: (map: google.maps.Map) => boolean, map: google.maps.Map) {
-          const poll = (resolve: (value: unknown) => void, reject: (reason?: any) => void) => {
-            if (cond(map)) resolve(map);
-            else setTimeout(() => poll(resolve, reject), 400);
-          };
-          return new Promise(poll);
-        }
-
-        updateGrid(map: google.maps.Map, grids: DrawnS2Grid[]) {
-          this.polyLines.forEach((line) => line.setMap(null));
-          return grids.map((grid) => this.drawCellGrid(map, grid));
-        }
-
-        async drawCellGrid(map: google.maps.Map, grid: DrawnS2Grid) {
-          await this.until(this.checkMapBoundsReady, map);
-          const bounds = map.getBounds();
-          if (typeof bounds === "undefined") return;
-          const zoom = map.getZoom();
-          const seenCells = [];
-          const cellsToDraw = [];
-
-
-          if (grid.level >= 2 && typeof zoom !== "undefined" && grid.level < (zoom + 2)) {
-            const ll = map.getCenter();
-            if (typeof ll === "undefined") return;
-            const cell = S2.S2Cell.FromLatLng(this.getLatLngPoint(ll), grid.level);
-            cellsToDraw.push(cell);
-            seenCells[cell.toString()] = true;
-
-            let curCell;
-            while (cellsToDraw.length > 0) {
-              curCell = cellsToDraw.pop();
-              const neighbors: S2.S2Cell[] = curCell.getNeighbors();
-
-              for (let n = 0; n < neighbors.length; n++) {
-                const nStr = neighbors[n].toString();
-                if (!seenCells[nStr]) {
-                  seenCells[nStr] = true;
-                  if (this.isCellOnScreen(bounds, neighbors[n])) {
-                    cellsToDraw.push(neighbors[n]);
-                  }
-                }
-              }
-
-              this.drawCell(map, curCell, grid);
-            }
-          }
-        }
-
-        drawCell(map: google.maps.Map, cell: S2.S2Cell, style: DrawnS2Grid) {
-          const cellCorners = cell.getCornerLatLngs();
-          cellCorners[4] = cellCorners[0]; // Loop it
-          const polyline = new google.maps.Polyline({
-            path: cellCorners,
-            geodesic: true,
-            strokeColor: style.color,
-            strokeOpacity: style.opacity ?? 1,
-            strokeWeight: style.thickness ?? 1,
-            map: map,
-          });
-          this.polyLines.push(polyline);
-        }
-
-        getLatLngPoint(data: { lat: number | (() => number), lng: number | (() => number) }) {
-          return {
-            lat: typeof data.lat == "function" ? data.lat() : data.lat,
-            lng: typeof data.lng == "function" ? data.lng() : data.lng,
-          };
-        }
-
-        isCellOnScreen(mapBounds: google.maps.LatLngBounds, cell: S2.S2Cell) {
-          const corners = cell.getCornerLatLngs();
-          for (let i = 0; i < corners.length; i++) {
-            if (mapBounds.intersects(new google.maps.LatLngBounds(corners[i]))) {
-              return true;
-            }
-          }
-          return false;
-        }
-      }
-
-      const addS2Overlay = (map: google.maps.Map, grids: DrawnS2Grid[]) => {
-        const overlay = new S2Overlay();
-        grids.sort((a, b) => b.level - a.level);
-        for (const grid of grids) {
-          overlay.drawCellGrid(map, grid);
-        }
-        map.addListener("idle", () => {
-          overlay.updateGrid(map, grids);
-        });
       };
 
       toolbox.interceptJson("GET", "/api/v1/vault/manage", parseContributions);

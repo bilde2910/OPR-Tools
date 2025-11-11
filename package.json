@@ -60,8 +60,7 @@
   },
   "dependencies": {
     "@googlemaps/markerclusterer": "^2.6.2",
-    "@types/google.maps": "^3.58.1",
-    "s2-geometry": "^1.2.10"
+    "@types/google.maps": "^3.58.1"
   },
   "nodemonConfig": {
     "watch": [
