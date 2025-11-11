@@ -56,6 +56,20 @@ export interface UserProperties {
   autoScroll: boolean,
 }
 
+export interface UserSettings {
+  hometownLatLng: string,
+  bonusLatLng: string,
+  bonusCanChange: boolean,
+  nextBonusChangeTimeMs: number,
+  hometownCanChange: boolean,
+  language: string,
+  autoScroll: boolean,
+  darkMode: string,
+  attribution: boolean,
+  campaign: boolean,
+  autoUpgrade: boolean,
+}
+
 export enum ContributionType {
   NOMINATION = "NOMINATION",
   EDIT_LOCATION = "EDIT_LOCATION",

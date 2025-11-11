@@ -1,0 +1,59 @@
+.oprtcore-checkbox {
+  display: grid;
+  grid-template-columns: 1em auto;
+  gap: 0.5em;
+  line-height: 1.1;
+  margin-bottom: 0.5em;
+  cursor: pointer;
+}
+
+.oprtcore-checkbox input[type="checkbox"] {
+  appearance: none;
+  font: inherit;
+  color: currentColor;
+  width: 1.15em;
+  height: 1.15em;
+  border: 0.15em solid currentColor;
+  border-radius: 0.15em;
+  display: grid;
+  place-content: center;
+  /*transform: translateY(-0.075em);*/
+}
+
+.oprtcore-checkbox input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em rgb(255, 109, 56);
+}
+
+.oprtcore-checkbox input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.oprtcore-checkbox input[type="checkbox"]:disabled::before {
+  box-shadow: inset 1em 1em hsl(16, 0%, 61%);
+}
+
+.oprtcore-plugin {
+  margin-bottom: 1em;
+}
+
+.oprtcore-plugin-title {
+  font-weight: bold;
+}
+
+.oprtcore-authors {
+  font-size: 0.8em;
+}
+
+.oprtcore-description {
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.oprtcore-refresh-reminder {
+  margin-bottom: 1em;
+}

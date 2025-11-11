@@ -87,6 +87,15 @@ export function debounce(callback: () => any, wait: number) {
   };
 }
 
+export const makeChildNode = (parent: Element, tagName: string, content?: string) => {
+  const e = document.createElement(tagName);
+  if (typeof content !== "undefined") {
+    e.textContent = content;
+  }
+  parent.appendChild(e);
+  return e;
+};
+
 //#region Storage utils
 
 // https://github.com/bryc/code/blob/master/jshash/experimental/cyrb53.js

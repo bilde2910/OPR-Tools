@@ -1,7 +1,12 @@
 import { ApiResult, UserProperties } from "./types";
 import { cyrb53 } from "./utils";
 
+const CORE_ADDON_ID = "opr-tools-core";
+
 let userHash = 0;
+const addons = <Addon<any>[]>[];
+let initialized = false;
+
 export const initializeUserHash = () => new Promise((resolve: (v: number) => void, reject) => {
   if (userHash !== 0) {
     reject("Cannot reconfigure user hash");
@@ -70,16 +75,58 @@ function interceptJson<T>(method: string, url: string, callback: (obj: T) => any
   intercept(method, url, handle);
 }
 
-const AddonUtils = {
-  intercept, interceptJson
-};
+const listAvailableAddons = () => addons.map((a: Addon<any>): SanitizedAddon => {
+  const copy: any = {...a};
+  delete copy.defaultConfig;
+  delete copy.initialize;
+  return copy;
+});
 
-export interface Addon<T> {
+export interface SanitizedAddon {
   id: string,
-  defaultConfig: T,
-  initialize: (toolbox: typeof AddonUtils, config: AddonSettings<T>) => void,
+  name: string,
+  authors: string[],
+  description: string,
+  url?: string,
 }
 
-export const register = <T>(addon: Addon<T>) => {
-  addon.initialize(AddonUtils, new AddonSettings(addon.id, addon.defaultConfig));
+interface AddonToolbox {
+  intercept: typeof intercept,
+  interceptJson: typeof interceptJson,
+  listAvailableAddons: typeof listAvailableAddons,
+  log: (...data: any) => void,
+}
+
+export interface Addon<T> extends SanitizedAddon {
+  defaultConfig: T,
+  initialize: (toolbox: AddonToolbox, config: AddonSettings<T>) => void,
+}
+
+export const register = <T>(addon: Addon<T>) => addons.push(addon);
+export const initializeAllAddons = () => {
+  if (initialized) {
+    throw new Error("Addons have already been initialized!");
+  }
+  initialized = true;
+  const coreSettings = new AddonSettings(CORE_ADDON_ID, { 
+    activePlugins: <string[]>[],
+  });
+  const toInitialize = [
+    CORE_ADDON_ID,
+    ...coreSettings.get("activePlugins").filter(n => n !== CORE_ADDON_ID),
+  ];
+  console.log(toInitialize);
+  for (const addon of addons) {
+    if (toInitialize.includes(addon.id)) {
+      const AddonUtils = {
+        intercept,
+        interceptJson,
+        listAvailableAddons,
+        log: (...data: any) => console.log(`OPR-Tools[${addon.id}]:`, ...data),
+      };
+      console.log(`Initializing addon ${addon.id}...`);
+      addon.initialize(AddonUtils, new AddonSettings(addon.id, addon.defaultConfig));
+    }
+  }
+  console.log("Addon initialization done.");
 };
