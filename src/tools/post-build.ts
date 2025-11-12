@@ -119,7 +119,7 @@ ${resourcesDirectives ? "\n" + resourcesDirectives : ""}\
 ${requireDirectives ? "\n" + requireDirectives : ""}\
 ${devDirectives ? "\n" + devDirectives : ""}
 // ==/UserScript==
-`;
+`.split("\n").join("\r\n");
 
   try {
     const rootPath = join(dirname(fileURLToPath(import.meta.url)), "../../");
