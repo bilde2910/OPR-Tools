@@ -16,7 +16,7 @@
 // <https://github.com/tehstone/wayfarer-addons/blob/main/LICENSE>
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { register } from "src/core";
+import { CheckboxEditor, register } from "src/core";
 import { awaitElement, debounce } from "src/utils";
 import { Contribution, ContributionStatus, SubmissionsResult } from "src/types";
 
@@ -36,6 +36,11 @@ export default () => {
       loadFirst: true,
     },
     initialize: (toolbox, config) => {
+      config.setUserEditable("loadFirst", {
+        label: "Load first wayspot detail automatically",
+        editor: new CheckboxEditor()
+      });
+
       let countText: HTMLElement | null = null;
       let nominationCluster: MarkerClusterer | null = null;
       let nominationMarkers: google.maps.Marker[] = [];
@@ -45,7 +50,6 @@ export default () => {
       const parseContributions = (data: SubmissionsResult) => {
         if (!data.submissions) return;
         nominations = data.submissions;
-        addLoadSetting();
         addCounter();
         initPrimaryListener();
         initNominationMap();
@@ -85,30 +89,6 @@ export default () => {
               setTimeout(updateMapFilter, 250);
             });
           }
-        });
-      };
-
-      const addLoadSetting = async () => {
-        const insDiv = await awaitElement(() => document.querySelector(".mt-2"));
-        const loadFirstChkbox = document.createElement("input");
-        loadFirstChkbox.setAttribute("type", "checkbox");
-
-        loadFirstChkbox.id = "oprnm-wayfarernmloadfirstchkbox";
-
-        const loadFirstChkboxLabel = document.createElement("label");
-        loadFirstChkboxLabel.innerText = "Load first wayspot detail automatically:";
-        loadFirstChkboxLabel.setAttribute("for", "oprnm-wayfarernmloadfirstchkbox");
-
-        insDiv.insertBefore(loadFirstChkbox, insDiv.children[0]);
-        insDiv.insertBefore(loadFirstChkboxLabel, insDiv.children[0]);
-        insDiv.insertBefore(document.createElement("br"), insDiv.children[0]);
-
-        const loadFirst = config.get("loadFirst");
-        if (loadFirst) loadFirstChkbox.checked = true;
-
-        loadFirstChkbox.addEventListener("click", (e: any) => {
-          const val: boolean = e.target!.checked;
-          config.set("loadFirst", val);
         });
       };
       
@@ -237,7 +217,7 @@ export default () => {
         return `https://maps.google.com/mapfiles/ms/icons/${colorMap[nomination.status] || "blue"}.png`;
       };
 
-      toolbox.interceptJson("GET", "/api/v1/vault/manage", parseContributions);
+      toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", parseContributions);
     },
   });
 };

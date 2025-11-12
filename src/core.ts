@@ -1,5 +1,5 @@
 import { ApiResult, UserProperties } from "./types";
-import { cyrb53 } from "./utils";
+import { awaitElement, cyrb53, makeChildNode } from "./utils";
 
 const CORE_ADDON_ID = "opr-tools-core";
 
@@ -11,25 +11,74 @@ export const initializeUserHash = () => new Promise((resolve: (v: number) => voi
   if (userHash !== 0) {
     reject("Cannot reconfigure user hash");
   } else {
-    interceptJson("GET", "/api/v1/vault/properties", (props: UserProperties) => {
+    const dummyAddon: any = {};
+    const toolbox = new AddonToolbox(dummyAddon);
+    toolbox.interceptOpenJson("GET", "/api/v1/vault/properties", (props: UserProperties) => {
       userHash = props.socialProfile?.email ? cyrb53(props.socialProfile.email) : 0;
       resolve(userHash);
     });
   }
 });
 
-class AddonSettings<T> {
-  key: string;
-  defaults: T;
+interface OptionMetadata {
+  label: string,
+  help?: string,
+}
 
-  constructor(key: string, defaults: T) {
+interface RendererOptions<T> extends OptionMetadata {
+  value: T,
+  parent: HTMLElement,
+  save: (v: T) => void,
+}
+
+interface OptionEditor<T> {
+  render: (opts: RendererOptions<T>) => void,
+}
+
+export class CheckboxEditor implements OptionEditor<boolean> {
+  render(opts: RendererOptions<boolean>) {
+    const label = makeChildNode(opts.parent, "label");
+    const checkbox = makeChildNode(label, "input");
+    checkbox.setAttribute("type", "checkbox");
+    if (opts.value) checkbox.setAttribute("checked", "checked");
+    checkbox.addEventListener("change", () => {
+      opts.save(!!checkbox.checked);
+    });
+    makeChildNode(label, "span", ` ${opts.label} `);
+  }
+}
+
+interface UserEditableOption<T> extends OptionMetadata {
+  editor: OptionEditor<T>,
+}
+
+interface InternalEditableOption<T, Ti> extends UserEditableOption<Ti> {
+  iface: AddonSettings<T>,
+}
+
+type SetUserEditableCallable<T> = <Tk extends keyof T>(
+  key: Tk,
+  options: InternalEditableOption<T, T[Tk]>,
+) => void
+
+class AddonSettings<T> {
+  private key: string;
+  private defaults: T;
+  addEditor: SetUserEditableCallable<T>;
+
+  constructor(
+    key: string,
+    defaults: T,
+    addEditor: SetUserEditableCallable<T>
+  ) {
     this.key = key;
     this.defaults = defaults;
+    this.addEditor = addEditor;
   }
 
-  get(key: keyof T): T extends { [key]: infer V } ? V : never {
+  get<Tk extends keyof T>(key: Tk): T[Tk] {
     const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
-    const props = JSON.parse(data)[this.key] ?? {};
+    const props: T = JSON.parse(data)[this.key] ?? {};
     if (Object.prototype.hasOwnProperty.call(props, key)) {
       return props[key];
     } else {
@@ -37,7 +86,7 @@ class AddonSettings<T> {
     }
   }
 
-  set(key: keyof T, value: T extends { [key]: infer V } ? V : never) {
+  set<Tk extends keyof T>(key: Tk, value: T[Tk]) {
     const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
     const props = JSON.parse(data);
     if (!Object.prototype.hasOwnProperty.call(props, this.key)) {
@@ -47,39 +96,48 @@ class AddonSettings<T> {
     const nData = JSON.stringify(props);
     localStorage.setItem(`opr-tools-settings-${userHash}`, nData);
   }
-}
 
-function intercept(method: string, url: string, callback: (e: Event) => any) {
-  (function (open) {
-    XMLHttpRequest.prototype.open = function (m, u) {
-      if (u === url && m == method) {
-        this.addEventListener("load", callback, false);
-      }
-      open.apply(this, arguments);
-    };
-  })(XMLHttpRequest.prototype.open);
-}
-
-function interceptJson<T>(method: string, url: string, callback: (obj: T) => any) {
-  function handle(_: Event) {
-    try {
-      const resp = this.response;
-      const json: ApiResult<T> = JSON.parse(resp);
-      if (!json) return;
-      if (json.captcha) return;
-      callback(json.result);
-    } catch (e) {
-      console.error(e);
-    }
+  setUserEditable<Tk extends keyof T>(key: Tk, options: UserEditableOption<T[Tk]>) {
+    this.addEditor(key, {...options, iface: this });
   }
-  intercept(method, url, handle);
 }
 
-const listAvailableAddons = () => addons.map((a: Addon<any>): SanitizedAddon => {
-  const copy: any = {...a};
-  delete copy.defaultConfig;
-  delete copy.initialize;
-  return copy;
+/**
+ * Opens an IDB database connection.
+ * IT IS YOUR RESPONSIBILITY TO CLOSE THE RETURNED DATABASE CONNECTION WHEN YOU ARE DONE WITH IT.
+ * THIS FUNCTION DOES NOT DO THIS FOR YOU - YOU HAVE TO CALL db.close()!
+ * @param objectStoreName The name of the object store to open
+ * @param version 
+ * @returns 
+ */
+const getIDBInstance = (objectStoreName: string, version?: number) => new Promise((resolve: (db: IDBDatabase) => void, reject) => {
+  "use strict";
+
+  if (!window.indexedDB) {
+    reject("This browser doesn't support IndexedDB!");
+    return;
+  }
+
+  const openRequest = indexedDB.open(`opr-tools-${userHash}`, version);
+  openRequest.onsuccess = (event: any) => {
+    const db = event.target!.result;
+    const dbVer = db.version;
+    console.log(`IndexedDB initialization complete (database version ${dbVer}).`);
+    if (!db.objectStoreNames.contains(objectStoreName)) {
+      db.close();
+      console.log(`Database does not contain column ${objectStoreName}. Closing and incrementing version.`);
+      getIDBInstance(dbVer + 1).then(resolve);
+    } else {
+      resolve(db);
+    }
+  };
+  openRequest.onupgradeneeded = (event: any) => {
+    console.log("Upgrading database...");
+    const db = event.target!.result;
+    if (!db.objectStoreNames.contains(objectStoreName)) {
+      db.createObjectStore(objectStoreName, { keyPath: "id" });
+    }
+  };
 });
 
 export interface SanitizedAddon {
@@ -90,16 +148,103 @@ export interface SanitizedAddon {
   url?: string,
 }
 
-interface AddonToolbox {
-  intercept: typeof intercept,
-  interceptJson: typeof interceptJson,
-  listAvailableAddons: typeof listAvailableAddons,
-  log: (...data: any) => void,
+class AddonToolbox<T> {
+  private addon: Addon<T>;
+  constructor(addon: Addon<T>) {
+    this.addon = addon;
+  }
+
+  public interceptOpen(method: string, url: string, callback: (e: Event) => void) {
+    (function (open) {
+      XMLHttpRequest.prototype.open = function (m, u) {
+        if (u === url && m == method) {
+          this.addEventListener("load", callback, false);
+        }
+        open.apply(this, arguments);
+      };
+    })(XMLHttpRequest.prototype.open);
+  }
+
+  public interceptOpenJson<Tr>(method: string, url: string, callback: (obj: Tr) => void) {
+    function handle(_event: Event) {
+      try {
+        const resp = this.response;
+        const json: ApiResult<Tr> = JSON.parse(resp);
+        if (!json) return;
+        if (json.captcha) return;
+        callback(json.result);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    this.interceptOpen(method, url, handle);
+  }
+
+  public interceptSend(url: string, callback: (data: string, request: XMLHttpRequest, response: Event) => void) {
+    (function (send) {
+      XMLHttpRequest.prototype.send = function (body: string) {
+        this.addEventListener("load", function (e: Event) {
+          if (this.responseURL === window.origin + url) {
+            callback(body, this, e);
+          }
+        }, false);
+        send.apply(this, arguments);
+      };
+    })(XMLHttpRequest.prototype.send);
+  }
+
+  public interceptSendJson<Ts, Tr>(url: string, callback: (sent: Ts, received: Tr) => void) {
+    function handle(data: string, request: XMLHttpRequest, _event: Event) {
+      try {
+        const resp = request.response;
+        const jSent: Ts = JSON.parse(data);
+        const jRecv: ApiResult<Tr> = JSON.parse(resp);
+        if (!jRecv) return;
+        if (jRecv.captcha) return;
+        callback(jSent, jRecv.result);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    this.interceptSend(url, handle);
+  }
+
+  public listAvailableAddons() {
+    return addons.map((a: Addon<any>): SanitizedAddon => {
+      const copy: any = {...a};
+      delete copy.defaultConfig;
+      delete copy.initialize;
+      return copy;
+    });
+  }
+
+  public log(...data: any) {
+    console.log(`OPR-Tools[${this.addon.id}]:`, ...data);
+  }
+
+  public get userHash() {
+    return userHash;
+  }
+
+  public async usingIDB(objectStoreName: string) {
+    const scopedOSN = `${this.addon.id}-${objectStoreName}`;
+    const db = await getIDBInstance(scopedOSN);
+    const transaction = (mode: IDBTransactionMode) =>
+      db.transaction([scopedOSN], mode);
+    const getStore = (tx: IDBTransaction) =>
+      tx.objectStore(objectStoreName);
+    return { db, transaction, getStore };
+  }
 }
 
 export interface Addon<T> extends SanitizedAddon {
   defaultConfig: T,
-  initialize: (toolbox: AddonToolbox, config: AddonSettings<T>) => void,
+  initialize: (toolbox: AddonToolbox<T>, config: AddonSettings<T>) => void,
+}
+
+interface AddonOptionsEntry {
+  addon: Addon<any>,
+  options: Record<PropertyKey, InternalEditableOption<any, any>>,
 }
 
 export const register = <T>(addon: Addon<T>) => addons.push(addon);
@@ -108,25 +253,71 @@ export const initializeAllAddons = () => {
     throw new Error("Addons have already been initialized!");
   }
   initialized = true;
-  const coreSettings = new AddonSettings(CORE_ADDON_ID, { 
-    activePlugins: <string[]>[],
-  });
+  const coreSettings = new AddonSettings(
+    CORE_ADDON_ID,
+    { activePlugins: <string[]>[] },
+    () => {},
+  );
   const toInitialize = [
     CORE_ADDON_ID,
     ...coreSettings.get("activePlugins").filter(n => n !== CORE_ADDON_ID),
   ];
-  console.log(toInitialize);
+  console.log("Preparing to initialize addons", toInitialize);
+  const options: Record<string, AddonOptionsEntry> = {};
   for (const addon of addons) {
     if (toInitialize.includes(addon.id)) {
-      const AddonUtils = {
-        intercept,
-        interceptJson,
-        listAvailableAddons,
-        log: (...data: any) => console.log(`OPR-Tools[${addon.id}]:`, ...data),
-      };
       console.log(`Initializing addon ${addon.id}...`);
-      addon.initialize(AddonUtils, new AddonSettings(addon.id, addon.defaultConfig));
+      addon.initialize(
+        new AddonToolbox(addon),
+        new AddonSettings(
+          addon.id,
+          addon.defaultConfig,
+          (key, opts) => {
+            if (!(addon.id in options)) {
+              options[addon.id] = { addon, options: {} };
+            }
+            options[addon.id].options[key] = opts;
+          }
+        )
+      );
     }
   }
+  if (Object.keys(options).length > 0) {
+    console.log("Hooking settings editor...");
+    const dummyAddon: any = {};
+    const toolbox = new AddonToolbox(dummyAddon);
+    toolbox.interceptOpenJson(
+      "GET", "/api/v1/vault/settings",
+      renderEditors(Object.values(options))
+    );
+  }
   console.log("Addon initialization done.");
+};
+
+const renderEditors = (options: AddonOptionsEntry[]) => async () => {
+  const ref = await awaitElement(() => document.querySelector("app-settings"));
+  const box = makeChildNode(ref, "div");
+  box.id = "oprtoolsMainPluginSettingsPane";
+  const header = makeChildNode(box, "h3", "Plugin Settings");
+  header.classList.add("wf-page-header");
+
+  for (const entry of options) {
+    const entryBox = makeChildNode(box, "div");
+    entryBox.classList.add("settings__item");
+    entryBox.classList.add("settings-item");
+    const entryHeader = makeChildNode(entryBox, "div");
+    entryHeader.classList.add("settings-item__header");
+    makeChildNode(entryHeader, "div", entry.addon.name);
+    const entryBody = makeChildNode(entryBox, "div");
+    entryBody.classList.add("settings-item__description");
+    
+    for (const [key, option] of Object.entries(entry.options)) {
+      option.editor.render({
+        value: option.iface.get(key),
+        parent: entryBody,
+        save: (v: any) => option.iface.set(key, v),
+        ...option,
+      });
+    }
+  }
 };

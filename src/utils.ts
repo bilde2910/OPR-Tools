@@ -20,33 +20,6 @@ export async function getResourceUrl(name: string) {
   return url;
 }
 
-//#region requests / urls
-
-/**
- * Sends a request with the specified parameters and returns the response as a Promise.  
- * Ignores the CORS policy, contrary to fetch and fetchAdvanced.  
- * ⚠️ Requires the directive `@grant GM.xmlhttpRequest`
- */
-export function sendRequest<T = any>(details: GM.Request<T>) {
-  return new Promise<GM.Response<T>>((resolve, reject) => {
-    GM.xmlHttpRequest({
-      timeout: 10_000,
-      ...details,
-      onload: resolve,
-      onerror: reject,
-      ontimeout: reject,
-      onabort: reject,
-    });
-  });
-}
-
-/**
- * Opens the given URL in a new tab
- */
-export function openInTab(href: string) {
-  window.open(href, "_blank", "noopener noreferrer");
-}
-
 //#region DOM utils
 
 export let domLoaded = document.readyState === "complete" || document.readyState === "interactive";
@@ -109,4 +82,68 @@ export const cyrb53 = function(str: string, seed: number = 0) {
   h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
   h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
   return 4294967296 * (2097151 & h2) + (h1>>>0);
+};
+
+//#region Miscellaneous
+
+/**
+ * Returns an copy of obj containing only the keys specified in the keys array.
+ * @param obj The object to remove entries from
+ * @param keys The keys to keep
+ * @returns 
+ */
+export const filterObject = (obj: Record<string, any>, keys: string[]) => Object
+  .keys(obj)
+  .filter(key => keys.includes(key))
+  .reduce((nObj, key) => {
+    nObj[key] = obj[key]; return nObj;
+  }, <Record<string, any>>{});
+
+export const downloadAsFile = (data: string, type: string, name: string) => {
+  const blob = new Blob([data], { type });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.setAttribute("download", name);
+  anchor.href = url;
+  anchor.setAttribute("target", "_blank");
+  anchor.click();
+  URL.revokeObjectURL(url);
+};
+
+export const readFile = (...accept: string[]) => new Promise((resolve: (v: string | ArrayBuffer | null) => void, reject) => {
+  const input = document.createElement("input");
+  input.type = "file";
+  if (accept.length > 0) {
+    input.accept = accept.join(",");
+  }
+  input.onchange = () => {
+    const reader = new FileReader();
+    reader.onload = function (e2) {
+      resolve(e2.target!.result);
+    };
+    if (input.files !== null) {
+      reader.readAsText(input.files[0]);
+    } else {
+      reject();
+    }
+  };
+  input.click();
+});
+
+export const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+  const toRad = (x: number) => x * Math.PI / 180;
+  const R = 6371; // km
+
+  const x1 = lat2 - lat1;
+  const dLat = toRad(x1);
+  const x2 = lon2 - lon1;
+  const dLon = toRad(x2);
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c;
+
+  // returns in meters
+  return d * 1000;
 };

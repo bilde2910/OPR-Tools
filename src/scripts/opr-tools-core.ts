@@ -17,8 +17,14 @@ export default () => {
     initialize: (toolbox, config) => {
       const renderOprtSettings = async (data: UserSettings) => {
         const ref = await awaitElement(() => document.querySelector("app-settings"));
-        const box = makeChildNode(ref, "div");
-        const header = makeChildNode(box, "h3", "OPR Tools Settings");
+        const box = document.createElement("div");
+        const mainSettings = document.getElementById("oprtoolsMainPluginSettingsPane");
+        if (mainSettings) {
+          ref.insertBefore(box, mainSettings);
+        } else {
+          ref.appendChild(box);
+        }
+        const header = makeChildNode(box, "h3", "OPR Tools");
         header.classList.add("wf-page-header");
         const activeAddonsBox = makeChildNode(box, "div");
         activeAddonsBox.classList.add("settings__item");
@@ -66,7 +72,7 @@ export default () => {
         }
       };
 
-      toolbox.interceptJson("GET", "/api/v1/vault/settings", renderOprtSettings);
+      toolbox.interceptOpenJson("GET", "/api/v1/vault/settings", renderOprtSettings);
     }
   });
 };

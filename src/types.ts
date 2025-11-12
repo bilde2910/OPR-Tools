@@ -19,11 +19,18 @@ export interface ApiResult<T> {
   message: string | null,
   code: string,
   version: string,
-  captcha: false,
+  captcha: boolean,
 }
 
 export interface SubmissionsResult {
   submissions: Contribution[],
+}
+
+interface SocialProfile {
+  email: string,
+  name: string,
+  pictureUrl: string,
+  username: string,
 }
 
 export interface UserProperties {
@@ -44,12 +51,7 @@ export interface UserProperties {
   attribution: boolean,
   nianticIdUrl: string,
   darkMode: string,
-  socialProfile: {
-    email: string,
-    name: string,
-    pictureUrl: string,
-    username: string,
-  },
+  socialProfile: SocialProfile,
   browserClientId: string,
   eligibleToOnboard: boolean,
   onboardingState: string,
@@ -68,6 +70,21 @@ export interface UserSettings {
   attribution: boolean,
   campaign: boolean,
   autoUpgrade: boolean,
+}
+
+export interface Profile {
+  socialProfile: SocialProfile,
+  performance: string,
+  finished: number,
+  accepted: number,
+  rejected: number,
+  duplicated: number,
+  available: number,
+  progress: number,
+  total: number,
+  interval: number,
+  maximum: number,
+  history: never[], // TODO: what is this?
 }
 
 export enum ContributionType {
@@ -118,3 +135,100 @@ export interface Contribution {
   canReleaseHold: boolean,
   poiData: object[],
 }
+
+//#region Incoming reviews
+
+export interface BaseReview {
+  id: string,
+  lat: number,
+  lng: number,
+  expires: number,
+  canSkip: boolean,
+  autoScroll: boolean | null,
+  china: boolean | null,
+  title: string,
+  description: string,
+}
+
+export interface NewReview extends BaseReview {
+  type: "NEW",
+  imageUrl: string,
+  nearbyPortals: {
+    guid: string,
+    title: string,
+    description: string,
+    imageUrl: string,
+    lat: number,
+    lng: number,
+  }[],
+  t1: number,
+  newLocationMaxDistance: number,
+  statement: string,
+  supportingImageUrl: string,
+  streetAddress: string,
+  categoryIds: string[],
+}
+
+export interface EditReview extends BaseReview {
+  type: "EDIT",
+  imageUrl: string,
+  titleEdits: never[], // TODO
+  descriptionEdits: never[], // TODO
+  locationEdits: {
+    value: string,
+    hash: string,
+    lat: string,
+    lng: string,
+  }[],
+}
+
+export interface PhotoReview extends BaseReview {
+  type: "PHOTO",
+  newPhotos: {
+    value: string,
+    hash: string,
+  }
+}
+
+export type AnyReview = NewReview | EditReview | PhotoReview;
+
+//#region Submitted reviews
+
+interface SubmittedReview {
+  id: string,
+}
+
+interface SubmittedNewReview extends SubmittedReview {
+  type: "NEW",
+  quality: number,
+  description: number,
+  cultural: number,
+  uniqueness: number,
+  safety: number,
+  location: number,
+  socialize: number,
+  photo: number,
+  exercise: number,
+  accuracyDontKnowComment: string,
+  reviewerSuggestedCategories: string[],
+}
+
+interface SubmittedEditReview extends SubmittedReview {
+  type: "EDIT",
+  comment: string,
+  descriptionUnable: boolean,
+  selectedDescriptionHash?: string,
+  locationUnable: boolean,
+  selectedLocationHash?: string,
+  titleUnable: boolean,
+  selectedTitleHash?: string,
+}
+
+interface SubmittedPhotoReview extends SubmittedReview {
+  type: "PHOTO",
+  abuseReasons: Record<string, string>, // ID -> reason
+  acceptPhotos: string[],
+  rejectPhotos: string[],
+}
+
+export type AnySubmittedReview = SubmittedNewReview | SubmittedEditReview | SubmittedPhotoReview;

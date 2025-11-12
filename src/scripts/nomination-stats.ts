@@ -30,7 +30,7 @@ export default () => {
     description: "Add extended OPR Profile stats",
     defaultConfig: {},
     initialize: (toolbox, config) => {
-      toolbox.interceptJson("GET", "/api/v1/vault/manage", parseContributions);
+      toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", parseContributions);
     }
   });
 };
