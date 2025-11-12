@@ -22,9 +22,11 @@ https://static.varden.info/opr-tools/dist/opr-tools.user.js
 If you're familiar with the older [Wayfarer Addons](https://github.com/tehstone/wayfarer-addons) this part will be a bit different.
 Installation of the single script linked previously will make all current tools available.
 Individual tools can turned on and off from the [OPR Settings page](https://opr.ingress.com/new/settings):
+
 ![Example Screenshot](https://i.imgur.com/LxYytUU.png)
 
 Settings for all tools can be found there as well:
+
 ![Example Screenshot](https://i.imgur.com/IWmJm72.png)
 
 
