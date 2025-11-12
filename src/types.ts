@@ -12,6 +12,8 @@ export type ScriptConfig = {
   // add data here
 };
 
+export type Resolve<T> = (value: T) => void
+
 //#region Wayfarer types
 
 export interface ApiResult<T> {

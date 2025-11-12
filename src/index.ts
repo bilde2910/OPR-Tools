@@ -6,12 +6,14 @@ import oprToolsCore from "./scripts/opr-tools-core";
 import nominationStats from "./scripts/nomination-stats";
 import nominationMap from "./scripts/nomination-map";
 import reviewHistory from "./scripts/review-history";
+import keyboardReview from "./scripts/keyboard-review";
 
 const availableAddons = [
   oprToolsCore,
   nominationStats,
   nominationMap,
   reviewHistory,
+  keyboardReview,
 ];
 
 /** Runs when the userscript is loaded initially */

@@ -1,22 +1,29 @@
-import { ApiResult, UserProperties } from "./types";
+import { ApiResult, Resolve } from "./types";
 import { awaitElement, cyrb53, makeChildNode } from "./utils";
 
 const CORE_ADDON_ID = "opr-tools-core";
 
 let userHash = 0;
+let language = "en";
+
 const addons = <Addon<any>[]>[];
 let initialized = false;
 
-export const initializeUserHash = () => new Promise((resolve: (v: number) => void, reject) => {
+export const initializeUserHash = () => new Promise((resolve: Resolve<number>, reject) => {
   if (userHash !== 0) {
     reject("Cannot reconfigure user hash");
   } else {
-    const dummyAddon: any = {};
-    const toolbox = new AddonToolbox(dummyAddon);
-    toolbox.interceptOpenJson("GET", "/api/v1/vault/properties", (props: UserProperties) => {
-      userHash = props.socialProfile?.email ? cyrb53(props.socialProfile.email) : 0;
-      resolve(userHash);
+    const req = new XMLHttpRequest();
+    req.open("GET", "/api/v1/vault/properties");
+    req.addEventListener("load", () => {
+      const props = JSON.parse(req.responseText).result;
+      if (req.status >= 200 && req.status < 400) {
+        userHash = props.socialProfile?.email ? cyrb53(props.socialProfile.email) : 0;
+        language = props.language;
+        resolve(userHash);
+      }
     });
+    req.send();
   }
 });
 
@@ -134,7 +141,7 @@ class AddonSettings<T> {
  * @param version 
  * @returns 
  */
-const getIDBInstance = (objectStoreName: string, version?: number) => new Promise((resolve: (db: IDBDatabase) => void, reject) => {
+const getIDBInstance = (objectStoreName: string, version?: number) => new Promise((resolve: Resolve<IDBDatabase>, reject) => {
   "use strict";
 
   if (!window.indexedDB) {
@@ -248,8 +255,22 @@ class AddonToolbox<T> {
     console.log(`OPR-Tools[${this.addon.id}]:`, ...data);
   }
 
+  public warn(...data: any) {
+    console.warn(`OPR-Tools[${this.addon.id}]:`, ...data);
+  }
+
   public get userHash() {
     return userHash;
+  }
+
+  public get l10n(): Record<string, string> {
+    const i18n = JSON.parse(localStorage["@transloco/translations"]);
+    return i18n[language];
+  }
+
+  public i18nPrefixResolver(prefix: string) {
+    const l10n = this.l10n;
+    return (id: string) => l10n[prefix + id];
   }
 
   public async usingIDB(objectStoreName: string) {

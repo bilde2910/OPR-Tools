@@ -30,13 +30,13 @@ const userscriptMetaFile = `${pkg.name}${suffix}.meta.js`;
 /** URL that links directly to the file to update the userscript from */
 const scriptUrl = (() => {
   switch(host) {
-  case "github":
-    return `https://raw.githubusercontent.com/${repo}/${branch}/dist/${userscriptDistFile}`;
-  case "varden":
-    return `https://static.varden.info/opr-tools/dist/${userscriptDistFile}`;
-  case "dev":
-  default:
-    return `http://localhost:8710/${userscriptDistFile}`;
+    case "github":
+      return `https://raw.githubusercontent.com/${repo}/${branch}/dist/${userscriptDistFile}`;
+    case "varden":
+      return `https://static.varden.info/opr-tools/dist/${userscriptDistFile}`;
+    case "dev":
+    default:
+      return `http://localhost:8710/${userscriptDistFile}`;
   }
 })();
 

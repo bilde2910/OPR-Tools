@@ -1,0 +1,68 @@
+.oprkr2-eds-highlighted {
+    border-width: 1px;
+    border-color: #df471c;
+}
+.dark .oprkr2-eds-highlighted {
+    border-color: #20B8E3;
+}
+.oprkr2-eds-btn-key::before, .oprkr2-key-label, .oprkr2-key-span {
+    color: #FF6D38;
+    font-family: monospace;
+    text-transform: none;
+    display: inline-block;
+}
+.oprkr2-key-span-wildcard {
+    color: #20B8E3;
+}
+.oprkr2-eds-btn-key-no-highlight::before {
+    color: black;
+}
+.dark .oprkr2-eds-btn-key-no-highlight::before {
+    color: white;
+}
+.oprkr2-eds-btn-key-pad::before, .oprkr2-key-label {
+    margin-right: 5px;
+}
+.oprkr2-eds-btn-key.is-selected::before, .oprkr2-eds-btn-key.wf-button--primary::before {
+    color: black;
+}
+.oprkr2-eds-thumb-card-btnr {
+    width: 43% !important;
+}
+.oprkr2-eds-thumb-card-tassr {
+    width: 57% !important;
+}
+.oprkr2-photo-card-label {
+    font-size: 1.9em;
+    display: inline-block;
+    padding: 0 0.5em;
+}
+
+$keys:
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J",
+    "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
+    "U", "V", "W", "X", "Y", "Z",
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "Esc", "Tab", "Enter";
+
+@each $k in $keys {
+    .oprkr2-eds-key-bracket-#{$k}::before {
+        content: $k;
+    }
+}
+
+.oprkr2-dupe-key-box {
+    width: 0;
+    z-index: 10;
+}
+.oprkr2-dupe-key-box > div {
+    width: 1.7em;
+    margin: 5px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.3em;
+    border: 1px solid black;
+    pointer-events: none;
+    background: rgba(0,0,0,0.5);
+    color: #FF6D38;
+}

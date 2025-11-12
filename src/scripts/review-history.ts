@@ -18,7 +18,7 @@
 
 import { register, UnixTimestampDateOnlyEditor } from "src/core";
 import { awaitElement, downloadAsFile, filterObject, haversine, makeChildNode, readFile } from "src/utils";
-import { AnyReview, AnySubmittedReview, BaseReview, EditReview, NewReview, PhotoReview } from "src/types";
+import { AnyReview, AnySubmittedReview, BaseReview, EditReview, NewReview, PhotoReview, Resolve } from "src/types";
 
 import "./review-history.css";
 
@@ -43,22 +43,22 @@ export default () => {
         editor: new UnixTimestampDateOnlyEditor(),
       });
 
-      const handleIncomingReview = (review: AnyReview) => new Promise((resolve: (v: void) => void, reject) => {
+      const handleIncomingReview = (review: AnyReview) => new Promise((resolve: Resolve<void>, reject) => {
         toolbox.log("handleIncomingReview");
         let saveColumns = <(
           keyof NewReview | keyof EditReview | keyof PhotoReview
         )[]>[];
         const common = <(keyof BaseReview)[]>["type", "id", "title", "description", "lat", "lng"];
         switch (review.type) {
-        case "NEW":
-          saveColumns = <(keyof NewReview)[]>[...common, "imageUrl", "statement", "supportingImageUrl"];
-          break;
-        case "EDIT":
-          saveColumns = <(keyof EditReview)[]>[...common, "descriptionEdits", "titleEdits", "locationEdits"];
-          break;
-        case "PHOTO":
-          saveColumns = <(keyof PhotoReview)[]>[...common, "newPhotos"];
-          break;
+          case "NEW":
+            saveColumns = <(keyof NewReview)[]>[...common, "imageUrl", "statement", "supportingImageUrl"];
+            break;
+          case "EDIT":
+            saveColumns = <(keyof EditReview)[]>[...common, "descriptionEdits", "titleEdits", "locationEdits"];
+            break;
+          case "PHOTO":
+            saveColumns = <(keyof PhotoReview)[]>[...common, "newPhotos"];
+            break;
         }
         if (saveColumns.length > 0) {
           const saveData = { ...filterObject(review, saveColumns), ts: Date.now(), review: null };
@@ -78,7 +78,7 @@ export default () => {
         }
       });
 
-      const handleSubmittedReview = (review: AnySubmittedReview, result: string) => new Promise((resolve: (v: void) => void, reject) => {
+      const handleSubmittedReview = (review: AnySubmittedReview, result: string) => new Promise((resolve: Resolve<void>, reject) => {
         toolbox.log("handleSubmittedReview");
         if (result === "api.review.post.accepted" && !!review.id) {
           toolbox.usingIDB("history").then(({ db, transaction, getStore }) => {
