@@ -1,5 +1,5 @@
 // Copyright 2025 tehstone, Tntnnbltn, bilde2910
-// This file is part of the Wayfarer Addons collection.
+// This file is part of the OPR Tools collection.
 
 // This script is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

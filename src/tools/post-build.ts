@@ -108,7 +108,6 @@ const ringBell = Boolean(env.RING_BELL && (env.RING_BELL.length > 0 && env.RING_
 // @copyright         ${pkg.author.name} (${pkg.author.url})
 // @icon              ${getResourceUrl("images/logo_48.png", buildNbr)}
 // @match             https://opr.ingress.com/*
-// @run-at            document-start
 // @downloadURL       ${scriptUrl}
 // @updateURL         ${metaUrl}
 // @grant             GM.getResourceUrl

@@ -1,5 +1,5 @@
 // Copyright 2025 tehstone, bilde2910
-// This file is part of the Wayfarer Addons collection.
+// This file is part of the OPR Tools collection.
 
 // This script is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import "./review-history.css";
 export default () => {
   register({
     id: "review-history",
-    name: "OPR Review History",
+    name: "Review History IDB",
     authors: ["tehstone", "bilde2910"],
     description: "Add local review history storage to OPR",
     defaultConfig: {
