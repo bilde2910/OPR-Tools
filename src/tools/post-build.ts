@@ -324,7 +324,7 @@ function getResourceUrl(path: string, buildToken?: string) {
     assetPath = "";
   return assetSource === "local"
     ? `http://localhost:${devServerPort}${assetPath}${path}?b=${buildUuid}`
-    : `https://raw.githubusercontent.com/${repo}/${branch}${assetPath}${path}?b=${buildToken ?? pkg.version}`;
+    : `https://static.varden.info/opr-tools${assetPath}${path}?b=${buildToken ?? pkg.version}`;
 }
 
 /** Returns the value of a CLI argument (in the format `--arg=<value>`) or the value of `defaultVal` if it doesn't exist */

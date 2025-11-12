@@ -45,9 +45,11 @@ jobs:
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
+        SSH_TARGET: ${{ vars.SSH_TARGET }}
       run: |
         mkdir -p ~/.ssh/
         echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
         echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
         chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
-        scp dist/* gha-oprtools@varden.info:dist/
+        scp dist/* "${SSH_TARGET}:dist/"
+        scp assets/* "${SSH_TARGET}:assets/"
