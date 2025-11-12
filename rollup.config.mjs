@@ -63,7 +63,7 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
     output: {
       file: `${outputDir}/${getOutputFileName(suffix)}`,
       format: "iife",
-      sourcemap: mode === "development",
+      sourcemap: false, // mode === "development",
       compact: mode === "development",
       globals: linkedPkgs.length > 0 ? Object.fromEntries(
         Object.entries(globalPkgs).filter(([key]) => !linkedPkgs.some((pkg) => pkg.pkgName === key))
