@@ -23,25 +23,34 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm run build-prod
-    - name: Upload build artifacts
+    - name: Upload scripts
       uses: actions/upload-artifact@v5
       with:
         name: dist
         path: dist/*
+        overwrite: true
+    - name: Upload assets
+      uses: actions/upload-artifact@v5
+      with:
+        name: assets
+        path: assets/*
         overwrite: true
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Download build artifacts
+    - name: Download scripts
       uses: actions/download-artifact@v5
       with:
         name: dist
         path: dist
-    - name: List files
-      run: ls -laR dist
-    - name: Create SSH key
+    - name: Download assets
+      uses: actions/download-artifact@v5
+      with:
+        name: assets
+        path: assets
+    - name: Publish scripts and assets
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         SSH_KNOWN_HOSTS: ${{ vars.SSH_KNOWN_HOSTS }}
