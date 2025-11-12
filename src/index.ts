@@ -5,11 +5,13 @@ import { addStyle, domLoaded } from "./utils";
 import oprToolsCore from "./scripts/opr-tools-core";
 import nominationStats from "./scripts/nomination-stats";
 import nominationMap from "./scripts/nomination-map";
+import reviewHistory from "./scripts/review-history";
 
 const availableAddons = [
   oprToolsCore,
   nominationStats,
   nominationMap,
+  reviewHistory,
 ];
 
 /** Runs when the userscript is loaded initially */

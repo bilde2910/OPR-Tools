@@ -29,7 +29,7 @@ export default () => {
     authors: ["tehstone", "Thtnnbltn", "bilde2910"],
     description: "Add extended OPR Profile stats",
     defaultConfig: {},
-    initialize: (toolbox, config) => {
+    initialize: (toolbox, _config) => {
       toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", parseContributions);
     }
   });

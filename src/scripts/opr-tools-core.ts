@@ -15,7 +15,7 @@ export default () => {
       activePlugins: <string[]>[],
     },
     initialize: (toolbox, config) => {
-      const renderOprtSettings = async (data: UserSettings) => {
+      const renderOprtSettings = async (_data: UserSettings) => {
         const ref = await awaitElement(() => document.querySelector("app-settings"));
         const box = document.createElement("div");
         const mainSettings = document.getElementById("oprtoolsMainPluginSettingsPane");

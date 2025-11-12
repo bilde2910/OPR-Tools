@@ -52,6 +52,7 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": "off",
     "comma-dangle": ["error", "only-multiline"],
     "no-misleading-character-class": "off",
+    "prefer-rest-params": "off",
   },
   overrides: [
     {

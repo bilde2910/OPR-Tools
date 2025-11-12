@@ -38,13 +38,37 @@ interface OptionEditor<T> {
 export class CheckboxEditor implements OptionEditor<boolean> {
   render(opts: RendererOptions<boolean>) {
     const label = makeChildNode(opts.parent, "label");
-    const checkbox = makeChildNode(label, "input");
+    if (opts.help) {
+      label.title = opts.help;
+      label.classList.add("oprtcore-help-available");
+    }
+    const checkbox = document.createElement("input");
+    label.appendChild(checkbox);
     checkbox.setAttribute("type", "checkbox");
     if (opts.value) checkbox.setAttribute("checked", "checked");
     checkbox.addEventListener("change", () => {
       opts.save(!!checkbox.checked);
     });
     makeChildNode(label, "span", ` ${opts.label} `);
+  }
+}
+
+export class UnixTimestampDateOnlyEditor implements OptionEditor<number> {
+  render(opts: RendererOptions<number>) {
+    const label = makeChildNode(opts.parent, "label", `${opts.label}: `);
+    if (opts.help) {
+      label.title = opts.help;
+      label.classList.add("oprtcore-help-available");
+    }
+    const input = document.createElement("input");
+    label.appendChild(input);
+    input.classList.add("oprtcore-fix");
+    input.setAttribute("type", "date");
+    input.value = opts.value ? new Date(opts.value).toISOString().substring(0, 10) : "";
+    input.addEventListener("change", () => {
+      if (input.value === "") opts.save(0);
+      else (opts.save(new Date(input.value).getTime()));
+    });
   }
 }
 
@@ -126,7 +150,7 @@ const getIDBInstance = (objectStoreName: string, version?: number) => new Promis
     if (!db.objectStoreNames.contains(objectStoreName)) {
       db.close();
       console.log(`Database does not contain column ${objectStoreName}. Closing and incrementing version.`);
-      getIDBInstance(dbVer + 1).then(resolve);
+      getIDBInstance(objectStoreName, dbVer + 1).then(resolve);
     } else {
       resolve(db);
     }
@@ -160,7 +184,8 @@ class AddonToolbox<T> {
         if (u === url && m == method) {
           this.addEventListener("load", callback, false);
         }
-        open.apply(this, arguments);
+        const args: any = arguments;
+        open.apply(this, args);
       };
     })(XMLHttpRequest.prototype.open);
   }
@@ -188,7 +213,8 @@ class AddonToolbox<T> {
             callback(body, this, e);
           }
         }, false);
-        send.apply(this, arguments);
+        const args: any = arguments;
+        send.apply(this, args);
       };
     })(XMLHttpRequest.prototype.send);
   }
@@ -232,7 +258,7 @@ class AddonToolbox<T> {
     const transaction = (mode: IDBTransactionMode) =>
       db.transaction([scopedOSN], mode);
     const getStore = (tx: IDBTransaction) =>
-      tx.objectStore(objectStoreName);
+      tx.objectStore(scopedOSN);
     return { db, transaction, getStore };
   }
 }

@@ -1,0 +1,27 @@
+.oprrh-idb {
+  color: #333;
+  padding-top: 0.3em;
+  text-align: center;
+  display: block;
+}
+
+.dark .oprrh-idb {
+  color: #ddd;
+}
+
+.oprrh-idb button {
+  background-color: #e5e5e5;
+  border: none;
+  color: #ff4713;
+  padding: 2px 6px;
+  margin: 3px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+}
+
+.dark .oprrh-idb button {
+  background-color: #404040;
+  color: #20B8E3;
+}

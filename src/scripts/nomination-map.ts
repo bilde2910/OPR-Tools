@@ -137,7 +137,7 @@ export default () => {
         collapsibleContent.classList.add("oprnm-collapsible-content");
 
         const mapElement = document.createElement("div");
-        mapElement.style = "height: 400px;";
+        mapElement.classList.add("oprnm-map");
         mapElement.textContent = "Loading...";
 
         collapsibleContent.appendChild(mapElement);

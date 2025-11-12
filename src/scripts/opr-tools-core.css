@@ -57,3 +57,12 @@
 .oprtcore-refresh-reminder {
   margin-bottom: 1em;
 }
+
+.oprtcore-help-available {
+  cursor: context-menu;
+  text-decoration: underline dotted #7f7f7f;
+}
+
+.dark input.oprtcore-fix {
+  background-color: #333;
+}
