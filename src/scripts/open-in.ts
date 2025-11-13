@@ -17,8 +17,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { awaitElement, insertAfter, makeChildNode, readGeofences } from "src/utils";
-import { AnyReview, Contribution, Showcase, SubmissionsResult, Zone } from "src/types";
+import { awaitElement, insertAfter, iterObject, makeChildNode, readGeofences } from "src/utils";
+import { AnyReview, AnyContribution, Showcase, SubmissionsResult, Zone, ContributionType } from "src/types";
 
 import proj4 from "proj4";
 
@@ -523,7 +523,7 @@ const providers: Provider[] = [
 ];
 
 const registerProjections = () => {
-  for (const [epsg, def] of Object.entries(projections)) {
+  for (const [epsg, def] of iterObject(projections)) {
     proj4.defs(epsg, def);
   }
 };
@@ -557,13 +557,13 @@ const injectShowcase = async (result: Showcase) => {
 
 const injectNominations = async (result: SubmissionsResult) => {
   const ref = await awaitElement(() => document.querySelector("app-submissions-list"));
-  const nomCache = {} as Record<string, Contribution>;
+  const nomCache = {} as Record<string, AnyContribution>;
   let box: HTMLElement | null = null;
 
   for (const contribution of result.submissions) {
     if (contribution.imageUrl.length > 0) {
       nomCache[contribution.imageUrl] = contribution;
-    } else if ("poiData" in contribution.poiData) {
+    } else if (contribution.type !== ContributionType.NOMINATION) {
       nomCache[contribution.poiData.imageUrl] = contribution;
     }
   }
@@ -608,7 +608,7 @@ const addOpenButtons = async (before: Node, portal: HasPOIData) => {
 
   const membership = await getGeofenceMemberships(portal.lat, portal.lng);
   const regionBoxes = {} as Record<string, HTMLElement>;
-  for (const [zone, member] of Object.entries(membership)) {
+  for (const [zone, member] of iterObject(membership)) {
     if (member) {
       const flag = getFlag(zone);
       regionBoxes[flag] = document.createElement("p");
@@ -665,8 +665,8 @@ const addOpenButtons = async (before: Node, portal: HasPOIData) => {
       linkSpan.appendChild(ast);
     }*/
     if (typeof e.regions !== "undefined") {
-      for (const [zone, member] of Object.entries(membership)) {
-        if (member && e.regions.includes(zone as Zone)) {
+      for (const [zone, member] of iterObject(membership)) {
+        if (member && e.regions.includes(zone)) {
           regionBoxes[getFlag(zone)].appendChild(linkSpan);
         }
       }
@@ -701,8 +701,8 @@ const addOpenButtons = async (before: Node, portal: HasPOIData) => {
 const getGeofenceMemberships = async (lat: number, lng: number) => {
   const geofences = await readGeofences();
   const membership = {} as Record<Zone, boolean>;
-  for (const [zone, points] of Object.entries(geofences)) {
-    membership[zone as Zone] = isWithinBounds(points, lat, lng);
+  for (const [zone, points] of iterObject(geofences)) {
+    membership[zone] = isWithinBounds(points, lat, lng);
   }
   return membership;
 };

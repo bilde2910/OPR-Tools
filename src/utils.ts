@@ -180,6 +180,24 @@ export const filterObject = (obj: Record<string, any>, keys: string[]) => Object
     nObj[key] = obj[key]; return nObj;
   }, <Record<string, any>>{});
 
+/**
+ * Type-safe version of Object.entries(). The object must be string-keyed.
+ * @param obj The object to get entries from
+ * @returns An array of pairs of the object's keys and values
+ */
+export const iterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T): [K, T[K]][] => Object
+  .entries(obj)
+  .map(([k, v]) => [k as K, v as T[K]]);
+ 
+/**
+ * Type-safe version of Object.keys(). The object must be string-keyed.
+ * @param obj The object to get keys from
+ * @returns An array of the object's keys
+ */
+export const iterKeys = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T): K[] => Object
+  .keys(obj)
+  .map(k => k as K);
+
 export const downloadAsFile = (data: string, type: string, name: string) => {
   const blob = new Blob([data], { type });
   const url = URL.createObjectURL(blob);

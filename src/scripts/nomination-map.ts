@@ -18,7 +18,7 @@
 
 import { CheckboxEditor, register } from "src/core";
 import { awaitElement, debounce } from "src/utils";
-import { Contribution, ContributionStatus, SubmissionsResult } from "src/types";
+import { AnyContribution, ContributionStatus, SubmissionsResult } from "src/types";
 
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
 
@@ -45,7 +45,7 @@ export default () => {
       let nominationCluster: MarkerClusterer | null = null;
       let nominationMarkers: google.maps.Marker[] = [];
       let nominationMap: google.maps.Map | null = null;
-      let nominations: Contribution[] | null = null;
+      let nominations: AnyContribution[] | null = null;
 
       const parseContributions = (data: SubmissionsResult) => {
         if (!data.submissions) return;
@@ -204,7 +204,7 @@ export default () => {
         }
       };
 
-      const getIconUrl = (nomination: Contribution) => {
+      const getIconUrl = (nomination: AnyContribution) => {
         const colorMap = <Record<ContributionStatus, string>>{
           [ContributionStatus.ACCEPTED]: "green",
           [ContributionStatus.APPEALED]: "purple",

@@ -1,5 +1,5 @@
 import { ApiResult, Requests, Responses } from "./types";
-import { awaitElement, cyrb53, makeChildNode } from "./utils";
+import { awaitElement, cyrb53, iterObject, makeChildNode } from "./utils";
 
 const CORE_ADDON_ID = "opr-tools-core";
 
@@ -407,7 +407,7 @@ const renderEditors = (options: AddonOptionsEntry[]) => async () => {
     const entryBody = makeChildNode(entryBox, "div");
     entryBody.classList.add("settings-item__description");
     
-    for (const [key, option] of Object.entries(entry.options)) {
+    for (const [key, option] of iterObject(entry.options)) {
       const lineItem = makeChildNode(entryBody, "div");
       lineItem.classList.add("oprtcore-option-line");
 

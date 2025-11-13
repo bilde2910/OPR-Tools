@@ -61,10 +61,11 @@ type DarkMode = "ENABLED" | "DISABLED" | "AUTOMATIC";
 export interface SaveSettings {
   darkMode?: DarkMode,
   autoScroll?: false,
+  // TODO: Add more
 }
 
 export interface SubmissionsResult {
-  submissions: Contribution[],
+  submissions: AnyContribution[],
 }
 
 export interface ShowcasedPortal {
@@ -165,6 +166,12 @@ export enum ContributionType {
   PHOTO = "PHOTO",
 }
 
+type EditContributionType =
+  ContributionType.EDIT_TITLE |
+  ContributionType.EDIT_DESCRIPTION |
+  ContributionType.EDIT_LOCATION |
+  ContributionType.PHOTO
+
 export enum ContributionStatus {
   ACCEPTED = "ACCEPTED",
   APPEALED = "APPEALED",
@@ -177,7 +184,7 @@ export enum ContributionStatus {
   WITHDRAWN = "WITHDRAWN",
 }
 
-export interface Contribution {
+interface Contribution {
   id: string,
   type: ContributionType,
   title: string,
@@ -195,7 +202,9 @@ export interface Contribution {
   isNianticControlled: boolean,
   statement: string,
   supportingImageUrl: string,
-  rejectReasons: string[],
+  rejectReasons: {
+    reason: string,
+  }[],
   canAppeal: boolean,
   appealResolved: boolean,
   isClosed: boolean,
@@ -203,11 +212,29 @@ export interface Contribution {
   userAppealNotes: string,
   canHold: boolean,
   canReleaseHold: boolean,
-  poiData: {
-    imageUrl: string,
-    // TODO: More?
-  },
 }
+
+export interface EditContribution extends Contribution {
+  type: EditContributionType
+  poiData: {
+    id: string,
+    imageUrl: string,
+    title: string,
+    description: string,
+    lat: number,
+    lng: number,
+    city: string,
+    state: string, // TODO: enum?
+    lastUpdateDate: string,
+  }
+}
+
+export interface Nomination extends Contribution {
+  type: ContributionType.NOMINATION,
+  poiData: never[],
+}
+
+export type AnyContribution = EditContribution | Nomination
 
 //#region Incoming reviews
 
