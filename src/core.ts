@@ -1,4 +1,4 @@
-import { ApiResult } from "./types";
+import { AnyReview, ApiResult, Profile, Showcase, SubmissionsResult, UserSettings } from "./types";
 import { awaitElement, cyrb53, makeChildNode } from "./utils";
 
 const CORE_ADDON_ID = "opr-tools-core";
@@ -179,6 +179,16 @@ export interface SanitizedAddon {
   url?: string,
 }
 
+interface Responses {
+  "GET": {
+    "/api/v1/vault/manage": SubmissionsResult,
+    "/api/v1/vault/review": AnyReview,
+    "/api/v1/vault/home": Showcase,
+    "/api/v1/vault/settings": UserSettings,
+    "/api/v1/vault/profile": Profile,
+  },
+}
+
 class AddonToolbox<T> {
   private addon: Addon<T>;
   constructor(addon: Addon<T>) {
@@ -197,11 +207,12 @@ class AddonToolbox<T> {
     })(XMLHttpRequest.prototype.open);
   }
 
-  public interceptOpenJson<Tr>(method: string, url: string, callback: (obj: Tr) => void) {
+  public interceptOpenJson<Tm extends keyof Responses, Tu extends keyof Responses[Tm]>(method: Tm, url: Tu, callback: (obj: Responses[Tm][Tu]) => void) {
+    if (typeof url !== "string") throw Error("Invalid URL type");
     function handle(_event: Event) {
       try {
         const resp = this.response;
-        const json: ApiResult<Tr> = JSON.parse(resp);
+        const json: ApiResult<Responses[Tm][Tu]> = JSON.parse(resp);
         if (!json) return;
         if (json.captcha) return;
         callback(json.result);
