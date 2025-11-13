@@ -3,3 +3,4 @@ node_modules/
 dist/
 !dist/*.user.js
 .build.json
+/assets/geofences.bin*

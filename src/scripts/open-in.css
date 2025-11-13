@@ -1,0 +1,54 @@
+.oproi-label {
+  font-weight: bold;
+}
+.oproi-container {
+  margin-bottom: 10px;
+}
+.oproi-linkspan::before { content: ' · '; }
+.oproi-linkspan:nth-child(2)::before { content: ''; }
+.oproi-experimental {
+    color: darkorange;
+    position: relative;
+    display: inline-block;
+}
+.oproi-tttitle {
+    color: darkorange;
+    font-weight: bold;
+}
+.oproi-experimental .oproi-tooltip {
+    visibility: hidden;
+    width: 320px;
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    text-align: center;
+    padding: 12px;
+    position: absolute;
+    z-index: 1;
+    bottom: 150%;
+    left: 50%;
+    margin-left: -160px;
+    border-radius: 10px;
+    pointer-events: none;
+}
+.oproi-experimental .oproi-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    z-index: 1;
+    margin-left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: rgba(0,0,0,0.8) transparent transparent transparent;
+}
+.oproi-experimental:hover .oproi-tooltip {
+    visibility: visible;
+}
+.oproi-address {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: black;
+}
+.dark .oproi-address {
+    color: white;
+}

@@ -1,5 +1,5 @@
 import type resources from "../assets/resources.json";
-import { Resolve } from "./types";
+import { GeofenceMap, Resolve } from "./types";
 
 //#region resources
 
@@ -20,6 +20,82 @@ export async function getResourceUrl(name: string) {
   }
   return url;
 }
+
+class EOFError extends Error {
+  constructor() {
+    super("End of file reached");
+  }
+}
+
+export class ByteReader {
+  stream: ReadableStreamDefaultReader<Uint8Array>;
+  buffer: Uint8Array;
+  offset: number;
+  done: boolean;
+  constructor(stream: ReadableStream<Uint8Array>) {
+    this.stream = stream.getReader();
+    this.buffer = new Uint8Array(0);
+    this.offset = 0;
+    this.done = false;
+  }
+
+  async read(length: number): Promise<ArrayBuffer> {
+    if (this.buffer.length - this.offset >= length) {
+      this.offset += length;
+      return this.buffer.slice(this.offset - length, this.offset).buffer;
+    } else {
+      const firstHalf = this.buffer.slice(this.offset, this.buffer.length);
+      const result = await this.stream.read();
+      this.done = result.done;
+      if (!result.done) {
+        this.buffer = result.value;
+        this.offset = length - firstHalf.length;
+        const secondHalf = this.buffer.slice(0, this.offset);
+        const combined = new Uint8Array(length);
+        combined.set(firstHalf, 0);
+        combined.set(secondHalf, firstHalf.length);
+        return combined.buffer;
+      } else {
+        this.buffer = new Uint8Array(0);
+        this.offset = 0;
+        if (length > firstHalf.length) throw new EOFError();
+        return firstHalf.buffer;
+      }
+    }
+  }
+}
+
+let geofenceCache: GeofenceMap | null = null;
+export const readGeofences = async () => {
+  if (geofenceCache) return geofenceCache;
+  console.log("Reading geofences...");
+  const resp = await fetch(await getResourceUrl("geofences"));
+  geofenceCache = await resp.json() as GeofenceMap;
+  // For binary encoded data
+  // Disabled because for some reason this is extremely slow
+  /*const ds = new DecompressionStream("gzip");
+  const rawStream = resp.body?.pipeThrough(ds);
+  const reader = new ByteReader(rawStream!);
+  geofenceCache = {};
+  const decoder = new TextDecoder();
+  while (!reader.done) {
+    try {
+      const zLength = new Uint8Array(await reader.read(1));
+      const zBytes = await reader.read(zLength[0]);
+      const zone = decoder.decode(zBytes);
+      geofenceCache[zone] = [];
+      const pLength = new Uint32Array(await reader.read(4));
+      for (let i = 0; i < pLength[0]; i++) {
+        const ll = new Float32Array(await reader.read(8));
+        geofenceCache[zone].push([ll[0], ll[1]]);
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  }*/
+  console.log("Done reading geofences");
+  return geofenceCache;
+};
 
 //#region DOM utils
 
@@ -68,6 +144,10 @@ export const makeChildNode = (parent: Element, tagName: string, content?: string
   }
   parent.appendChild(e);
   return e;
+};
+
+export const insertAfter = (after: Node, node: Node) => {
+  after.parentNode!.insertBefore(node, after.nextSibling);
 };
 
 //#region Storage utils

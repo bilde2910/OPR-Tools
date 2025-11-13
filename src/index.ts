@@ -7,6 +7,7 @@ import nominationStats from "./scripts/nomination-stats";
 import nominationMap from "./scripts/nomination-map";
 import reviewHistory from "./scripts/review-history";
 import keyboardReview from "./scripts/keyboard-review";
+import openIn from "./scripts/open-in";
 
 const availableAddons = [
   oprToolsCore,
@@ -14,6 +15,7 @@ const availableAddons = [
   nominationMap,
   reviewHistory,
   keyboardReview,
+  openIn,
 ];
 
 /** Runs when the userscript is loaded initially */

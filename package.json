@@ -40,6 +40,7 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/express": "^4.17.21",
+    "@types/google.maps": "^3.58.1",
     "@types/greasemonkey": "^4.0.7",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^7.6.0",
@@ -60,7 +61,7 @@
   },
   "dependencies": {
     "@googlemaps/markerclusterer": "^2.6.2",
-    "@types/google.maps": "^3.58.1"
+    "proj4": "^2.20.0"
   },
   "nodemonConfig": {
     "watch": [

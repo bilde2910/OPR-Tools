@@ -3,5 +3,9 @@
     "pkgName": "@googlemaps/markerclusterer",
     "path": "dist/index.min.js",
     "global": "markerClusterer"
+  }, {
+    "pkgName": "proj4",
+    "path": "dist/proj4.js",
+    "global": "proj4"
   }
 ]

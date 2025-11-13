@@ -14,6 +14,8 @@ export type ScriptConfig = {
 
 export type Resolve<T> = (value: T) => void
 
+export type GeofenceMap = Record<string, number[][]>;
+
 //#region Wayfarer types
 
 export interface ApiResult<T> {
@@ -26,6 +28,35 @@ export interface ApiResult<T> {
 
 export interface SubmissionsResult {
   submissions: Contribution[],
+}
+
+export interface ShowcasedPortal {
+  guid: string,
+  title: string,
+  description: string,
+  lat: number,
+  lng: number,
+  address: string,
+  countryLong: string,
+  countryShort: string,
+  stateLong: string,
+  stateShort: string,
+  city: string,
+  postalCode: null, // TODO
+  imageUrl: string,
+  index: number,
+  discoverer: string,
+  discovererGame: string,
+  categoryName: string,
+  criteriaTitle: string,
+  criteriaDescription: string,
+}
+
+export interface Showcase {
+  showcase: ShowcasedPortal[],
+  notifications: never[], // TODO
+  punishmentWarn: boolean,
+  showcaseMessage: string,
 }
 
 interface SocialProfile {
@@ -135,7 +166,10 @@ export interface Contribution {
   userAppealNotes: string,
   canHold: boolean,
   canReleaseHold: boolean,
-  poiData: object[],
+  poiData: {
+    imageUrl: string,
+    // TODO: More?
+  },
 }
 
 //#region Incoming reviews

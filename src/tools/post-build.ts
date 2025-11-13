@@ -3,10 +3,13 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { exec } from "node:child_process";
+import { createWriteStream } from "node:fs";
+import zlib from "node:zlib";
 import "dotenv/config";
 import { outputDir as rollupCfgOutputDir, outputFile as rollupCfgOutputFile } from "../../rollup.config.mjs";
 import pkg from "../../package.json" with { type: "json" };
-import type { RollupArgs } from "../types";
+import type { GeofenceMap, RollupArgs } from "../types";
+import { Readable } from "node:stream";
 
 type CliArg<TName extends keyof Required<RollupArgs>> = Required<RollupArgs>[TName];
 
@@ -89,6 +92,10 @@ const assetFolderPath = "./assets/";
 const ringBell = Boolean(env.RING_BELL && (env.RING_BELL.length > 0 && env.RING_BELL.trim().toLowerCase() === "true"));
 
 (async () => {
+  // Binary encoding of geofence data
+  // Disabled because apparently this is VERY SLOW on browsers
+  // await convertGeofences();
+
   const buildNbr = await getLastCommitSha();
   const buildVer = await getVersion();
 
@@ -200,6 +207,34 @@ ${devDirectives ? "\n" + devDirectives : ""}
     setImmediate(() => exit(1));
   }
 })();
+
+async function convertGeofences() {
+  console.log("Compressing geofence data...");
+  const rootPath = join(dirname(fileURLToPath(import.meta.url)), "../../");
+  const inPath = join(rootPath, assetFolderPath, "geofences.json");
+  const outPath = join(rootPath, assetFolderPath, "geofences.bin.gz");
+  const fences = JSON.parse(String(await readFile(inPath))) as GeofenceMap;
+  const binData: ArrayBuffer[] = [];
+  for (const [zone, points] of Object.entries(fences)) {
+    const zBytes = new TextEncoder().encode(zone);
+    const zLength = new Uint8Array([zBytes.length]);
+    const pLength = new Uint32Array([points.length]);
+    binData.push(zLength.buffer, zBytes.buffer, pLength.buffer);
+    for (const [lat, lng] of points) {
+      binData.push(new Float32Array([lat, lng]).buffer);
+    }
+  }
+  const blob = new Blob(binData, { type: "application/octet-stream" });
+  const buffer = Buffer.from(await blob.arrayBuffer());
+  // Brotli brings it down to 490 kB vs 723 kB for gzip, but we can't
+  // use it because it's non-standard and not supported in browsers.
+  // const compress = zlib.createBrotliCompress();
+  const compress = zlib.createGzip();
+  const writeStream = createWriteStream(outPath);
+  const stream = Readable.from(buffer).pipe(compress).pipe(writeStream);
+  await new Promise<void>((resolve) => stream.on("finish", resolve));
+  console.log("Compression done.");
+}
 
 /** Replaces tokens in the format `#{{key}}` or `/⋆#{{key}}⋆/` of the `replacements` param with their respective value */
 function insertValues(userscript: string, replacements: Record<string, Stringifiable>) {
