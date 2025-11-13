@@ -36,6 +36,7 @@ interface RendererOptions<T> extends OptionMetadata {
   value: T,
   parent: HTMLElement,
   save: (v: T) => void,
+  clear: () => void,
 }
 
 interface OptionEditor<T> {
@@ -73,8 +74,42 @@ export class UnixTimestampDateOnlyEditor implements OptionEditor<number> {
     input.setAttribute("type", "date");
     input.value = opts.value ? new Date(opts.value).toISOString().substring(0, 10) : "";
     input.addEventListener("change", () => {
-      if (input.value === "") opts.save(0);
+      if (input.value === "") opts.clear();
       else (opts.save(new Date(input.value).getTime()));
+    });
+  }
+}
+
+interface NumericInputEditorOptoins {
+  min?: number,
+  max?: number,
+  step?: number,
+}
+
+export class NumericInputEditor implements OptionEditor<number> {
+  options?: NumericInputEditorOptoins;
+  constructor(options?: NumericInputEditorOptoins) {
+    this.options = options;
+  }
+
+  render(opts: RendererOptions<number>) {
+    const label = makeChildNode(opts.parent, "label", `${opts.label}: `);
+    if (opts.help) {
+      label.title = opts.help;
+      label.classList.add("oprtcore-help-available");
+    }
+    const input = document.createElement("input");
+    input.type = "number";
+    if (typeof this.options?.min !== "undefined") input.min = this.options.min.toString();
+    if (typeof this.options?.max !== "undefined") input.max = this.options.max.toString();
+    if (typeof this.options?.step !== "undefined") input.step = this.options.step.toString();
+    label.appendChild(input);
+    input.classList.add("oprtcore-fix");
+    input.value = opts.value.toString();
+    input.addEventListener("change", () => {
+      if (input.value === "") opts.clear();
+      else if ((this.options?.step ?? 1) < 1) opts.save(parseFloat(input.value));
+      else opts.save(parseInt(input.value));
     });
   }
 }
@@ -124,6 +159,19 @@ class AddonSettings<T> {
       props[this.key] = {};
     }
     props[this.key][key] = value;
+    const nData = JSON.stringify(props);
+    localStorage.setItem(`opr-tools-settings-${userHash}`, nData);
+  }
+
+  clear<Tk extends keyof T>(key: Tk) {
+    const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
+    const props = JSON.parse(data);
+    if (!Object.prototype.hasOwnProperty.call(props, this.key)) {
+      props[this.key] = {};
+    }
+    if (!Object.prototype.hasOwnProperty.call(props[this.key], key)) {
+      delete props[this.key][key];
+    }
     const nData = JSON.stringify(props);
     localStorage.setItem(`opr-tools-settings-${userHash}`, nData);
   }
@@ -370,10 +418,14 @@ const renderEditors = (options: AddonOptionsEntry[]) => async () => {
     entryBody.classList.add("settings-item__description");
     
     for (const [key, option] of Object.entries(entry.options)) {
+      const lineItem = makeChildNode(entryBody, "div");
+      lineItem.classList.add("oprtcore-option-line");
+
       option.editor.render({
         value: option.iface.get(key),
-        parent: entryBody,
+        parent: lineItem,
         save: (v: any) => option.iface.set(key, v),
+        clear: () => option.iface.clear(key),
         ...option,
       });
     }

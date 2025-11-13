@@ -28,7 +28,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-review-history-table.user.js
 - [ ] wayfarer-review-map-mods.user.js
 - [ ] wayfarer-review-pings.user.js
-- [ ] wayfarer-review-timer.user.js
+- [x] wayfarer-review-timer.user.js
 - [ ] wayfarer-skip-count.user.js
 - [ ] wayfarer-ticket-saver.user.js
 - [ ] wayfarer-translate.user.js

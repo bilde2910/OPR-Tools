@@ -63,6 +63,14 @@
   text-decoration: underline dotted #7f7f7f;
 }
 
+.oprtcore-option-line {
+  margin-bottom: 1rem;
+}
+
 .dark input.oprtcore-fix {
   background-color: #333;
+}
+
+input.oprtcore-fix {
+  padding: 2px 5px;
 }
