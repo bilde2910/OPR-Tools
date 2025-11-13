@@ -51,7 +51,7 @@
 
 .oprtcore-description {
   font-size: 0.8em;
-  color: rgba(255, 255, 255, 0.5);
+  opacity: 0.5;
 }
 
 .oprtcore-refresh-reminder {
