@@ -25,7 +25,7 @@ import "./review-history.css";
 export default () => {
   register({
     id: "review-history",
-    name: "Review History IDB",
+    name: "Review History",
     authors: ["tehstone", "bilde2910"],
     description: "Add local review history storage to OPR",
     defaultConfig: {
