@@ -1,0 +1,15 @@
+.oprtes-text {
+  font-size: 18px;
+}
+
+.oprtes-count {
+  font-size: 18px;
+  display: flex;
+  margin: 0px 0px 0px 0px;
+}
+
+.oprtes-parent {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0px 0px;
+}

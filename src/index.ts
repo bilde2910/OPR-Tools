@@ -9,6 +9,7 @@ import reviewHistory from "./scripts/review-history";
 import keyboardReview from "./scripts/keyboard-review";
 import openIn from "./scripts/open-in";
 import reviewTimer from "./scripts/review-timer";
+import extendedStats from "./scripts/extended-stats";
 
 const availableAddons = [
   oprToolsCore,
@@ -18,6 +19,7 @@ const availableAddons = [
   keyboardReview,
   openIn,
   reviewTimer,
+  extendedStats,
 ];
 
 /** Runs when the userscript is loaded initially */
