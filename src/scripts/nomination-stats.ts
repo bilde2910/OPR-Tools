@@ -17,8 +17,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { awaitElement } from "src/utils";
-import { Contribution, ContributionStatus, ContributionType, SubmissionsResult } from "src/types";
+import { awaitElement, downloadAsFile, iterKeys, iterObject, makeChildNode } from "src/utils";
+import { AnyContribution, ContributionStatus, ContributionType, EditContribution, SubmissionsResult } from "src/types";
 
 import "./nomination-stats.css";
 
@@ -38,9 +38,10 @@ export default () => {
 const parseContributions = (data: SubmissionsResult) => {
   if (!data.submissions) return;
   addNominationDetails(data.submissions);
+  addExportButtons(data.submissions);
 };
 
-const addNominationDetails = async (subs: Contribution[]) => {
+const addNominationDetails = async (subs: AnyContribution[]) => {
   const ref = await awaitElement(() => document.querySelector("app-submissions-list"));
   const counts = <Record<string, Record<string, number>>>{
     "EDIT": {},
@@ -165,4 +166,81 @@ const addNominationDetails = async (subs: Contribution[]) => {
 
   const container = ref.parentNode!;
   container.appendChild(statsContainer);
+};
+
+const addExportButtons = async (subs: AnyContribution[]) => {
+  const ref = await awaitElement(() => document.querySelector("wf-logo"));
+  if (document.getElementById("oprtns-export") !== null) return;
+  const div = makeChildNode(ref.parentElement!.parentElement!, "div");
+  div.id = "oprtns-export";
+  const exportButton = makeChildNode(div, "button", "Export JSON");
+  exportButton.addEventListener("click", () => exportNominationsJson(subs));
+  exportButton.classList.add("oprtns-button");
+  const exportCsvButton = makeChildNode(div, "button", "Export CSV");
+  exportCsvButton.addEventListener("click", () => exportNominationsCsv(subs));
+  exportCsvButton.classList.add("oprtns-button");
+};
+
+const exportNominationsJson = (subs: AnyContribution[]) => {
+  const dataStr = JSON.stringify(subs);
+  downloadAsFile(dataStr, "applications/json", "contributions.json");
+};
+
+const exportNominationsCsv = (subs: AnyContribution[]) => {
+  const separator = ".";
+  const headers = [] as string[];
+  for (const item of subs) {
+    for (const [k, v] of iterObject(item)) {
+      if (Array.isArray(v)) {
+        if (k === "rejectReasons") {
+          if (!headers.includes(k)) headers.push(k);
+          for (const reject of v) {
+            const reasonKey =  k + separator + reject.reason;
+            if (!headers.includes(reasonKey)) headers.push(reasonKey);
+          }
+        }
+      } else if (k === "poiData") {
+        if (item.type !== ContributionType.NOMINATION) {
+          for (const poiKey of iterKeys(v)) {
+            const pdKey = k + separator + poiKey;
+            if (!headers.includes(pdKey)) headers.push(pdKey);
+          }
+        }
+      } else {
+        if (!headers.includes(k)) headers.push(k);
+      }
+    }
+  }
+
+  // Generate CSV headers dynamically from headers
+  let csv = headers.join(",") + "\r\n";
+
+  for (const item of subs) {
+    let row = "";
+    for (const header of headers) {
+      const sep = header.indexOf(separator);
+      if (sep >= 0) {
+        const itemKey = header.substring(0, sep) as keyof AnyContribution;
+        const subKey = header.substring(sep + 1);
+        if (itemKey === "poiData" && item.type !== ContributionType.NOMINATION) {
+          const tsKey = subKey as keyof EditContribution["poiData"];
+          row += `"${String(item.poiData[tsKey] ?? "").replace(/"/g, "\"\"")}",`;
+        } else if (Array.isArray(item[itemKey]) && itemKey === "rejectReasons") {
+          row += item[itemKey].map(r => r.reason).includes(subKey) ? "1," : "0,";
+        } else {
+          row += ",";
+        }
+      } else {
+        const tHdr = header as keyof AnyContribution;
+        if (tHdr === "rejectReasons") {
+          row += `"${(item[tHdr] ?? []).map(r => r.reason).join(",").replace(/"/g, "\"\"")}",`;
+        } else {
+          row += `"${String(item[tHdr] ?? "").replace(/"/g, "\"\"")}",`;
+        }
+      }
+    }
+    // Remove trailing comma
+    csv += row.slice(0, -1) + "\r\n";
+  }
+  downloadAsFile(csv, "text/csv; charset=utf-8", "contributions.csv");
 };
