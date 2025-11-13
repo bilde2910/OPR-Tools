@@ -18,7 +18,7 @@
 
 import { register } from "src/core";
 import { awaitElement } from "src/utils";
-import { AnyReview, EditReview, NewReview, PhotoReview, Resolve } from "src/types";
+import { AnyReview, EditReview, NewReview, PhotoReview } from "src/types";
 
 import "./keyboard-review.scss";
 
@@ -819,7 +819,7 @@ export default () => {
         if (matchingElement) matchingElement.click();
       };
 
-      const thumbDownOpen = (card: ThumbCard) => new Promise((resolve: Resolve<void>, reject) => {
+      const thumbDownOpen = (card: ThumbCard) => new Promise<void>((resolve, reject) => {
         if (isDialogOpen()) {
           if (!card.opens) {
             reject();
@@ -856,7 +856,7 @@ export default () => {
         }
       };
 
-      const report = () => new Promise((resolve: Resolve<void>, reject) => {
+      const report = () => new Promise<void>((resolve, reject) => {
         if (isDialogOpen()) {
           resolve();
           return;
@@ -1028,7 +1028,7 @@ const waitForDialog = () => awaitElement(
   () => document.querySelector("mat-dialog-container > *")
 );
 
-const checkDialogBox = (parent: HTMLElement | null, text: string | null) => new Promise((resolve: Resolve<void>, reject) => {
+const checkDialogBox = (parent: HTMLElement | null, text: string | null) => new Promise<void>((resolve, reject) => {
   const btns = parent ? parent.querySelectorAll("wf-checkbox") : document.querySelectorAll("mat-dialog-container wf-checkbox");
   for (let i = 0; i < btns.length; i++) {
     const label = btns[i].querySelector<HTMLElement>(".mat-checkbox-label")!;
@@ -1051,7 +1051,7 @@ const checkDialogBox = (parent: HTMLElement | null, text: string | null) => new 
   reject();
 });
 
-const selectDialogRadio = (value: string) => new Promise((resolve: Resolve<void>, reject) => {
+const selectDialogRadio = (value: string) => new Promise<void>((resolve, reject) => {
   const btns = document.querySelectorAll("mat-dialog-container mat-radio-button");
   for (const btn of btns) {
     if (btn.querySelector<HTMLInputElement>("input[type=radio]")!.value == value) {
@@ -1074,7 +1074,7 @@ const getDialogAccordionPanel = (text: string) => {
   return null;
 };
 
-const expandDialogAccordionPanel = (text: string) => new Promise((resolve: Resolve<void>, reject) => {
+const expandDialogAccordionPanel = (text: string) => new Promise<void>((resolve, reject) => {
   const panel = getDialogAccordionPanel(text);
   if (panel) {
     if (!panel.classList.contains("mat-expanded")) {

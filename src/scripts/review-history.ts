@@ -18,7 +18,7 @@
 
 import { register, UnixTimestampDateOnlyEditor } from "src/core";
 import { awaitElement, downloadAsFile, filterObject, haversine, makeChildNode, readFile } from "src/utils";
-import { AnyReview, AnySubmittedReview, BaseReview, EditReview, NewReview, PhotoReview, Resolve } from "src/types";
+import { AnyReview, AnySubmittedReview, BaseReview, EditReview, NewReview, PhotoReview } from "src/types";
 
 import "./review-history.css";
 
@@ -43,7 +43,7 @@ export default () => {
         editor: new UnixTimestampDateOnlyEditor(),
       });
 
-      const handleIncomingReview = (review: AnyReview) => new Promise((resolve: Resolve<void>, reject) => {
+      const handleIncomingReview = (review: AnyReview) => new Promise<void>((resolve, reject) => {
         toolbox.log("handleIncomingReview");
         let saveColumns = <(
           keyof NewReview | keyof EditReview | keyof PhotoReview
@@ -78,7 +78,7 @@ export default () => {
         }
       });
 
-      const handleSubmittedReview = (review: AnySubmittedReview, result: string) => new Promise((resolve: Resolve<void>, reject) => {
+      const handleSubmittedReview = (review: AnySubmittedReview, result: string) => new Promise<void>((resolve, reject) => {
         toolbox.log("handleSubmittedReview");
         if (result === "api.review.post.accepted" && !!review.id) {
           toolbox.usingIDB("history").then(({ db, transaction, getStore }) => {

@@ -1,4 +1,4 @@
-import { ApiResult, Resolve } from "./types";
+import { ApiResult } from "./types";
 import { awaitElement, cyrb53, makeChildNode } from "./utils";
 
 const CORE_ADDON_ID = "opr-tools-core";
@@ -9,7 +9,7 @@ let language = "en";
 const addons = <Addon<any>[]>[];
 let initialized = false;
 
-export const initializeUserHash = () => new Promise((resolve: Resolve<number>, reject) => {
+export const initializeUserHash = () => new Promise<number>((resolve, reject) => {
   if (userHash !== 0) {
     reject("Cannot reconfigure user hash");
   } else {
@@ -141,7 +141,7 @@ class AddonSettings<T> {
  * @param version 
  * @returns 
  */
-const getIDBInstance = (objectStoreName: string, version?: number) => new Promise((resolve: Resolve<IDBDatabase>, reject) => {
+const getIDBInstance = (objectStoreName: string, version?: number) => new Promise<IDBDatabase>((resolve, reject) => {
   "use strict";
 
   if (!window.indexedDB) {

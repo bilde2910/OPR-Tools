@@ -1,5 +1,5 @@
 import type resources from "../assets/resources.json";
-import { GeofenceMap, Resolve } from "./types";
+import { GeofenceMap } from "./types";
 
 //#region resources
 
@@ -117,7 +117,7 @@ export function addStyle(css: string) {
 }
 
 export function awaitElement<T>(listener: () => T | null) {
-  return new Promise((resolve: Resolve<T>, _reject) => {
+  return new Promise<T>((resolve, _reject) => {
     const queryLoop = () => {
       const ref = listener();
       if (ref) resolve(ref);
@@ -191,7 +191,7 @@ export const downloadAsFile = (data: string, type: string, name: string) => {
   URL.revokeObjectURL(url);
 };
 
-export const readFile = (...accept: string[]) => new Promise((resolve: Resolve<string | ArrayBuffer | null>, reject) => {
+export const readFile = (...accept: string[]) => new Promise<string | ArrayBuffer | null>((resolve, reject) => {
   const input = document.createElement("input");
   input.type = "file";
   if (accept.length > 0) {

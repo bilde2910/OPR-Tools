@@ -12,8 +12,6 @@ export type ScriptConfig = {
   // add data here
 };
 
-export type Resolve<T> = (value: T) => void
-
 export type GeofenceMap = Record<string, number[][]>;
 
 //#region Wayfarer types
