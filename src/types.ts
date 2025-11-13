@@ -1,3 +1,5 @@
+import geofenceJson from "../assets/geofences.json" with { type: "json" };
+
 /** Custom CLI args passed to rollup */
 export type RollupArgs = Partial<{
   "config-mode": "development" | "production";
@@ -12,7 +14,8 @@ export type ScriptConfig = {
   // add data here
 };
 
-export type GeofenceMap = Record<string, number[][]>;
+export type Zone = keyof typeof geofenceJson;
+export type GeofenceMap = Record<Zone, number[][]>;
 
 //#region Wayfarer types
 

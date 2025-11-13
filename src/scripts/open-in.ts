@@ -18,7 +18,7 @@
 
 import { register } from "src/core";
 import { awaitElement, insertAfter, makeChildNode, readGeofences } from "src/utils";
-import { AnyReview, Contribution, Showcase, SubmissionsResult } from "src/types";
+import { AnyReview, Contribution, Showcase, SubmissionsResult, Zone } from "src/types";
 
 import proj4 from "proj4";
 
@@ -78,7 +78,7 @@ interface Provider {
   url: string,
   projection?: Projection,
   cornerOffsets?: number,
-  regions?: string[],
+  regions?: Zone[],
 }
 
 const providers: Provider[] = [
@@ -665,7 +665,7 @@ const addOpenButtons = async (before: Node, portal: HasPOIData) => {
     }*/
     if (typeof e.regions !== "undefined") {
       for (const [zone, member] of Object.entries(membership)) {
-        if (member && e.regions.includes(zone)) {
+        if (member && e.regions.includes(zone as Zone)) {
           regionBoxes[getFlag(zone)].appendChild(linkSpan);
         }
       }
@@ -699,9 +699,9 @@ const addOpenButtons = async (before: Node, portal: HasPOIData) => {
 
 const getGeofenceMemberships = async (lat: number, lng: number) => {
   const geofences = await readGeofences();
-  const membership = {} as Record<string, boolean>;
+  const membership = {} as Record<Zone, boolean>;
   for (const [zone, points] of Object.entries(geofences)) {
-    membership[zone] = isWithinBounds(points, lat, lng);
+    membership[zone as Zone] = isWithinBounds(points, lat, lng);
   }
   return membership;
 };
