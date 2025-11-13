@@ -529,6 +529,7 @@ const registerProjections = () => {
 };
 
 const injectShowcase = async (result: Showcase) => {
+  await readGeofences();
   await awaitElement(() => document.querySelector(".showcase-item"));
   const showcase = result.showcase;
   const count = showcase.length;
