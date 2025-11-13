@@ -11,7 +11,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-contribution-management-layout.user.js
 - [ ] wayfarer-edits-diff.user.js
 - [ ] wayfarer-email-api.user.js
-- [ ] wayfarer-extended-stats.user.js
+- [x] wayfarer-extended-stats.user.js
 - [x] wayfarer-keyboard-review.user.js
 - [ ] wayfarer-localstoragecheck.user.js
 - [x] wayfarer-nomination-map.user.js
