@@ -18,6 +18,7 @@ export default () => {
       const renderOprtSettings = async (_data: UserSettings) => {
         const ref = await awaitElement(() => document.querySelector("app-settings"));
         const box = document.createElement("div");
+        box.classList.add("max-w-md");
         const mainSettings = document.getElementById("oprtoolsMainPluginSettingsPane");
         if (mainSettings) {
           ref.insertBefore(box, mainSettings);

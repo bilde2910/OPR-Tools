@@ -393,6 +393,7 @@ export const initializeAllAddons = () => {
 const renderEditors = (options: AddonOptionsEntry[]) => async () => {
   const ref = await awaitElement(() => document.querySelector("app-settings"));
   const box = makeChildNode(ref, "div");
+  box.classList.add("max-w-md");
   box.id = "oprtoolsMainPluginSettingsPane";
   const header = makeChildNode(box, "h3", "Plugin Settings");
   header.classList.add("wf-page-header");
