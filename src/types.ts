@@ -17,6 +17,35 @@ export type ScriptConfig = {
 export type Zone = keyof typeof geofenceJson;
 export type GeofenceMap = Record<Zone, number[][]>;
 
+//#region API types
+
+export interface Requests {
+  "/api/v1/vault/review": AnySubmittedReview,
+  "/api/v1/vault/manage/hold": SetHold,
+  "/api/v1/vault/manage/releasehold": ReleaseHold,
+  "/api/v1/vault/manage/edit": EditContribution,
+  "/api/v1/vault/manage/appeal": SubmitAppeal,
+  "/api/v1/vault/settings": SaveSettings,
+}
+
+export interface Responses {
+  "GET": {
+    "/api/v1/vault/manage": SubmissionsResult,
+    "/api/v1/vault/review": AnyReview,
+    "/api/v1/vault/home": Showcase,
+    "/api/v1/vault/settings": UserSettings,
+    "/api/v1/vault/profile": Profile,
+  },
+  "POST": {
+    "/api/v1/vault/review": string,
+    "/api/v1/vault/manage/hold": string,
+    "/api/v1/vault/manage/releasehold": string,
+    "/api/v1/vault/manage/edit": string,
+    "/api/v1/vault/manage/appeal": string,
+    "/api/v1/vault/settings": string,
+  },
+}
+
 //#region Wayfarer types
 
 export interface ApiResult<T> {
@@ -25,6 +54,13 @@ export interface ApiResult<T> {
   code: string,
   version: string,
   captcha: boolean,
+}
+
+type DarkMode = "ENABLED" | "DISABLED" | "AUTOMATIC";
+
+export interface SaveSettings {
+  darkMode?: DarkMode,
+  autoScroll?: false,
 }
 
 export interface SubmissionsResult {
@@ -84,7 +120,7 @@ export interface UserProperties {
   nianticLoginStartUri: string,
   attribution: boolean,
   nianticIdUrl: string,
-  darkMode: string,
+  darkMode: DarkMode,
   socialProfile: SocialProfile,
   browserClientId: string,
   eligibleToOnboard: boolean,
@@ -100,7 +136,7 @@ export interface UserSettings {
   hometownCanChange: boolean,
   language: string,
   autoScroll: boolean,
-  darkMode: string,
+  darkMode: DarkMode,
   attribution: boolean,
   campaign: boolean,
   autoUpgrade: boolean,
@@ -269,3 +305,25 @@ interface SubmittedPhotoReview extends SubmittedReview {
 }
 
 export type AnySubmittedReview = SubmittedNewReview | SubmittedEditReview | SubmittedPhotoReview;
+
+//#region Contribution management
+
+export interface SetHold {
+  id: string,
+}
+
+export interface ReleaseHold {
+  id: string,
+}
+
+export interface EditContribution {
+  id: string,
+  title: string,
+  description: string,
+  supporting: string,
+}
+
+export interface SubmitAppeal {
+  id: string,
+  statement: string,
+}

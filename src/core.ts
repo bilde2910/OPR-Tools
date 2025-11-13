@@ -1,4 +1,4 @@
-import { AnyReview, ApiResult, Profile, Showcase, SubmissionsResult, UserSettings } from "./types";
+import { ApiResult, Requests, Responses } from "./types";
 import { awaitElement, cyrb53, makeChildNode } from "./utils";
 
 const CORE_ADDON_ID = "opr-tools-core";
@@ -227,16 +227,6 @@ export interface SanitizedAddon {
   url?: string,
 }
 
-interface Responses {
-  "GET": {
-    "/api/v1/vault/manage": SubmissionsResult,
-    "/api/v1/vault/review": AnyReview,
-    "/api/v1/vault/home": Showcase,
-    "/api/v1/vault/settings": UserSettings,
-    "/api/v1/vault/profile": Profile,
-  },
-}
-
 class AddonToolbox<T> {
   private addon: Addon<T>;
   constructor(addon: Addon<T>) {
@@ -285,12 +275,12 @@ class AddonToolbox<T> {
     })(XMLHttpRequest.prototype.send);
   }
 
-  public interceptSendJson<Ts, Tr>(url: string, callback: (sent: Ts, received: Tr) => void) {
+  public interceptSendJson<Tu extends keyof Requests & keyof Responses["POST"]>(url: Tu, callback: (sent: Requests[Tu], received: Responses["POST"][Tu]) => void) {
     function handle(data: string, request: XMLHttpRequest, _event: Event) {
       try {
         const resp = request.response;
-        const jSent: Ts = JSON.parse(data);
-        const jRecv: ApiResult<Tr> = JSON.parse(resp);
+        const jSent: Requests[Tu] = JSON.parse(data);
+        const jRecv: ApiResult<Responses["POST"][Tu]> = JSON.parse(resp);
         if (!jRecv) return;
         if (jRecv.captcha) return;
         callback(jSent, jRecv.result);
