@@ -2,8 +2,41 @@
 
 This repository is still very much a work in progress. The goal is to port most of the addons from [tehstone's repo](https://github.com/tehstone/wayfarer-addons) from Wayfarer to OPR. At the same time, I'm taking the opportunity to do a major rework of the userscript structure to make the scripts much more pleasant and safe to code.
 
+<details>
+  <summary>Current script porting progress</summary>
 
-## Prerequisites:
+- [ ] wayfarer-achievements.user.js
+- [ ] wayfarer-appeal-info.user.js
+- [ ] wayfarer-compact-card.user.js
+- [ ] wayfarer-contribution-management-layout.user.js
+- [ ] wayfarer-edits-diff.user.js
+- [ ] wayfarer-email-api.user.js
+- [ ] wayfarer-extended-stats.user.js
+- [x] wayfarer-keyboard-review.user.js
+- [ ] wayfarer-localstoragecheck.user.js
+- [x] wayfarer-nomination-map.user.js
+- [x] wayfarer-nomination-stats.user.js
+- [ ] wayfarer-nomination-status-history.user.js
+- [ ] wayfarer-nomination-streetview.user.js
+- [ ] wayfarer-nomination-types.user.js
+- [x] wayfarer-open-in.user.js
+- [ ] wayfarer-prime-portal-links.user.js
+- [ ] wayfarer-rejections-plus.user.js
+- [ ] wayfarer-reverse-image-search.user.js
+- [ ] wayfarer-review-counter.user.js
+- [x] wayfarer-review-history-idb.user.js
+- [ ] wayfarer-review-history-table.user.js
+- [ ] wayfarer-review-map-mods.user.js
+- [ ] wayfarer-review-pings.user.js
+- [ ] wayfarer-review-timer.user.js
+- [ ] wayfarer-skip-count.user.js
+- [ ] wayfarer-ticket-saver.user.js
+- [ ] wayfarer-translate.user.js
+- [ ] wayfarer-upgrade-percent.user.js
+- [ ] wayfarer-version-display.user.js
+</details>
+
+## Prerequisites
 
 Usage of these tools requires a Script Manager, install the manager extension of your choice. 
 Some options include:
@@ -28,7 +61,6 @@ Individual tools can turned on and off from the [OPR Settings page](https://opr.
 Settings for all tools can be found there as well:
 
 ![Example Screenshot](https://i.imgur.com/IWmJm72.png)
-
 
 ## Keyboard Review
 
@@ -57,11 +89,9 @@ This tool enables nearly full control of the review page via the keyboard.
 - Number keys to select Edit options
 - Letter keys to select photo options
 
-
 ## Nomination Map 
 
 Places a map of all your contributions at the top of the [Contributions Page](https://opr.ingress.com/new/nominations). Also places a counter of the currently listed contributions above the list, this counter updates whenever the search or filter is updated.
-
 
 ## Nomination Stats
 
