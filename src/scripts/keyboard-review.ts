@@ -626,7 +626,7 @@ export default () => {
           for (let i = 0; i < btns.length && i < 9; i++) {
             const btn = btns[i];
             keys[(i + 1).toString()] = () => {
-              if (context.type !== RenderContextType.NEW) throw new InvalidContextError();
+              if (context.type !== RenderContextType.EDIT) throw new InvalidContextError();
               btn.click();
               context.nextCard();
             };
@@ -719,12 +719,16 @@ export default () => {
             }
           }
         };
-        context.extraKeys = context.cards[context.currentCard].extraKeys;
-        updateKeybindsEdit(candidate);
+        if (context.cards.length > 0) {
+          context.extraKeys = context.cards[context.currentCard].extraKeys;
+          updateKeybindsEdit(candidate);
+        } else {
+          setTimeout(() => initForEdit(candidate), 250);
+        }
       };
 
-      const initForPhoto = (_candidate: PhotoReview) => {
-        const acceptAll = document.querySelector<HTMLElement>("app-review-photo app-accept-all-photos-card .photo-card");
+      const initForPhoto = async (_candidate: PhotoReview) => {
+        const acceptAll = await awaitElement(() => document.querySelector<HTMLElement>("app-review-photo app-accept-all-photos-card .photo-card"));
 
         context = {
           type: RenderContextType.PHOTO,
@@ -733,6 +737,10 @@ export default () => {
             if (context.type !== RenderContextType.PHOTO) throw new InvalidContextError();
             const infoCard = document.querySelector("app-review-photo .review-photo__info div");
             toolbox.log(infoCard);
+            if (infoCard === null) {
+              setTimeout(() => redrawUI(), 250);
+              return;
+            }
             const photoHelp = drawNew("p");
             photoHelp.style.marginTop = "10px";
             const phK1 = document.createElement("span");
@@ -764,7 +772,7 @@ export default () => {
             photoHelp.appendChild(phK5);
             photoHelp.appendChild(phK6);
             photoHelp.appendChild(document.createTextNode(" to open it in full screen"));
-            infoCard!.appendChild(photoHelp);
+            infoCard.appendChild(photoHelp);
 
             for (let i = 0; i < context.cards.length; i++) {
               const actions = context.cards[i].querySelector(".photo-card__actions");
@@ -778,7 +786,7 @@ export default () => {
             const label = drawNew("span");
             label.classList.add("oprkr2-key-label");
             label.textContent = "[Tab]";
-            const acceptAllText = acceptAll!.querySelector("span");
+            const acceptAllText = acceptAll.querySelector("span");
             acceptAllText!.insertBefore(label, acceptAllText!.firstChild);
           },
           cards: document.querySelectorAll<HTMLElement>("app-review-photo app-photo-card .photo-card"),
@@ -802,11 +810,11 @@ export default () => {
         let btn = null;
         toolbox.log("handleEnterNew");
         if (isDialogOpen() && !isDialogClosing()) {
-          btn = document.getElementById("wayfarerrtssbutton_r");
-          if (!btn) btn = document.getElementById("wayfarerrtssbutton_d");
+          btn = document.getElementById("oprtmr-ssmb-r");
+          if (!btn) btn = document.getElementById("oprtmr-ssmb-d");
           if (!btn) btn = document.querySelector<HTMLElement>("mat-dialog-container .mat-dialog-actions button.wf-button--primary");
         } else {
-          btn = document.getElementById("wayfarerrtssbutton_0");
+          btn = document.getElementById("oprtmr-ssb-0");
           if (!btn) btn = document.querySelector<HTMLElement>("app-submit-review-split-button button.wf-button--primary");
         }
         if (btn) btn.click();
