@@ -38,16 +38,21 @@ This repository is still very much a work in progress. The goal is to port most 
 
 ## Prerequisites
 
-Usage of these tools requires a Script Manager, install the manager extension of your choice. 
+Usage of these tools requires a UserScript manager. Install the manager extension of your choice.
+
 Some options include:
 - [Tampermonkey](https://tampermonkey.net/)
 - [Greasemonkey](https://www.greasespot.net/)
 - [Violentmonkey](https://github.com/Violentmonkey/Violentmonkey)
 
+**⚠️ OPR Tools does not support IITC Button!**
+
+IITC Button will offer to install OPR Tools for you, but it will not actually run it, rendering OPR Tools non-functional. Please switch to a general-purpose UserScript manager instead, like one of those listed above, if you want to use OPR Tools.
+
 ## Installation
 
-As noted previously, the current state of this script is very early development.
-If you want to be an early tester, you can install all of the OPR tools using this link:
+As noted previously, the current state of this script is very early development. If you want to be an early tester, you can install all of the OPR tools using this link:
+
 https://static.varden.info/opr-tools/dist/opr-tools.user.js
 
 ## Setup
