@@ -173,12 +173,10 @@ export const cyrb53 = function(str: string, seed: number = 0) {
  * @param keys The keys to keep
  * @returns 
  */
-export const filterObject = (obj: Record<string, any>, keys: string[]) => Object
-  .keys(obj)
-  .filter(key => keys.includes(key))
+export const filterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T, keys: K[]): Pick<T, K> => keys
   .reduce((nObj, key) => {
     nObj[key] = obj[key]; return nObj;
-  }, <Record<string, any>>{});
+  }, <Pick<T, K>>{});
 
 /**
  * Type-safe version of Object.entries(). The object must be string-keyed.

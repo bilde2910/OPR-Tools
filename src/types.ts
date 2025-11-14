@@ -224,7 +224,7 @@ export interface EditContribution extends Contribution {
     lat: number,
     lng: number,
     city: string,
-    state: string, // TODO: enum?
+    state: "LIVE" | "RETIRED",
     lastUpdateDate: string,
   }
 }
@@ -272,7 +272,10 @@ export interface NewReview extends BaseReview {
 export interface EditReview extends BaseReview {
   type: "EDIT",
   imageUrl: string,
-  titleEdits: never[], // TODO
+  titleEdits: {
+    value: string,
+    hash: string,
+  }[],
   descriptionEdits: never[], // TODO
   locationEdits: {
     value: string,
@@ -298,7 +301,7 @@ interface SubmittedReview {
   id: string,
 }
 
-interface SubmittedNewReview extends SubmittedReview {
+export interface SubmittedNewReview extends SubmittedReview {
   type: "NEW",
   quality: number,
   description: number,
@@ -313,7 +316,7 @@ interface SubmittedNewReview extends SubmittedReview {
   reviewerSuggestedCategories: string[],
 }
 
-interface SubmittedEditReview extends SubmittedReview {
+export interface SubmittedEditReview extends SubmittedReview {
   type: "EDIT",
   comment: string,
   descriptionUnable: boolean,
@@ -324,7 +327,7 @@ interface SubmittedEditReview extends SubmittedReview {
   selectedTitleHash?: string,
 }
 
-interface SubmittedPhotoReview extends SubmittedReview {
+export interface SubmittedPhotoReview extends SubmittedReview {
   type: "PHOTO",
   abuseReasons: Record<string, string>, // ID -> reason
   acceptPhotos: string[],

@@ -6,7 +6,7 @@ const CORE_ADDON_ID = "opr-tools-core";
 let userHash = 0;
 let language = "en";
 
-const addons = <Addon<any>[]>[];
+const addons = <Addon<any, any>[]>[];
 let initialized = false;
 
 export const initializeUserHash = () => new Promise<number>((resolve, reject) => {
@@ -227,9 +227,9 @@ export interface SanitizedAddon {
   url?: string,
 }
 
-class AddonToolbox<T> {
-  private addon: Addon<T>;
-  constructor(addon: Addon<T>) {
+class AddonToolbox<Tcfg, Tidb> {
+  private addon: Addon<Tcfg, Tidb>;
+  constructor(addon: Addon<Tcfg, Tidb>) {
     this.addon = addon;
   }
 
@@ -292,9 +292,10 @@ class AddonToolbox<T> {
   }
 
   public listAvailableAddons() {
-    return addons.map((a: Addon<any>): SanitizedAddon => {
+    return addons.map((a: Addon<any, any>): SanitizedAddon => {
       const copy: any = {...a};
       delete copy.defaultConfig;
+      delete copy.idbStores;
       delete copy.initialize;
       return copy;
     });
@@ -306,6 +307,10 @@ class AddonToolbox<T> {
 
   public warn(...data: any) {
     console.warn(`OPR-Tools[${this.addon.id}]:`, ...data);
+  }
+
+  public error(...data: any) {
+    console.error(`OPR-Tools[${this.addon.id}]:`, ...data);
   }
 
   public get userHash() {
@@ -322,28 +327,55 @@ class AddonToolbox<T> {
     return (id: string) => l10n[prefix + id];
   }
 
-  public async usingIDB(objectStoreName: string) {
+  public async openIDB<Tk extends keyof Tidb & string>(objectStoreName: Tk, mode: "readonly" | "readwrite") {
     const scopedOSN = `${this.addon.id}-${objectStoreName}`;
     const db = await getIDBInstance(scopedOSN);
-    const transaction = (mode: IDBTransactionMode) =>
-      db.transaction([scopedOSN], mode);
-    const getStore = (tx: IDBTransaction) =>
-      tx.objectStore(scopedOSN);
-    return { db, transaction, getStore };
+    const tx = db.transaction([scopedOSN], mode);
+    tx.oncomplete = () => db.close();
+
+    const get = (query: IDBValidKey | IDBKeyRange) => new Promise<Tidb[Tk]>((resolve, reject) => {
+      const store = tx.objectStore(scopedOSN);
+      const req = store.get(query);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject();
+    });
+
+    const getAll = () => new Promise<Tidb[Tk][]>((resolve, reject) => {
+      const store = tx.objectStore(scopedOSN);
+      const req = store.getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject();
+    });
+
+    const put = (...values: Tidb[Tk][]) => {
+      const store = tx.objectStore(scopedOSN);
+      for (const value of values) store.put(value);
+    };
+
+    const clear = () => new Promise<void>((resolve, reject) => {
+      const store = tx.objectStore(scopedOSN);
+      const req = store.clear();
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject();
+    });
+
+    const commit = () => tx.commit();
+
+    return { get, getAll, put, clear, commit };
   }
 }
 
-export interface Addon<T> extends SanitizedAddon {
-  defaultConfig: T,
-  initialize: (toolbox: AddonToolbox<T>, config: AddonSettings<T>) => void,
+export interface Addon<Tcfg, Tidb> extends SanitizedAddon {
+  defaultConfig: Tcfg,
+  initialize: (toolbox: AddonToolbox<Tcfg, Tidb>, config: AddonSettings<Tcfg>) => void,
 }
 
 interface AddonOptionsEntry {
-  addon: Addon<any>,
+  addon: Addon<any, any>,
   options: Record<PropertyKey, InternalEditableOption<any, any>>,
 }
 
-export const register = <T>(addon: Addon<T>) => addons.push(addon);
+export const register = <Tcfg, Tidb>(addon: Addon<Tcfg, Tidb>) => addons.push(addon);
 export const initializeAllAddons = () => {
   if (initialized) {
     throw new Error("Addons have already been initialized!");

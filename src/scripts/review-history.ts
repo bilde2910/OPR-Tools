@@ -18,24 +18,55 @@
 
 import { register, UnixTimestampDateOnlyEditor } from "src/core";
 import { awaitElement, downloadAsFile, filterObject, haversine, makeChildNode, readFile } from "src/utils";
-import { AnyReview, AnySubmittedReview, BaseReview, EditReview, NewReview, PhotoReview } from "src/types";
+import { AnyReview, AnySubmittedReview, EditReview, NewReview, PhotoReview, SubmittedEditReview, SubmittedNewReview, SubmittedPhotoReview } from "src/types";
 
 import "./review-history.css";
 
+type BaseColumns = "type" | "id" | "title" | "description" | "lat" | "lng"
+type NewColumns = BaseColumns | "imageUrl" | "statement" | "supportingImageUrl"
+type EditColumns = BaseColumns | "descriptionEdits" | "titleEdits" | "locationEdits"
+type PhotoColumns = BaseColumns | "newPhotos"
+
+const BASE_COLUMNS: BaseColumns[] = ["type", "id", "title", "description", "lat", "lng"];
+const NEW_COLUMNS: NewColumns[] = [...BASE_COLUMNS, "imageUrl", "statement", "supportingImageUrl"];
+const EDIT_COLUMNS: EditColumns[] = [...BASE_COLUMNS, "descriptionEdits", "titleEdits", "locationEdits"];
+const PHOTO_COLUMNS: PhotoColumns[] = [...BASE_COLUMNS, "newPhotos"];
+
+type FilteredNewReview = Pick<NewReview, NewColumns>
+type StoredNewReview = FilteredNewReview &
+  { review: SubmittedNewReview | null, ts: number }
+
+type FilteredEditReview = Pick<EditReview, EditColumns>
+type StoredEditReview = FilteredEditReview &
+  { review: SubmittedEditReview | null, ts: number }
+
+type FilteredPhotoReview = Pick<PhotoReview, PhotoColumns>
+type StoredPhotoReview = FilteredPhotoReview &
+  { review: SubmittedPhotoReview | null, ts: number }
+
+type FilteredReview = FilteredNewReview | FilteredEditReview | FilteredPhotoReview
+type StoredReview = StoredNewReview | StoredEditReview | StoredPhotoReview
+
+const DEFAULT_CONFIG = {
+  importAfter: 0,
+  importAround: { // TODO: Configurable
+    lat: 0,
+    lng: 0,
+  },
+  importWithin: 0,
+};
+
+interface IdbStores {
+  history: StoredReview,
+}
+
 export default () => {
-  register({
+  register<typeof DEFAULT_CONFIG, IdbStores>({
     id: "review-history",
     name: "Review History",
     authors: ["tehstone", "bilde2910"],
     description: "Add local review history storage to OPR",
-    defaultConfig: {
-      importAfter: 0,
-      importAround: { // TODO: Configurable
-        lat: 0,
-        lng: 0,
-      },
-      importWithin: 0,
-    },
+    defaultConfig: DEFAULT_CONFIG,
     initialize: (toolbox, config) => {
       config.setUserEditable("importAfter", {
         label: "Import after date",
@@ -43,62 +74,57 @@ export default () => {
         editor: new UnixTimestampDateOnlyEditor(),
       });
 
-      const handleIncomingReview = (review: AnyReview) => new Promise<void>((resolve, reject) => {
+      const handleIncomingReview = async (review: AnyReview) => {
         toolbox.log("handleIncomingReview");
-        let saveColumns = <(
-          keyof NewReview | keyof EditReview | keyof PhotoReview
-        )[]>[];
-        const common = <(keyof BaseReview)[]>["type", "id", "title", "description", "lat", "lng"];
+        let filtered: FilteredReview | null = null;
         switch (review.type) {
           case "NEW":
-            saveColumns = <(keyof NewReview)[]>[...common, "imageUrl", "statement", "supportingImageUrl"];
+            filtered = filterObject(review, NEW_COLUMNS);
             break;
           case "EDIT":
-            saveColumns = <(keyof EditReview)[]>[...common, "descriptionEdits", "titleEdits", "locationEdits"];
+            filtered = filterObject(review, EDIT_COLUMNS);
             break;
           case "PHOTO":
-            saveColumns = <(keyof PhotoReview)[]>[...common, "newPhotos"];
+            filtered = filterObject(review, PHOTO_COLUMNS);
             break;
         }
-        if (saveColumns.length > 0) {
-          const saveData = { ...filterObject(review, saveColumns), ts: Date.now(), review: null };
-          toolbox.usingIDB("history").then(({ db, transaction, getStore }) => {
-            const tx = transaction("readwrite");
-            tx.oncomplete = () => {
-              db.close();
-              resolve();
-            };
-            tx.onerror = reject;
-            const objectStore = getStore(tx);
-            objectStore.put(saveData);
-            tx.commit();
-          }).catch(reject);
+        if (filtered !== null) {
+          const saveData: StoredReview = { ...filtered, ts: Date.now(), review: null };
+          const idb = await toolbox.openIDB("history", "readwrite");
+          idb.put(saveData);
+          idb.commit();
         } else {
-          reject("Unknown review type: " + review.type);
+          toolbox.error("Unknown review type: " + review.type);
         }
-      });
+      };
 
-      const handleSubmittedReview = (review: AnySubmittedReview, result: string) => new Promise<void>((resolve, reject) => {
+      const handleSubmittedReview = async (review: AnySubmittedReview, result: string) => {
         toolbox.log("handleSubmittedReview");
         if (result === "api.review.post.accepted" && !!review.id) {
-          toolbox.usingIDB("history").then(({ db, transaction, getStore }) => {
-            const tx = transaction("readwrite");
-            tx.oncomplete = () => {
-              db.close();
-              resolve();
-            };
-            tx.onerror = reject;
-            const objectStore = getStore(tx);
-            const getReview = objectStore.get(review.id);
-            getReview.onsuccess = () => {
-              const { result } = getReview;
-              objectStore.put({ ...result, review });
-              tx.commit();
-            };
-            getReview.onerror = reject;
-          }).catch(reject);
+          const idb = await toolbox.openIDB("history", "readwrite");
+          const assigned = await idb.get(review.id);
+          if (assigned.type === "NEW" && review.type === "NEW") {
+            idb.put({ ...assigned, review });
+          } else if (assigned.type === "EDIT" && review.type === "EDIT") {
+            idb.put({ ...assigned, review });
+          } else if (assigned.type === "PHOTO" && review.type === "PHOTO") {
+            idb.put({ ...assigned, review });
+          } else {
+            idb.commit();
+            const msg = `Attempted to submit a ${review.type} review for a ${assigned.type} assignment`;
+            toolbox.warn();
+            toolbox.warn("Submitted review:", review);
+            toolbox.warn("Assigned review:", assigned);
+            alert(`${msg}. This should not be possbile. Please see the developer console for more details.`);
+            return;
+          }
+          idb.commit();
         }
-      });
+      };
+
+      const handleProfile = () => {
+        addRHButtons();
+      };
 
       const addRHButtons = async () => {
         const ref = await awaitElement(() => document.querySelector("wf-rating-bar"));
@@ -108,19 +134,13 @@ export default () => {
         makeChildNode(outer, "p", "Review history:");
         makeChildNode(outer, "button", "Export")
           .addEventListener("click", async () => {
-            const { db, transaction, getStore } = await toolbox.usingIDB("history");
-            const tx = transaction("readonly");
-            tx.oncomplete = () => db.close();
-            const objectStore = getStore(tx);
-            const getAllReviews = objectStore.getAll();
-            getAllReviews.onsuccess = () => {
-              const { result } = getAllReviews;
-              downloadAsFile(
-                JSON.stringify(result),
-                "application/json",
-                `reviewHistory-${toolbox.userHash}.json`
-              );
-            };
+            const idb = await toolbox.openIDB("history", "readonly");
+            const result = await idb.getAll();
+            downloadAsFile(
+              JSON.stringify(result),
+              "application/json",
+              `reviewHistory-${toolbox.userHash}.json`
+            );
           });
 
         makeChildNode(outer, "button", "Import")
@@ -134,10 +154,8 @@ export default () => {
               throw new Error("Invalid file type.");
             }
             const jsonData = JSON.parse(contents);
-            const { db, transaction, getStore } = await toolbox.usingIDB("history");
-            const tx = transaction("readwrite");
-            const objectStore = getStore(tx);
-            objectStore.clear();
+            const toStore: StoredReview[] = [];
+
             let imported = 0, failed = 0, filtered = 0;
             try {
               for (const review of jsonData) {
@@ -149,7 +167,7 @@ export default () => {
                         review.id = review.review.id;
                         found = true;
                         if (applyFilters(review)) {
-                          objectStore.put(review);
+                          toStore.push(review);
                           imported++;
                         } else {
                           filtered++;
@@ -160,7 +178,7 @@ export default () => {
                 } else {
                   found = true;
                   if (applyFilters(review)) {
-                    objectStore.put(review);
+                    toStore.push(review);
                     imported++;
                   } else {
                     filtered++;
@@ -170,19 +188,19 @@ export default () => {
                   failed++;
                 }
               }
+              const idb = await toolbox.openIDB("history", "readwrite");
+              idb.clear();
+              idb.put(...toStore);
+              idb.commit();
             } catch (error) {
-              tx.abort();
-              db.close();
               alert(`Failed to import data with error:\n${error}`);
               location.reload();
               return;
             }
 
-            tx.commit();
             let alertText = `Cleared all saved review history.\nImported ${imported} review history item(s).`;
             if (filtered > 0) alertText += `\nFiltered ${filtered} item(s) from import.`;
             if (failed > 0) alertText += `\nFailed to import ${failed} item(s).`;
-            db.close();
             alert(alertText);
             location.reload();
           });
@@ -190,15 +208,10 @@ export default () => {
         makeChildNode(outer, "button", "Clear")
           .addEventListener("click", async () => {
             if (confirm("Are you sure you want to clear your review history?")) {
-              const { db, transaction, getStore } = await toolbox.usingIDB("history");
-              const tx = transaction("readwrite");
-              tx.oncomplete = () => db.close();
-              const objectStore = getStore(tx);
-              const clearReviewHistory = objectStore.clear();
-              clearReviewHistory.onsuccess = () => {
-                alert("Cleared all saved review history.");
-                location.reload();
-              };
+              const idb = await toolbox.openIDB("history", "readwrite");
+              await idb.clear();
+              alert("Cleared all saved review history.");
+              location.reload();
             }
           });
       };
@@ -222,7 +235,7 @@ export default () => {
       };
 
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", handleIncomingReview);
-      toolbox.interceptOpenJson("GET", "/api/v1/vault/profile", addRHButtons);
+      toolbox.interceptOpenJson("GET", "/api/v1/vault/profile", handleProfile);
       toolbox.interceptSendJson("/api/v1/vault/review", handleSubmittedReview);
     }
   });
