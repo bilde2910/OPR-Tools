@@ -22,25 +22,20 @@ import { AnyReview, AnySubmittedReview, EditReview, NewReview, PhotoReview, Subm
 
 import "./review-history.css";
 
-type BaseColumns = "type" | "id" | "title" | "description" | "lat" | "lng"
-type NewColumns = BaseColumns | "imageUrl" | "statement" | "supportingImageUrl"
-type EditColumns = BaseColumns | "descriptionEdits" | "titleEdits" | "locationEdits"
-type PhotoColumns = BaseColumns | "newPhotos"
+const BASE_COLUMNS = ["type", "id", "title", "description", "lat", "lng"] as const;
+const NEW_COLUMNS = [...BASE_COLUMNS, "imageUrl", "statement", "supportingImageUrl"] as const;
+const EDIT_COLUMNS = [...BASE_COLUMNS, "descriptionEdits", "titleEdits", "locationEdits"] as const;
+const PHOTO_COLUMNS = [...BASE_COLUMNS, "newPhotos"] as const;
 
-const BASE_COLUMNS: BaseColumns[] = ["type", "id", "title", "description", "lat", "lng"];
-const NEW_COLUMNS: NewColumns[] = [...BASE_COLUMNS, "imageUrl", "statement", "supportingImageUrl"];
-const EDIT_COLUMNS: EditColumns[] = [...BASE_COLUMNS, "descriptionEdits", "titleEdits", "locationEdits"];
-const PHOTO_COLUMNS: PhotoColumns[] = [...BASE_COLUMNS, "newPhotos"];
-
-type FilteredNewReview = Pick<NewReview, NewColumns>
+type FilteredNewReview = Pick<NewReview, typeof NEW_COLUMNS[number]>
 type StoredNewReview = FilteredNewReview &
   { review: SubmittedNewReview | null, ts: number }
 
-type FilteredEditReview = Pick<EditReview, EditColumns>
+type FilteredEditReview = Pick<EditReview, typeof EDIT_COLUMNS[number]>
 type StoredEditReview = FilteredEditReview &
   { review: SubmittedEditReview | null, ts: number }
 
-type FilteredPhotoReview = Pick<PhotoReview, PhotoColumns>
+type FilteredPhotoReview = Pick<PhotoReview, typeof PHOTO_COLUMNS[number]>
 type StoredPhotoReview = FilteredPhotoReview &
   { review: SubmittedPhotoReview | null, ts: number }
 

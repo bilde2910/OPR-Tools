@@ -173,7 +173,7 @@ export const cyrb53 = function(str: string, seed: number = 0) {
  * @param keys The keys to keep
  * @returns 
  */
-export const filterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T, keys: K[]): Pick<T, K> => keys
+export const filterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T, keys: readonly K[]): Pick<T, K> => keys
   .reduce((nObj, key) => {
     nObj[key] = obj[key]; return nObj;
   }, <Pick<T, K>>{});
@@ -207,7 +207,7 @@ export const downloadAsFile = (data: string, type: string, name: string) => {
   URL.revokeObjectURL(url);
 };
 
-export const readFile = (...accept: string[]) => new Promise<string | ArrayBuffer | null>((resolve, reject) => {
+export const readFile = (...accept: readonly string[]) => new Promise<string | ArrayBuffer | null>((resolve, reject) => {
   const input = document.createElement("input");
   input.type = "file";
   if (accept.length > 0) {
