@@ -81,31 +81,3 @@
   text-align: center;
   /* Center-align the content within columns 2 to 5 */
 }
-
-.oprtns-button {
-  background-color: #e5e5e5;
-  border: none;
-  color: #ff4713;
-  padding: 10px 10px;
-  margin: 10px;
-  border-radius: .375rem;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-}
-
-.oprtns-button:hover {
-  background-color: #bdbbbb;
-  transition: 0.2s;
-}
-
-.dark .oprtns-button {
-  background-color: #404040;
-  color: #20B8E3;
-}
-
-.dark .oprtns-button:hover {
-  background-color: #707070;
-  transition: 0.2s;
-}

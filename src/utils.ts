@@ -97,6 +97,8 @@ export const readGeofences = async () => {
   return geofenceCache;
 };
 
+export const isDarkMode = () => !!document.querySelector("html")?.classList.contains("dark");
+
 //#region DOM utils
 
 export let domLoaded = document.readyState === "complete" || document.readyState === "interactive";
@@ -137,7 +139,7 @@ export function debounce(callback: () => any, wait: number) {
   };
 }
 
-export const makeChildNode = (parent: Element, tagName: string, content?: string) => {
+export const makeChildNode = (parent: Node, tagName: string, content?: string) => {
   const e = document.createElement(tagName);
   if (typeof content !== "undefined") {
     e.textContent = content;

@@ -25,3 +25,8 @@
   background-color: #404040;
   color: #20B8E3;
 }
+
+.oprrh-table {
+  display: none;
+  height: 500px;
+}

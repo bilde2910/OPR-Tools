@@ -290,18 +290,15 @@ export interface PhotoReview extends BaseReview {
   newPhotos: {
     value: string,
     hash: string,
-  }
+  }[],
 }
 
 export type AnyReview = NewReview | EditReview | PhotoReview;
 
 //#region Submitted reviews
 
-interface SubmittedReview {
+export interface AcceptedNewReview {
   id: string,
-}
-
-export interface SubmittedNewReview extends SubmittedReview {
   type: "NEW",
   quality: number,
   description: number,
@@ -316,7 +313,25 @@ export interface SubmittedNewReview extends SubmittedReview {
   reviewerSuggestedCategories: string[],
 }
 
-export interface SubmittedEditReview extends SubmittedReview {
+export interface RejectedNewReview {
+  id: string,
+  type: "NEW",
+  spam: true,
+  rejectReasons: string[],
+  accuracyRejectComment: string,
+}
+
+export interface DuplicatedNewReview {
+  id: string,
+  type: "NEW",
+  duplicate: true,
+  duplicateOf: string,
+}
+
+export type SubmittedNewReview = AcceptedNewReview | RejectedNewReview | DuplicatedNewReview;
+
+export interface SubmittedEditReview {
+  id: string,
   type: "EDIT",
   comment: string,
   descriptionUnable: boolean,
@@ -327,7 +342,8 @@ export interface SubmittedEditReview extends SubmittedReview {
   selectedTitleHash?: string,
 }
 
-export interface SubmittedPhotoReview extends SubmittedReview {
+export interface SubmittedPhotoReview {
+  id: string,
   type: "PHOTO",
   abuseReasons: Record<string, string>, // ID -> reason
   acceptPhotos: string[],

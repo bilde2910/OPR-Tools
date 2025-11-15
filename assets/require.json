@@ -7,5 +7,9 @@
     "pkgName": "proj4",
     "path": "dist/proj4.js",
     "global": "proj4"
+  }, {
+    "pkgName": "ag-grid-community",
+    "path": "dist/ag-grid-community.min.js",
+    "global": "agGrid"
   }
 ]

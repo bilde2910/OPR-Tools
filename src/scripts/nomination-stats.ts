@@ -175,10 +175,10 @@ const addExportButtons = async (subs: AnyContribution[]) => {
   div.id = "oprtns-export";
   const exportButton = makeChildNode(div, "button", "Export JSON");
   exportButton.addEventListener("click", () => exportNominationsJson(subs));
-  exportButton.classList.add("oprtns-button");
+  exportButton.classList.add("oprtcore-ui-button");
   const exportCsvButton = makeChildNode(div, "button", "Export CSV");
   exportCsvButton.addEventListener("click", () => exportNominationsCsv(subs));
-  exportCsvButton.classList.add("oprtns-button");
+  exportCsvButton.classList.add("oprtcore-ui-button");
 };
 
 const exportNominationsJson = (subs: AnyContribution[]) => {

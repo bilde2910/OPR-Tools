@@ -74,3 +74,46 @@
 input.oprtcore-fix {
   padding: 2px 5px;
 }
+
+input.oprtcore-ui-large-input {
+  padding: 10px 10px;
+  margin: 10px 10px 10px 0;
+  border-radius: .375rem;
+  font-size: 16px;
+}
+
+.oprtcore-ui-button {
+  background-color: #e5e5e5;
+  border: none;
+  color: #ff4713;
+  padding: 10px 10px;
+  margin: 10px 10px 10px 0;
+  border-radius: .375rem;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+.oprtcore-ui-button:hover {
+  background-color: hsl(0, 1%, 75%);
+  transition: 0.2s;
+}
+
+.dark .oprtcore-ui-button {
+  background-color: hsl(0, 1%, 25%);
+  color: #20B8E3;
+}
+
+.dark .oprtcore-ui-button:hover {
+  background-color: #707070;
+  transition: 0.2s;
+}
+
+.oprtcore-ui-button-active {
+  background-color: hsl(0, 1%, 67%);
+}
+
+.dark .oprtcore-ui-button-active {
+  background-color: hsl(0, 1%, 33%);
+}
