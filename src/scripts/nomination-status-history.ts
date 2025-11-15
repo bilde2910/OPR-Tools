@@ -251,7 +251,7 @@ export default () => {
         const messageTypeMapping: Record<ContributionType, (count: number) => string> = {
           NOMINATION: (c) => `Found ${c} new nomination${c > 1 ? "s" : ""} in the list!`,
           EDIT_TITLE: (c) => `Found ${c} new title edit${c > 1 ? "s" : ""} in the list!`,
-          EDIT_DESCRIPTION: (c) => `Found ${c} new descriptoin edit${c > 1 ? "s" : ""} in the list!`,
+          EDIT_DESCRIPTION: (c) => `Found ${c} new description edit${c > 1 ? "s" : ""} in the list!`,
           EDIT_LOCATION: (c) => `Found ${c} new location edit${c > 1 ? "s" : ""} in the list!`,
           PHOTO: (c) => `Found ${c} new photo${c > 1 ? "s" : ""} in the list!`,
         };
