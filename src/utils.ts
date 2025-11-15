@@ -175,28 +175,50 @@ export const cyrb53 = function(str: string, seed: number = 0) {
  * @param keys The keys to keep
  * @returns 
  */
-export const filterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T, keys: readonly K[]): Pick<T, K> => keys
-  .reduce((nObj, key) => {
-    nObj[key] = obj[key]; return nObj;
-  }, <Pick<T, K>>{});
+export const filterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T, keys: readonly K[]): Pick<T, K> =>
+  keys
+    .reduce((nObj, key) => {
+      nObj[key] = obj[key]; return nObj;
+    }, <Pick<T, K>>{});
 
 /**
  * Type-safe version of Object.entries(). The object must be string-keyed.
  * @param obj The object to get entries from
  * @returns An array of pairs of the object's keys and values
  */
-export const iterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T): [K, T[K]][] => Object
-  .entries(obj)
-  .map(([k, v]) => [k as K, v as T[K]]);
+export const iterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T): [K, T[K]][] =>
+  Object
+    .entries(obj)
+    .map(([k, v]) => [k as K, v as T[K]]);
  
 /**
  * Type-safe version of Object.keys(). The object must be string-keyed.
  * @param obj The object to get keys from
  * @returns An array of the object's keys
  */
-export const iterKeys = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T): K[] => Object
-  .keys(obj)
-  .map(k => k as K);
+export const iterKeys = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T): K[] =>
+  Object
+    .keys(obj)
+    .map(k => k as K);
+
+/**
+ * Type-safe version of Object.assign(target, ...source).
+ * @param target The target to assign to
+ * @param source An array of sources to assign from
+ * @returns The target that was assigned to
+ */
+export const assignAll = <Tt extends Record<Kt, Tt[Kt]> & Ts, Kt extends keyof Tt, Ts extends Record<Ks, Ts[Ks]>, Ks extends keyof Ts>(target: Tt, ...source: Ts[]): Tt & Ts =>
+  source
+    .reduce((t: Tt, s: Ts) => Object.assign(t, s), target);
+
+/**
+ * Converts an array of objects of type `T` to a map indexed by a property of `T`.
+ * @param arr The list of objects to index
+ * @param index The key by which to index
+ * @returns An object `{ [T[index]]: T }` for all `T` in `arr`
+ */
+export const indexToMap = <T extends Record<K, T[K]>, K extends keyof T>(arr: T[], index: K): Record<T[K], T> =>
+  assignAll({}, ...arr.map(e => ({ [e[index]]: e })));
 
 export const downloadAsFile = (data: string, type: string, name: string) => {
   const blob = new Blob([data], { type });
@@ -246,3 +268,8 @@ export const haversine = (lat1: number, lon1: number, lat2: number, lon2: number
   // returns in meters
   return d * 1000;
 };
+
+export const toUtcIsoDate = (d: Date) =>
+  `${d.getUTCFullYear()}-` +
+  `${(d.getUTCMonth() + 1).toString().padStart(2, "0")}-` +
+  `${d.getUTCDate().toString().padStart(2, "0")}`;

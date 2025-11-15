@@ -117,3 +117,60 @@ input.oprtcore-ui-large-input {
 .dark .oprtcore-ui-button-active {
   background-color: hsl(0, 1%, 33%);
 }
+
+#oprtcore-notifications {
+  position: absolute;
+  bottom: 1em;
+  right: 1em;
+  width: 30em;
+  z-index: 100;
+}
+
+.oprtcore-notification {
+  font-weight: bold;
+  border-radius: 1em;
+  padding: 1em;
+  margin-top: 1.5em;
+  color: white;
+}
+
+.oprtcore-notify-content-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.oprtcore-notify-icon-wrapper {
+  width: 30px;
+}
+
+.oprtcore-nbg-red {
+  background-color: hsl(0, 100%, 40%);
+}
+
+.oprtcore-nbg-red a {
+  color: hsl(0, 100%, 90%);
+}
+
+.oprtcore-nbg-green {
+  background-color: hsl(153, 90%, 36%);
+}
+
+.oprtcore-nbg-blue {
+  background-color: hsl(227, 74%, 39%);
+}
+
+.oprtcore-nbg-purple {
+  background-color: hsl(258, 90%, 66%);
+}
+
+.oprtcore-nbg-gold {
+  background-color: hsl(43, 74%, 49%);
+}
+
+.oprtcore-nbg-gray {
+  background-color: hsl(0, 0%, 50%);
+}
+
+.oprtcore-nbg-brown {
+  background-color: hsl(30, 38%, 33%);
+}

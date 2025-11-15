@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register, UnixTimestampDateOnlyEditor } from "src/core";
-import { awaitElement, downloadAsFile, filterObject, haversine, isDarkMode, iterObject, makeChildNode, readFile } from "src/utils";
+import { awaitElement, downloadAsFile, filterObject, haversine, isDarkMode, makeChildNode, readFile } from "src/utils";
 import { AnyReview, AnySubmittedReview, EditReview, NewReview, PhotoReview, SubmittedEditReview, SubmittedNewReview, SubmittedPhotoReview } from "src/types";
 
 import agGrid from "ag-grid-community";

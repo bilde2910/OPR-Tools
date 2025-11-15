@@ -214,19 +214,21 @@ interface Contribution {
   canReleaseHold: boolean,
 }
 
+export interface OriginalPoiData {
+  id: string,
+  imageUrl: string,
+  title: string,
+  description: string,
+  lat: number,
+  lng: number,
+  city: string,
+  state: "LIVE" | "RETIRED",
+  lastUpdateDate: string,
+}
+
 export interface EditContribution extends Contribution {
   type: EditContributionType
-  poiData: {
-    id: string,
-    imageUrl: string,
-    title: string,
-    description: string,
-    lat: number,
-    lng: number,
-    city: string,
-    state: "LIVE" | "RETIRED",
-    lastUpdateDate: string,
-  }
+  poiData: OriginalPoiData
 }
 
 export interface Nomination extends Contribution {

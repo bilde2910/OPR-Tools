@@ -1,0 +1,32 @@
+.oprnsh-dropdown {
+  cursor: pointer;
+}
+
+.oprnsh-dropdown .oprnsh-expanded {
+  display: none;
+}
+
+.oprnsh-dropdown .oprnsh-dd-left {
+  float: left;
+  margin-right: 7px;
+  display: block;
+}
+
+.oprnsh-dropdown .oprnsh-dd-right {
+  float: right;
+}
+
+/* If this changes, also update the script */
+app-submissions app-details-pane app-submission-tag-set + span {
+  display: none;
+}
+
+.oprnsh-verified::after {
+  content: ' \2713';
+  color: green;
+  font-family: initial;
+}
+
+.dark .oprnsh-verified::after {
+  color: lime;
+}

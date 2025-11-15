@@ -219,6 +219,14 @@ const getIDBInstance = (objectStoreName: string, version?: number) => new Promis
   };
 });
 
+const getNotificationDiv = () => {
+  const div = document.getElementById("oprtcore-notifications");
+  if (div) return div;
+  const nc = makeChildNode(document.getElementsByTagName("body")[0], "div");
+  nc.id = "oprtcore-notifications";
+  return nc;
+};
+
 export interface SanitizedAddon {
   id: string,
   name: string,
@@ -227,10 +235,12 @@ export interface SanitizedAddon {
   url?: string,
 }
 
+export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown"
+
 class AddonToolbox<Tcfg, Tidb> {
-  private addon: Addon<Tcfg, Tidb>;
+  #addon: Addon<Tcfg, Tidb>;
   constructor(addon: Addon<Tcfg, Tidb>) {
-    this.addon = addon;
+    this.#addon = addon;
   }
 
   public interceptOpen(method: string, url: string, callback: (e: Event) => void) {
@@ -302,15 +312,40 @@ class AddonToolbox<Tcfg, Tidb> {
   }
 
   public log(...data: any) {
-    console.log(`OPR-Tools[${this.addon.id}]:`, ...data);
+    console.log(`OPR-Tools[${this.#addon.id}]:`, ...data);
   }
 
   public warn(...data: any) {
-    console.warn(`OPR-Tools[${this.addon.id}]:`, ...data);
+    console.warn(`OPR-Tools[${this.#addon.id}]:`, ...data);
   }
 
   public error(...data: any) {
-    console.error(`OPR-Tools[${this.addon.id}]:`, ...data);
+    console.error(`OPR-Tools[${this.#addon.id}]:`, ...data);
+  }
+
+  public notify(options: {
+    color: NotificationColor,
+    message: string | Node,
+    icon?: Element,
+  }) {
+    const div = getNotificationDiv();
+    const message = typeof options.message === "string" ? document.createTextNode(options.message) : options.message;
+
+    const notification = makeChildNode(div, "div");
+    notification.classList.add("oprtcore-notification", `oprtcore-nbg-${options.color}`);
+    notification.addEventListener("click", () => div.removeChild(notification));
+    const contentWrapper = makeChildNode(notification, "div");
+    contentWrapper.classList.add("oprtcore-notify-content-wrapper");
+
+    if (typeof options.icon !== "undefined") {
+      const iconWrapper = makeChildNode(contentWrapper, "div");
+      iconWrapper.classList.add("oprtcore-notify-icon-wrapper");
+      iconWrapper.appendChild(options.icon);
+    }
+
+    const content = makeChildNode(contentWrapper, "p");
+    content.appendChild(message);
+    return notification;
   }
 
   public get userHash() {
@@ -328,10 +363,14 @@ class AddonToolbox<Tcfg, Tidb> {
   }
 
   public async openIDB<Tk extends keyof Tidb & string>(objectStoreName: Tk, mode: "readonly" | "readwrite") {
-    const scopedOSN = `${this.addon.id}-${objectStoreName}`;
+    const scopedOSN = `${this.#addon.id}-${objectStoreName}`;
     const db = await getIDBInstance(scopedOSN);
     const tx = db.transaction([scopedOSN], mode);
-    tx.oncomplete = () => db.close();
+    const completeHandlers: (() => void)[] = [];
+    tx.oncomplete = () => {
+      db.close();
+      for (const handler of completeHandlers) handler();
+    };
 
     const get = (query: IDBValidKey | IDBKeyRange) => new Promise<Tidb[Tk]>((resolve, reject) => {
       const store = tx.objectStore(scopedOSN);
@@ -359,9 +398,13 @@ class AddonToolbox<Tcfg, Tidb> {
       req.onerror = () => reject();
     });
 
+    const on = (event: "complete", callback: () => void) => {
+      if (event === "complete") completeHandlers.push(callback);
+    };
+
     const commit = () => tx.commit();
 
-    return { get, getAll, put, clear, commit };
+    return { on, get, getAll, put, clear, commit };
   }
 }
 
