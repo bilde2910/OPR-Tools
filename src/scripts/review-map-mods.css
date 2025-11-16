@@ -1,0 +1,9 @@
+.oprrmm-warning-box {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: black;
+}
+
+.dark .oprrmm-warning-box {
+  color: white;
+}

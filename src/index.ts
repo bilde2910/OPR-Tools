@@ -11,6 +11,7 @@ import openIn from "./scripts/open-in";
 import reviewTimer from "./scripts/review-timer";
 import extendedStats from "./scripts/extended-stats";
 import nominationStatusHistory from "./scripts/nomination-status-history";
+import reviewMapMods from "./scripts/review-map-mods";
 
 const availableAddons = [
   oprToolsCore,
@@ -22,6 +23,7 @@ const availableAddons = [
   reviewTimer,
   extendedStats,
   nominationStatusHistory,
+  reviewMapMods,
 ];
 
 /** Runs when the userscript is loaded initially */

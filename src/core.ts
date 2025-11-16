@@ -61,6 +61,34 @@ export class CheckboxEditor implements OptionEditor<boolean> {
   }
 }
 
+export class SelectBoxEditor<T extends string> implements OptionEditor<T> {
+  options: Record<T, string>;
+  constructor(options: Record<T, string>) {
+    this.options = options;
+  }
+
+  render(opts: RendererOptions<T>) {
+    const label = makeChildNode(opts.parent, "label", `${opts.label}: `);
+    if (opts.help) {
+      label.title = opts.help;
+      label.classList.add("oprtcore-help-available");
+    }
+    const select = document.createElement("select");
+    label.appendChild(select);
+    for (const [v, label] of iterObject(this.options)) {
+      const option = document.createElement("option");
+      option.textContent = label;
+      option.value = v;
+      select.appendChild(option);
+    }
+    select.classList.add("oprtcore-fix");
+    select.value = opts.value;
+    select.addEventListener("change", () => {
+      opts.save(select.value as T);
+    });
+  }
+}
+
 export class UnixTimestampDateOnlyEditor implements OptionEditor<number> {
   render(opts: RendererOptions<number>) {
     const label = makeChildNode(opts.parent, "label", `${opts.label}: `);
@@ -80,15 +108,15 @@ export class UnixTimestampDateOnlyEditor implements OptionEditor<number> {
   }
 }
 
-interface NumericInputEditorOptoins {
+interface NumericInputEditorOptions {
   min?: number,
   max?: number,
   step?: number,
 }
 
 export class NumericInputEditor implements OptionEditor<number> {
-  options?: NumericInputEditorOptoins;
-  constructor(options?: NumericInputEditorOptoins) {
+  options?: NumericInputEditorOptions;
+  constructor(options?: NumericInputEditorOptions) {
     this.options = options;
   }
 

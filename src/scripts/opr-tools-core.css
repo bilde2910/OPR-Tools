@@ -67,11 +67,11 @@
   margin-bottom: 1rem;
 }
 
-.dark input.oprtcore-fix {
+.dark input.oprtcore-fix, .dark select.oprtcore-fix {
   background-color: #333;
 }
 
-input.oprtcore-fix {
+input.oprtcore-fix, select.oprtcore-fix {
   padding: 2px 5px;
 }
 
