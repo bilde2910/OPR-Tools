@@ -231,8 +231,8 @@ const getIDBInstance = (objectStoreName: string, version?: number) => new Promis
   }
 
   const openRequest = indexedDB.open(`opr-tools-${userHash}`, version);
-  openRequest.onsuccess = (event: any) => {
-    const db = event.target!.result;
+  openRequest.onsuccess = () => {
+    const db = openRequest.result;
     const dbVer = db.version;
     console.log(`IndexedDB initialization complete (database version ${dbVer}).`);
     if (!db.objectStoreNames.contains(objectStoreName)) {
@@ -243,9 +243,9 @@ const getIDBInstance = (objectStoreName: string, version?: number) => new Promis
       resolve(db);
     }
   };
-  openRequest.onupgradeneeded = (event: any) => {
+  openRequest.onupgradeneeded = () => {
     console.log("Upgrading database...");
-    const db = event.target!.result;
+    const db = openRequest.result;
     if (!db.objectStoreNames.contains(objectStoreName)) {
       db.createObjectStore(objectStoreName, { keyPath: "id" });
     }
@@ -335,12 +335,12 @@ class AddonToolbox<Tcfg, Tidb, Tsess> {
   }
 
   public listAvailableAddons() {
-    return addons.map((a: UnspecAddon): SanitizedAddon => {
-      const copy: any = {...a};
+    return addons.map((a: UnspecAddon) => {
+      const copy = {...a} as Partial<UnspecAddon> & SanitizedAddon;
       delete copy.defaultConfig;
-      delete copy.idbStores;
+      delete copy.sessionData;
       delete copy.initialize;
-      return copy;
+      return copy as SanitizedAddon;
     });
   }
 
@@ -500,8 +500,7 @@ export const initializeAllAddons = () => {
   }
   if (Object.keys(options).length > 0) {
     console.log("Hooking settings editor...");
-    const dummyAddon: any = {};
-    const toolbox = new AddonToolbox(dummyAddon);
+    const toolbox = new AddonToolbox({} as any);
     toolbox.interceptOpenJson(
       "GET", "/api/v1/vault/settings",
       renderEditors(Object.values(options))

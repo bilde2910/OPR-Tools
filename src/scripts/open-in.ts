@@ -538,7 +538,7 @@ const injectShowcase = async (result: Showcase) => {
   let box: HTMLElement | null = null;
 
   const renderRef = () => document.getElementsByClassName("showcase-item__map")[0];
-  const render = () => unilTruthy(renderRef).then(async (rref: any) => {
+  const render = () => unilTruthy(renderRef).then(async (rref) => {
     const nBox = await addOpenButtons(rref, showcase[index]);
     if (box) box.parentElement!.removeChild(box);
     box = nBox;
@@ -569,8 +569,8 @@ const injectNominations = async (result: SubmissionsResult) => {
     }
   }
 
-  ref.addEventListener("click", async (e: any) => {
-    const item = e.target!.closest("app-submissions-list-item") as HTMLElement | null;
+  ref.addEventListener("click", async (e) => {
+    const item = (e.target! as HTMLElement).closest("app-submissions-list-item") as HTMLElement | null;
     if (item) {
       const nom = nomCache[item.querySelector<HTMLImageElement>(".object-cover")!.src];
       const rref = await unilTruthy(() => document.querySelector<HTMLElement>("app-details-pane .details-pane__map"));

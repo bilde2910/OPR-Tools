@@ -245,7 +245,7 @@ export default () => {
           });
       };
 
-      const applyFilters = (review: any) => {
+      const applyFilters = (review: StoredReview) => {
         const dateAfter = config.get("importAfter");
         if (dateAfter !== 0 && review.ts < dateAfter) {
           return false;
@@ -312,7 +312,7 @@ export default () => {
         for (const btn of btns) {
           btn.addEventListener("click", (ev) => {
             for (const b of btns) b.classList.remove("oprtcore-ui-button-active");
-            const e = ev.target as any;
+            const e = ev.target as HTMLElement;
             e.classList.add("oprtcore-ui-button-active");
           });
         }

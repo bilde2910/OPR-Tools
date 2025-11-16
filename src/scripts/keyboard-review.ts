@@ -153,9 +153,9 @@ export default () => {
 
       const makeKeyMap = (map: KeyHandlerMap) => (e: KeyboardEvent) => {
         let inputActive = false;
-        const ae: any = document.activeElement;
+        const ae = document.activeElement as HTMLElement | null;
         if (ae?.tagName == "TEXTAREA") inputActive = true;
-        if (ae?.tagName == "INPUT" && !["radio", "checkbox"].includes(ae?.type.toLowerCase())) inputActive = true;
+        if (ae?.tagName == "INPUT" && !["radio", "checkbox"].includes((ae as HTMLInputElement).type.toLowerCase())) inputActive = true;
         if (inputActive && (e.code.startsWith("Numpad") || e.code.startsWith("Key") || e.code.startsWith("Digit"))) return;
 
         if (e.shiftKey && e.code.startsWith("Digit")) keySequence = "+" + e.code.substring(5);
@@ -499,8 +499,7 @@ export default () => {
                   dupKeys[`[${key}`] = () => {
                     img.click();
                     unilTruthy(() => document.activeElement!.tagName === "IMG").then(() => {
-                      const ae: any = document.activeElement!;
-                      ae.blur();
+                      (document.activeElement! as HTMLImageElement).blur();
                       redrawUI();
                     });
                   };
@@ -824,7 +823,9 @@ export default () => {
       const skip = () => {
         const aahqrl10n = toolbox.i18nPrefixResolver("submission.");
         const xpath = `//button[contains(text(),'${aahqrl10n("skiptonext")}')]`;
-        const matchingElement: any = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        const matchingElement = document
+          .evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+          .singleNodeValue as HTMLButtonElement | null;
         if (matchingElement) matchingElement.click();
       };
 
@@ -872,7 +873,9 @@ export default () => {
         }
         const aahqrl10n = toolbox.i18nPrefixResolver("submission.");
         const xpath = `//button[contains(text(),'${aahqrl10n("report")}')]`;
-        const matchingElement: any = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        const matchingElement = document
+          .evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+          .singleNodeValue as HTMLButtonElement | null;
         if (matchingElement) {
           matchingElement.click();
           resolve();
@@ -1098,9 +1101,9 @@ const expandDialogAccordionPanel = (text: string) => new Promise<void>((resolve,
 const getDialogReportCheckbox = (text: string) => {
   const reportModal = document.querySelector("[class*='report-modal-content']")!;
   for (let i = 0; i < reportModal.childNodes.length; i++) {
-    const checkbox: any = reportModal.childNodes[i].childNodes[0];
+    const checkbox = reportModal.childNodes[i].childNodes[0] as HTMLElement;
     if (checkbox.textContent?.trim().includes(text)) {
-      checkbox.querySelector("span").click();
+      checkbox.querySelector("span")!.click();
       return;
     }
   }

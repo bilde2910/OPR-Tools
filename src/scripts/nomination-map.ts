@@ -58,8 +58,8 @@ export default () => {
       };
 
       const clickFirst = async () => {
-        const ref: any = await unilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
-        ref.children[0].click();
+        const ref = await unilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
+        (ref.children[0] as HTMLElement).click();
       };
 
       const addCounter = async () => {
@@ -185,7 +185,7 @@ export default () => {
           });
           marker.addListener("click", () => {
             const inputs = document.querySelectorAll("input[type=text]");
-            const input: any = inputs[0];
+            const input = inputs[0] as HTMLInputElement;
             input.value = n.id;
             input.dispatchEvent(new Event("input"));
             setTimeout(clickFirst, 500);
