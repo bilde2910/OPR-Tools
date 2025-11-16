@@ -202,7 +202,7 @@ class AddonSettings<T> {
     if (!Object.prototype.hasOwnProperty.call(props, this.key)) {
       props[this.key] = {};
     }
-    if (!Object.prototype.hasOwnProperty.call(props[this.key], key)) {
+    if (Object.prototype.hasOwnProperty.call(props[this.key], key)) {
       delete props[this.key][key];
     }
     const nData = JSON.stringify(props);
