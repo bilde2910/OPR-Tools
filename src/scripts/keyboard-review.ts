@@ -297,7 +297,7 @@ export default () => {
                 const btns = document.querySelectorAll("mat-dialog-container wf-checkbox");
                 let btnKey = "";
                 for (const btn of btns) {
-                  const lbl = btn.querySelector(".mat-checkbox-label")?.textContent.trim();
+                  const lbl = btn.querySelector(".mat-checkbox-label")?.textContent?.trim();
                   switch(lbl) {
                     case aahqrl10n("fake"): btnKey = "+5,F"; break;
                     case aahqrl10n("explicit"): btnKey = "+5,X"; break;
@@ -314,9 +314,9 @@ export default () => {
                 const aahqrl10n = toolbox.i18nPrefixResolver("review.new.question.accurateandhighquality.reject.");
                 const btns = document.querySelectorAll("mat-dialog-container wf-checkbox");
                 for (const btn of btns) {
-                  const lbl = btn.querySelector(".mat-checkbox-label")!.textContent.trim();
+                  const lbl = btn.querySelector(".mat-checkbox-label")!.textContent?.trim();
                   const panel = btn.closest("mat-expansion-panel");
-                  const pnl = panel ? panel.querySelector("mat-panel-title > div > div")!.textContent.trim() : null;
+                  const pnl = panel ? panel.querySelector("mat-panel-title > div > div")!.textContent?.trim() : null;
                   let btnKey = "";
                   switch (pnl) {
                     case null:
@@ -373,7 +373,7 @@ export default () => {
                 for (let i = 0; i < panels.length; i++) {
                   const lbl = panels[i].querySelector("mat-panel-title")!;
                   let btnKey = "";
-                  switch (lbl.querySelector("div > div")?.textContent.trim()) {
+                  switch (lbl.querySelector("div > div")?.textContent?.trim()) {
                     case aahqrl10n("photos"): btnKey = "1"; break;
                     case aahqrl10n("title"): btnKey = "2"; break;
                     case aahqrl10n("description"): btnKey = "3"; break;
@@ -1041,7 +1041,7 @@ const checkDialogBox = (parent: HTMLElement | null, text: string | null) => new 
   for (let i = 0; i < btns.length; i++) {
     const label = btns[i].querySelector<HTMLElement>(".mat-checkbox-label")!;
     const input = btns[i].querySelector<HTMLElement>(".mat-checkbox-label app-text-input-review-b input");
-    if (text && label.textContent.trim() == text) {
+    if (text && label.textContent?.trim() == text) {
       label.click();
       resolve();
       return;
@@ -1075,7 +1075,7 @@ const getDialogAccordionPanel = (text: string) => {
   const panels = document.querySelectorAll<HTMLElement>("mat-dialog-container mat-accordion mat-expansion-panel");
   for (let i = 0; i < panels.length; i++) {
     const label = panels[i].querySelector("mat-panel-title > div > div");
-    if (label?.textContent.trim() == text) {
+    if (label?.textContent?.trim() == text) {
       return panels[i];
     }
   }
