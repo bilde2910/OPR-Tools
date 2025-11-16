@@ -52,10 +52,12 @@ export default () => {
       });
       config.setUserEditable("renderCloseCircle", {
         label: "Render minimum portal proximity circle",
+        help: "New Portals will not show up if they are within 20 meters of another Portal. Enabling this will make Review Map Mods draw a blue circle around the proposed location that corresponds to this minimum distance.",
         editor: new CheckboxEditor(),
       });
       config.setUserEditable("renderMoveCircle", {
         label: "Render minimum move distance circle",
+        help: "If a new Portal is misplaced, you can move it during review, but only if the new location is more than 2 meters away from the submitter's proposal. Enable this option to make Review Map Mods draw a red circle to highlight this movement deadzone when suggesting a new location for the Portal.",
         editor: new CheckboxEditor(),
       });
 
