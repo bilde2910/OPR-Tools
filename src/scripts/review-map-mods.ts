@@ -17,8 +17,8 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CheckboxEditor, register, SelectBoxEditor } from "src/core";
-import { unilTruthy, haversine, insertAfter, makeChildNode } from "src/utils";
-import { AnyReview, Profile } from "src/types";
+import { unilTruthy, haversine } from "src/utils";
+import { AnyReview } from "src/types";
 
 import "./extended-stats.css";
 
@@ -64,7 +64,7 @@ export default () => {
       let moveCircle: google.maps.Circle | null = null;
       let listenSvFocus = false;
 
-      document.addEventListener("focusin", (e) => {
+      document.addEventListener("focusin", () => {
         if (listenSvFocus && document.activeElement!.classList.contains("mapsConsumerUiSceneInternalCoreScene__root")) {
           listenSvFocus = false;
           document.querySelector("mat-sidenav-content")?.scrollTo(0, 0);
