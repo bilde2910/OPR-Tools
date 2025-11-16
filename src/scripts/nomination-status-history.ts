@@ -21,7 +21,6 @@ import { filterObject, iterObject, unilTruthy, indexToMap, makeChildNode, toUtcI
 import { AnyContribution, ContributionStatus, ContributionType, OriginalPoiData, SubmissionsResult } from "src/types";
 
 import "./nomination-status-history.css";
-import { verify } from "crypto";
 
 const FILTER_COLUMNS = ["id", "type", "day", "upgraded", "status", "isNianticControlled", "canAppeal", "isClosed", "canHold", "canReleaseHold"] as const;
 
@@ -60,19 +59,18 @@ type StoredContribution = FilteredContribution & {
   statusHistory: StatusHistoryEntry[],
 }
 
-const DEFAULT_CONFIG = {};
-
 interface IdbStores {
   history: StoredContribution,
 }
 
 export default () => {
-  register<typeof DEFAULT_CONFIG, IdbStores>({
+  register<IdbStores>()({
     id: "nomination-status-history",
     name: "Nomination Status History",
     authors: ["tehstone", "bilde2910", "Tntnnbltn"],
     description: "Track changes to contribution status, and receive alerts when a contribution has changed status.",
-    defaultConfig: DEFAULT_CONFIG,
+    defaultConfig: {},
+    sessionData: {},
     initialize: (toolbox, _config) => {
       let ready = false;
 

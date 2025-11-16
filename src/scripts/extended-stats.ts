@@ -23,7 +23,7 @@ import { Profile } from "src/types";
 import "./extended-stats.css";
 
 export default () => {
-  register({
+  register()({
     id: "extended-stats",
     name: "Extended Stats",
     authors: ["tehstone", "bilde2910"],
@@ -32,6 +32,7 @@ export default () => {
       bonusUpgrades: 0,
       offsetAgreements: 0,
     },
+    sessionData: {},
     initialize: (toolbox, config) => {
       const parseStats = async (profile: Profile) => {
         const parentRef = await unilTruthy(() => document.querySelector(".wf-profile-stats__section-title"));

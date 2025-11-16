@@ -6,7 +6,9 @@ const CORE_ADDON_ID = "opr-tools-core";
 let userHash = 0;
 let language = "en";
 
-const addons = <Addon<any, any>[]>[];
+type UnspecAddon = Addon<any, any, any>
+
+const addons = <UnspecAddon[]>[];
 let initialized = false;
 
 export const initializeUserHash = () => new Promise<number>((resolve, reject) => {
@@ -156,22 +158,25 @@ type SetUserEditableCallable<T> = <Tk extends keyof T>(
 ) => void
 
 class AddonSettings<T> {
-  private key: string;
-  private defaults: T;
+  storage: Storage;
+  key: string;
+  defaults: T;
   addEditor: SetUserEditableCallable<T>;
 
   constructor(
+    storage: Storage,
     key: string,
     defaults: T,
-    addEditor: SetUserEditableCallable<T>
+    addEditor: SetUserEditableCallable<T>,
   ) {
+    this.storage = storage;
     this.key = key;
     this.defaults = defaults;
     this.addEditor = addEditor;
   }
 
   get<Tk extends keyof T>(key: Tk): T[Tk] {
-    const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
+    const data = this.storage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
     const props: T = JSON.parse(data)[this.key] ?? {};
     if (Object.prototype.hasOwnProperty.call(props, key)) {
       return props[key];
@@ -181,18 +186,18 @@ class AddonSettings<T> {
   }
 
   set<Tk extends keyof T>(key: Tk, value: T[Tk]) {
-    const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
+    const data = this.storage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
     const props = JSON.parse(data);
     if (!Object.prototype.hasOwnProperty.call(props, this.key)) {
       props[this.key] = {};
     }
     props[this.key][key] = value;
     const nData = JSON.stringify(props);
-    localStorage.setItem(`opr-tools-settings-${userHash}`, nData);
+    this.storage.setItem(`opr-tools-settings-${userHash}`, nData);
   }
 
   clear<Tk extends keyof T>(key: Tk) {
-    const data = localStorage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
+    const data = this.storage.getItem(`opr-tools-settings-${userHash}`) ?? "{}";
     const props = JSON.parse(data);
     if (!Object.prototype.hasOwnProperty.call(props, this.key)) {
       props[this.key] = {};
@@ -201,7 +206,7 @@ class AddonSettings<T> {
       delete props[this.key][key];
     }
     const nData = JSON.stringify(props);
-    localStorage.setItem(`opr-tools-settings-${userHash}`, nData);
+    this.storage.setItem(`opr-tools-settings-${userHash}`, nData);
   }
 
   setUserEditable<Tk extends keyof T>(key: Tk, options: UserEditableOption<T[Tk]>) {
@@ -265,9 +270,9 @@ export interface SanitizedAddon {
 
 export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown"
 
-class AddonToolbox<Tcfg, Tidb> {
-  #addon: Addon<Tcfg, Tidb>;
-  constructor(addon: Addon<Tcfg, Tidb>) {
+class AddonToolbox<Tcfg, Tidb, Tsess> {
+  #addon: Addon<Tcfg, Tidb, Tsess>;
+  constructor(addon: Addon<Tcfg, Tidb, Tsess>) {
     this.#addon = addon;
   }
 
@@ -330,7 +335,7 @@ class AddonToolbox<Tcfg, Tidb> {
   }
 
   public listAvailableAddons() {
-    return addons.map((a: Addon<any, any>): SanitizedAddon => {
+    return addons.map((a: UnspecAddon): SanitizedAddon => {
       const copy: any = {...a};
       delete copy.defaultConfig;
       delete copy.idbStores;
@@ -434,25 +439,36 @@ class AddonToolbox<Tcfg, Tidb> {
 
     return { on, get, getAll, put, clear, commit };
   }
+
+  public get session() {
+    return new AddonSettings<Tsess>(
+      sessionStorage,
+      this.#addon.id,
+      this.#addon.sessionData,
+      () => {},
+    );
+  }
 }
 
-export interface Addon<Tcfg, Tidb> extends SanitizedAddon {
+export interface Addon<Tcfg, Tidb, Tsess> extends SanitizedAddon {
   defaultConfig: Tcfg,
-  initialize: (toolbox: AddonToolbox<Tcfg, Tidb>, config: AddonSettings<Tcfg>) => void,
+  sessionData: Tsess,
+  initialize: (toolbox: AddonToolbox<Tcfg, Tidb, Tsess>, config: AddonSettings<Tcfg>) => void,
 }
 
 interface AddonOptionsEntry {
-  addon: Addon<any, any>,
+  addon: UnspecAddon,
   options: Record<PropertyKey, InternalEditableOption<any, any>>,
 }
 
-export const register = <Tcfg, Tidb>(addon: Addon<Tcfg, Tidb>) => addons.push(addon);
+export const register = <Tidb>() => <Tcfg, Tsess>(addon: Addon<Tcfg, Tidb, Tsess>) => addons.push(addon);
 export const initializeAllAddons = () => {
   if (initialized) {
     throw new Error("Addons have already been initialized!");
   }
   initialized = true;
   const coreSettings = new AddonSettings(
+    localStorage,
     CORE_ADDON_ID,
     { activePlugins: <string[]>[] },
     () => {},
@@ -469,6 +485,7 @@ export const initializeAllAddons = () => {
       addon.initialize(
         new AddonToolbox(addon),
         new AddonSettings(
+          localStorage,
           addon.id,
           addon.defaultConfig,
           (key, opts) => {
@@ -476,7 +493,7 @@ export const initializeAllAddons = () => {
               options[addon.id] = { addon, options: {} };
             }
             options[addon.id].options[key] = opts;
-          }
+          },
         )
       );
     }
@@ -510,7 +527,7 @@ const renderEditors = (options: AddonOptionsEntry[]) => async () => {
     makeChildNode(entryHeader, "div", entry.addon.name);
     const entryBody = makeChildNode(entryBox, "div");
     entryBody.classList.add("settings-item__description");
-    
+
     for (const [key, option] of iterObject(entry.options)) {
       const lineItem = makeChildNode(entryBody, "div");
       lineItem.classList.add("oprtcore-option-line");

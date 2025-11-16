@@ -25,7 +25,7 @@ import "./review-timer.css";
 const REVIEW_EXPIRES_SECS = 1200;
 
 export default () => {
-  register({
+  register()({
     id: "review-timer",
     name: "Review Timer",
     authors: ["tehstone", "bilde2910"],
@@ -35,6 +35,7 @@ export default () => {
       minDelay: 20,
       maxDelay: 30,
     },
+    sessionData: {},
     initialize: (toolbox, config) => {
       config.setUserEditable("smartSubmit", {
         label: "Enable Smart Submit",
@@ -85,8 +86,14 @@ export default () => {
       };
 
       const removeTimer = () => {
-        if (interval) clearInterval(interval);
-        if (rejectModalCheckTimer) clearInterval(rejectModalCheckTimer);
+        if (interval) {
+          clearInterval(interval);
+          interval = 0;
+        }
+        if (rejectModalCheckTimer) {
+          clearInterval(rejectModalCheckTimer);
+          rejectModalCheckTimer = 0;
+        }
         const timer = document.getElementById("oprtmr-outer");
         if (timer !== null) timer.remove();
       };

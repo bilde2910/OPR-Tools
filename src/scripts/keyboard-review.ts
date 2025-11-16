@@ -116,12 +116,13 @@ interface PhotoRenderContext extends RenderContext {
 type AnyRenderContext = NullRenderContext | NewRenderContext | EditRenderContext | PhotoRenderContext
 
 export default () => {
-  register({
+  register()({
     id: "keyboard-review",
     name: "Keyboard Review",
     authors: ["tehstone", "bilde2910"],
     description: "Add keyboard review to OPR",
     defaultConfig: {},
+    sessionData: {},
     initialize: (toolbox, _config) => {
       let kdEvent: KeyHandler | null = null;
       let keySequence: string | null = null;

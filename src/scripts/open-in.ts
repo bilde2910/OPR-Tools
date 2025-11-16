@@ -25,12 +25,13 @@ import proj4 from "proj4";
 import "./open-in.css";
 
 export default () => {
-  register({
+  register()({
     id: "open-in",
     name: "Open In",
     authors: ["tehstone", "bilde2910"],
     description: "Add open-in buttons to OPR",
     defaultConfig: {},
+    sessionData: {},
     initialize: (toolbox, _config) => {
       registerProjections();
       toolbox.interceptOpenJson("GET", "/api/v1/vault/home", injectShowcase);

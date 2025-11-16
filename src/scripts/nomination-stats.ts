@@ -23,12 +23,13 @@ import { AnyContribution, ContributionStatus, ContributionType, EditContribution
 import "./nomination-stats.css";
 
 export default () => {
-  register({
+  register()({
     id: "nomination-stats",
     name: "Nomination Stats",
     authors: ["tehstone", "Thtnnbltn", "bilde2910"],
     description: "Add extended OPR Profile stats",
     defaultConfig: {},
+    sessionData: {},
     initialize: (toolbox, _config) => {
       toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", parseContributions);
     }

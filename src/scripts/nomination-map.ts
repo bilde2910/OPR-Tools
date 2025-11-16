@@ -27,7 +27,7 @@ import "./nomination-map.css";
 const CTRLESS_ZOOM = true;
 
 export default () => {
-  register({
+  register()({
     id: "nomination-map",
     name: "Nomination Map",
     authors: ["tehstone", "bilde2910", "Tntnnblth"],
@@ -35,6 +35,7 @@ export default () => {
     defaultConfig: {
       loadFirst: true,
     },
+    sessionData: {},
     initialize: (toolbox, config) => {
       config.setUserEditable("loadFirst", {
         label: "Load first wayspot detail automatically",

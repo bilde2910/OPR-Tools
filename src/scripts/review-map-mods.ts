@@ -31,7 +31,7 @@ interface LatLngLiteral {
 const RESET_SELECTOR = "#check-duplicates-card .wf-review-card__header button";
 
 export default () => {
-  register({
+  register()({
     id: "review-map-mods",
     name: "Review Map Mods",
     authors: ["tehstone", "bilde2910"],
@@ -41,6 +41,7 @@ export default () => {
       renderCloseCircle: true,
       renderMoveCircle: true,
     },
+    sessionData: {},
     initialize: (toolbox, config) => {
       config.setUserEditable("display", {
         label: "Default map view",

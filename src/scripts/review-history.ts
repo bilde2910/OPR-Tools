@@ -76,26 +76,25 @@ type StoredPhotoReview = FilteredPhotoReview &
 type FilteredReview = FilteredNewReview | FilteredEditReview | FilteredPhotoReview
 type StoredReview = StoredNewReview | StoredEditReview | StoredPhotoReview
 
-const DEFAULT_CONFIG = {
-  importAfter: 0,
-  importAround: { // TODO: Configurable
-    lat: 0,
-    lng: 0,
-  },
-  importWithin: 0,
-};
-
 interface IdbStores {
   history: StoredReview,
 }
 
 export default () => {
-  register<typeof DEFAULT_CONFIG, IdbStores>({
+  register<IdbStores>()({
     id: "review-history",
     name: "Review History",
     authors: ["tehstone", "bilde2910"],
     description: "Add local review history storage to OPR",
-    defaultConfig: DEFAULT_CONFIG,
+    defaultConfig: {
+      importAfter: 0,
+      importAround: { // TODO: Configurable
+        lat: 0,
+        lng: 0,
+      },
+      importWithin: 0,
+    },
+    sessionData: {},
     initialize: (toolbox, config) => {
       config.setUserEditable("importAfter", {
         label: "Import after date",

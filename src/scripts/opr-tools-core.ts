@@ -5,7 +5,7 @@ import { UserSettings } from "src/types";
 import "./opr-tools-core.css";
 
 export default () => {
-  register({
+  register()({
     id: "opr-tools-core",
     name: "OPR Tools Core",
     authors: ["bilde2910"],
@@ -14,6 +14,7 @@ export default () => {
     defaultConfig: {
       activePlugins: <string[]>[],
     },
+    sessionData: {},
     initialize: (toolbox, config) => {
       const renderOprtSettings = async (_data: UserSettings) => {
         const ref = await unilTruthy(() => document.querySelector("app-settings"));
