@@ -118,7 +118,7 @@ export function addStyle(css: string) {
   return elem;
 }
 
-export function awaitElement<T>(listener: () => T | null | undefined) {
+export function unilTruthy<T>(listener: () => T | null | undefined) {
   return new Promise<T>((resolve, _reject) => {
     const queryLoop = () => {
       const ref = listener();

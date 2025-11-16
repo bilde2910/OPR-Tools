@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { NotificationColor, register } from "src/core";
-import { filterObject, iterObject, awaitElement, indexToMap, makeChildNode, toUtcIsoDate } from "src/utils";
+import { filterObject, iterObject, unilTruthy, indexToMap, makeChildNode, toUtcIsoDate } from "src/utils";
 import { AnyContribution, ContributionStatus, ContributionType, OriginalPoiData, SubmissionsResult } from "src/types";
 
 import "./nomination-status-history.css";
@@ -81,7 +81,7 @@ export default () => {
         // TODO: Email API
         // Add event listener for each element in the nomination list,
         // so we can display the history box for nominations on click.
-        const ref = await awaitElement(() => document.querySelector("app-submissions-list"));
+        const ref = await unilTruthy(() => document.querySelector("app-submissions-list"));
 
         ref.addEventListener("click", async (e) => {
           // Ensure there is only one selection box.
@@ -93,7 +93,7 @@ export default () => {
             // I don't see a better way to access it.
             const nomId: StoredContribution["id"] = (item as any).__ngContext__[22].id;
             if (nomId) {
-              const dsRef = await awaitElement(() => document.querySelector(CONTRIB_DATE_SELECTOR));
+              const dsRef = await unilTruthy(() => document.querySelector(CONTRIB_DATE_SELECTOR));
               const box = makeChildNode(dsRef.parentNode!, "div");
               box.classList.add("oprnsh-dropdown");
 
@@ -121,7 +121,7 @@ export default () => {
               // That process sets ready = true when done. If it was already ready, then this will
               // continue immediately. When ready, that means the previous connection was closed, so we
               // open a new connection here to fetch data for the selected nomination.
-              await awaitElement(() => ready);
+              await unilTruthy(() => ready);
               const idb = await toolbox.openIDB("history", "readonly");
               const savedNom = await idb.get(nomId);
 

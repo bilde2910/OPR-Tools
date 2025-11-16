@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register, UnixTimestampDateOnlyEditor } from "src/core";
-import { awaitElement, downloadAsFile, filterObject, haversine, isDarkMode, makeChildNode, readFile } from "src/utils";
+import { unilTruthy, downloadAsFile, filterObject, haversine, isDarkMode, makeChildNode, readFile } from "src/utils";
 import { AnyReview, AnySubmittedReview, EditReview, NewReview, PhotoReview, SubmittedEditReview, SubmittedNewReview, SubmittedPhotoReview } from "src/types";
 
 import agGrid from "ag-grid-community";
@@ -157,7 +157,7 @@ export default () => {
       };
 
       const addRHButtons = async () => {
-        const ref = await awaitElement(() => document.querySelector("wf-rating-bar"));
+        const ref = await unilTruthy(() => document.querySelector("wf-rating-bar"));
         const outer = makeChildNode(ref.parentElement!, "div");
         outer.classList.add("oprrh-idb");
 
@@ -277,7 +277,7 @@ export default () => {
           else if (review.type === "PHOTO") rhPhotos.push(review);
         }
 
-        const ratingNarRef = await awaitElement(() => document.querySelector("wf-rating-bar"));
+        const ratingNarRef = await unilTruthy(() => document.querySelector("wf-rating-bar"));
         const parent = ratingNarRef.parentNode!.parentNode!;
         const searchBox = document.createElement("input");
         searchBox.classList.add("oprtcore-fix", "oprtcore-ui-large-input");

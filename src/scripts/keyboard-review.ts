@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { awaitElement } from "src/utils";
+import { unilTruthy } from "src/utils";
 import { AnyReview, EditReview, NewReview, PhotoReview } from "src/types";
 
 import "./keyboard-review.scss";
@@ -271,7 +271,7 @@ export default () => {
             if (context.type !== RenderContextType.NEW) throw new InvalidContextError();
             if (isDialogOpen()) {
               if (isDialogClosing()) {
-                awaitElement(() => !isDialogClosing()).then(() => redrawUI());
+                unilTruthy(() => !isDialogClosing()).then(() => redrawUI());
                 return;
               } else if (ThumbCards.APPROPRIATE.isDialogOpen()) {
                 const btns = document.querySelectorAll("mat-dialog-container mat-radio-button");
@@ -408,7 +408,7 @@ export default () => {
                   block: 'center'
                 });*/
               } else {
-                awaitElement(() => document.getElementById(cc.id)).then(() => redrawUI());
+                unilTruthy(() => document.getElementById(cc.id)).then(() => redrawUI());
               }
             }
           },
@@ -476,7 +476,7 @@ export default () => {
                       for (const dupeBtn of dupeBtns) {
                         if (dupeBtn && dupeBtn.closest("body")) {
                           dupeBtn.click();
-                          awaitElement(() => document.querySelector("mat-dialog-container > *")).then(() => redrawUI());
+                          unilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => redrawUI());
                           break;
                         }
                       }
@@ -488,7 +488,7 @@ export default () => {
                     if (isDialogOpen("app-confirm-duplicate-modal")) {
                       const cancelBtn = document.querySelector<HTMLElement>("mat-dialog-container .mat-dialog-actions button.wf-button");
                       cancelBtn!.click();
-                      awaitElement(() => !isDialogOpen()).then(() => redrawUI());
+                      unilTruthy(() => !isDialogOpen()).then(() => redrawUI());
                     }
                   },
                 };
@@ -497,7 +497,7 @@ export default () => {
                   const img = dupImgs[i];
                   dupKeys[`[${key}`] = () => {
                     img.click();
-                    awaitElement(() => document.activeElement!.tagName === "IMG").then(() => {
+                    unilTruthy(() => document.activeElement!.tagName === "IMG").then(() => {
                       const ae: any = document.activeElement!;
                       ae.blur();
                       redrawUI();
@@ -728,7 +728,7 @@ export default () => {
       };
 
       const initForPhoto = async (_candidate: PhotoReview) => {
-        const acceptAll = await awaitElement(() => document.querySelector<HTMLElement>("app-review-photo app-accept-all-photos-card .photo-card"));
+        const acceptAll = await unilTruthy(() => document.querySelector<HTMLElement>("app-review-photo app-accept-all-photos-card .photo-card"));
 
         context = {
           type: RenderContextType.PHOTO,
@@ -843,7 +843,7 @@ export default () => {
         for (const btn of btns) {
           if (btn.querySelector("mat-icon")!.textContent === "thumb_down") {
             btn.click();
-            awaitElement(() => document.querySelector("mat-dialog-container > *")).then(() => {
+            unilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => {
               redrawUI();
               resolve();
             });
@@ -1032,7 +1032,7 @@ const isDialogClosing = (diag?: string) => {
   );
 };
 
-const waitForDialog = () => awaitElement(
+const waitForDialog = () => unilTruthy(
   () => document.querySelector("mat-dialog-container > *")
 );
 

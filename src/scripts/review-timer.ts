@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CheckboxEditor, NumericInputEditor, register } from "src/core";
-import { awaitElement, insertAfter } from "src/utils";
+import { unilTruthy, insertAfter } from "src/utils";
 import { AnyReview } from "src/types";
 
 import "./review-timer.css";
@@ -59,7 +59,7 @@ export default () => {
       const injectTimer = async (candidate: AnyReview) => {
         submitButtonClicked = false;
         expireTime = candidate.expires;
-        const container = await awaitElement(() => document.querySelector("wf-logo")?.parentElement?.parentElement);
+        const container = await unilTruthy(() => document.querySelector("wf-logo")?.parentElement?.parentElement);
         let counter = document.getElementById("oprtmr-counter");
         if (counter === null) {
           const div = document.createElement("div");

@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CheckboxEditor, register } from "src/core";
-import { awaitElement, debounce } from "src/utils";
+import { unilTruthy, debounce } from "src/utils";
 import { AnyContribution, ContributionStatus, SubmissionsResult } from "src/types";
 
 import { MarkerClusterer } from "@googlemaps/markerclusterer";
@@ -57,13 +57,13 @@ export default () => {
       };
 
       const clickFirst = async () => {
-        const ref: any = await awaitElement(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
+        const ref: any = await unilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
         ref.children[0].click();
       };
 
       const addCounter = async () => {
-        const listEl: any = await awaitElement(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
-        const insDiv = await awaitElement(() => document.querySelector(".mt-2"));
+        const listEl: any = await unilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
+        const insDiv = await unilTruthy(() => document.querySelector(".mt-2"));
 
         const searchInput = document.querySelector("input.w-full");
         if (searchInput !== undefined) {
@@ -80,7 +80,7 @@ export default () => {
       };
 
       const initPrimaryListener = async () => {
-        const ref = await awaitElement(() => document.querySelector(".cursor-pointer"));
+        const ref = await unilTruthy(() => document.querySelector(".cursor-pointer"));
         ref.addEventListener("click", function() {
           const modal = document.getElementsByTagName("app-submissions-sort-modal");
           const els = modal[0].getElementsByClassName("wf-button--primary");
@@ -99,7 +99,7 @@ export default () => {
       };
 
       const initNominationMap = async () => {
-        await awaitElement(() => typeof google !== "undefined" && nominations!.length > 0);
+        await unilTruthy(() => typeof google !== "undefined" && nominations!.length > 0);
         if (nominationMap === null) {
           addMap(createElements());
         } else {

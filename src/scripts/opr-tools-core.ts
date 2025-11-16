@@ -1,5 +1,5 @@
 import { register } from "src/core";
-import { awaitElement, makeChildNode } from "src/utils";
+import { unilTruthy, makeChildNode } from "src/utils";
 import { UserSettings } from "src/types";
 
 import "./opr-tools-core.css";
@@ -16,7 +16,7 @@ export default () => {
     },
     initialize: (toolbox, config) => {
       const renderOprtSettings = async (_data: UserSettings) => {
-        const ref = await awaitElement(() => document.querySelector("app-settings"));
+        const ref = await unilTruthy(() => document.querySelector("app-settings"));
         const box = document.createElement("div");
         box.classList.add("max-w-md");
         const mainSettings = document.getElementById("oprtoolsMainPluginSettingsPane");

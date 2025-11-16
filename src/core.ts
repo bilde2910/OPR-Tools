@@ -1,5 +1,5 @@
 import { ApiResult, Requests, Responses } from "./types";
-import { awaitElement, cyrb53, iterObject, makeChildNode } from "./utils";
+import { unilTruthy, cyrb53, iterObject, makeChildNode } from "./utils";
 
 const CORE_ADDON_ID = "opr-tools-core";
 
@@ -494,7 +494,7 @@ export const initializeAllAddons = () => {
 };
 
 const renderEditors = (options: AddonOptionsEntry[]) => async () => {
-  const ref = await awaitElement(() => document.querySelector("app-settings"));
+  const ref = await unilTruthy(() => document.querySelector("app-settings"));
   const box = makeChildNode(ref, "div");
   box.classList.add("max-w-md");
   box.id = "oprtoolsMainPluginSettingsPane";
