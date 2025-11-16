@@ -16,7 +16,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-localstoragecheck.user.js
 - [x] wayfarer-nomination-map.user.js
 - [x] wayfarer-nomination-stats.user.js
-- [ ] wayfarer-nomination-status-history.user.js
+- [x] wayfarer-nomination-status-history.user.js
 - [ ] wayfarer-nomination-streetview.user.js
 - [ ] wayfarer-nomination-types.user.js
 - [x] wayfarer-open-in.user.js
@@ -26,7 +26,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-review-counter.user.js
 - [x] wayfarer-review-history-idb.user.js
 - [x] wayfarer-review-history-table.user.js
-- [ ] wayfarer-review-map-mods.user.js
+- [x] wayfarer-review-map-mods.user.js
 - [ ] wayfarer-review-pings.user.js
 - [x] wayfarer-review-timer.user.js
 - [ ] wayfarer-skip-count.user.js
