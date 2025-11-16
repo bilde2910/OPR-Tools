@@ -63,6 +63,7 @@ export default () => {
         let counter = document.getElementById("oprtmr-counter");
         if (counter === null) {
           const div = document.createElement("div");
+          div.id = "oprtmr-outer";
           div.classList.add("oprtmr-div");
           const countLabel = document.createElement("p");
           countLabel.id = "oprtmr-counter-label";
@@ -76,10 +77,18 @@ export default () => {
 
           if (interval) clearInterval(interval);
           interval = setInterval(() => updateTime(counter!, expireTime), 1000);
+          updateTime(counter!, expireTime);
           addSmartSubmitButton();
         } else {
           counter.style.display = "block";
         }
+      };
+
+      const removeTimer = () => {
+        if (interval) clearInterval(interval);
+        if (rejectModalCheckTimer) clearInterval(rejectModalCheckTimer);
+        const timer = document.getElementById("oprtmr-outer");
+        if (timer !== null) timer.remove();
       };
 
       const updateTime = (counter: HTMLElement, expiry: number) => {
@@ -270,6 +279,7 @@ export default () => {
       };
 
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", injectTimer);
+      toolbox.interceptSendJson("/api/v1/vault/review", removeTimer);
     }
   });
 };
