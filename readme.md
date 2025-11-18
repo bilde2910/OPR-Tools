@@ -23,7 +23,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-prime-portal-links.user.js
 - [ ] wayfarer-rejections-plus.user.js
 - [ ] wayfarer-reverse-image-search.user.js
-- [ ] wayfarer-review-counter.user.js
+- [x] wayfarer-review-counter.user.js
 - [x] wayfarer-review-history-idb.user.js
 - [x] wayfarer-review-history-table.user.js
 - [x] wayfarer-review-map-mods.user.js
