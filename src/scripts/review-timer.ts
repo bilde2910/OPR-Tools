@@ -40,15 +40,15 @@ export default () => {
       config.setUserEditable("smartSubmit", {
         label: "Enable Smart Submit",
         help: "Smart Submit helps you avoid cooldowns by delaying your submission if you are reviewing quickly.",
-        editor: new CheckboxEditor()
+        editor: new CheckboxEditor(),
       });
       config.setUserEditable("minDelay", {
         label: "Smart Submit minimum delay",
-        editor: new NumericInputEditor({ min: 0 })
+        editor: new NumericInputEditor({ min: 0 }),
       });
       config.setUserEditable("maxDelay", {
         label: "Smart Submit maximum delay",
-        editor: new NumericInputEditor({ min: 0 })
+        editor: new NumericInputEditor({ min: 0 }),
       });
 
       let submitButtonClicked = false;
@@ -190,7 +190,7 @@ export default () => {
         });
         observer.observe(button, {
           attributes: true,
-          attributeFilter: ["disabled"]
+          attributeFilter: ["disabled"],
         });
       };
 
@@ -212,7 +212,7 @@ export default () => {
 
         observer.observe(button, {
           attributes: true,
-          attributeFilter: ["disabled"]
+          attributeFilter: ["disabled"],
         });
       };
 
@@ -224,7 +224,7 @@ export default () => {
         if (diff + delay > REVIEW_EXPIRES_SECS) {
           updateButtonText(
             `Submitting in ${Math.abs(REVIEW_EXPIRES_SECS - delay - diff)}`,
-            Math.abs(REVIEW_EXPIRES_SECS - delay - diff)
+            Math.abs(REVIEW_EXPIRES_SECS - delay - diff),
           );
         }
         waitToSubmit(delay, rejection);
@@ -244,7 +244,7 @@ export default () => {
         } else {
           updateButtonText(
             `Submitting in ${Math.abs(REVIEW_EXPIRES_SECS - delay - diff)}`,
-            Math.abs(REVIEW_EXPIRES_SECS - delay - diff)
+            Math.abs(REVIEW_EXPIRES_SECS - delay - diff),
           );
           setTimeout(() => waitToSubmit(delay, rejection), 1000);
         }
@@ -287,6 +287,6 @@ export default () => {
 
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", injectTimer);
       toolbox.interceptSendJson("/api/v1/vault/review", removeTimer);
-    }
+    },
   });
 };

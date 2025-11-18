@@ -459,7 +459,7 @@ export const initializeAllAddons = () => {
             }
             options[addon.id].options[key] = opts;
           },
-        )
+        ),
       );
     }
   }
@@ -468,7 +468,7 @@ export const initializeAllAddons = () => {
     const toolbox = new AddonToolbox({} as any);
     toolbox.interceptOpenJson(
       "GET", "/api/v1/vault/settings",
-      renderEditors(Object.values(options))
+      renderEditors(Object.values(options)),
     );
   }
   console.log("Addon initialization done.");

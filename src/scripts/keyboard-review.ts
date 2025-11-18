@@ -44,19 +44,19 @@ class ThumbCard {
 const ThumbCards = {
   APPROPRIATE: new ThumbCard(
     "appropriate-card",
-    "app-appropriate-rejection-flow-modal"
+    "app-appropriate-rejection-flow-modal",
   ),
   SAFE: new ThumbCard(
     "safe-card",
-    "app-safe-rejection-flow-modal"
+    "app-safe-rejection-flow-modal",
   ),
   ACCURATE: new ThumbCard(
     "accurate-and-high-quality-card",
-    "app-accuracy-rejection-flow-modal"
+    "app-accuracy-rejection-flow-modal",
   ),
   PERMANENT: new ThumbCard(
     "permanent-location-card",
-    "app-location-permanent-rejection-flow-modal"
+    "app-location-permanent-rejection-flow-modal",
   ),
 };
 
@@ -215,14 +215,14 @@ export default () => {
         const findKeyBtnInCard = (key: string) => {
           if (context.type !== RenderContextType.NEW) throw new InvalidContextError();
           return document.querySelector<HTMLElement>(
-            `#${context.cards[context.currentCard].id} .oprkr2-eds-key-bracket-${key}`
+            `#${context.cards[context.currentCard].id} .oprkr2-eds-key-bracket-${key}`,
           );
         };
         const clickThumbCardBox = (key: string) => {
           if (context.type !== RenderContextType.NEW) throw new InvalidContextError();
           if (!context.type) return;
           const btn = document.querySelector<HTMLElement>(
-            `#${context.cards[context.currentCard].id} .oprkr2-data-key-${key}`
+            `#${context.cards[context.currentCard].id} .oprkr2-data-key-${key}`,
           );
           if (btn) btn.closest("label")!.click();
         };
@@ -258,11 +258,11 @@ export default () => {
             const help = findKeyBtnInCard("H");
             if (help) help.click();
             waitForDialog().then(() => redrawUI());
-          }
+          },
         });
 
         const dupImgs = document.querySelectorAll<HTMLImageElement>(
-          "#check-duplicates-card nia-map ~ * div.overflow-x-auto img.cursor-pointer"
+          "#check-duplicates-card nia-map ~ * div.overflow-x-auto img.cursor-pointer",
         );
 
         context = {
@@ -506,35 +506,35 @@ export default () => {
                   dupKeys[`+[${key}`] = () => window.open(`${img.src}=s0`);
                 }
                 return dupKeys;
-              }
+              },
             }, {
               id: "appropriate-card",
               draw: drawThumbCard,
-              extraKeys: thumbCardKeys(true)
+              extraKeys: thumbCardKeys(true),
             }, {
               id: "safe-card",
               draw: drawThumbCard,
-              extraKeys: thumbCardKeys(true)
+              extraKeys: thumbCardKeys(true),
             }, {
               id: "accurate-and-high-quality-card",
               draw: drawThumbCard,
-              extraKeys: thumbCardKeys(true)
+              extraKeys: thumbCardKeys(true),
             }, {
               id: "permanent-location-card",
               draw: drawThumbCard,
-              extraKeys: thumbCardKeys(true)
+              extraKeys: thumbCardKeys(true),
             }, {
               id: "socialize-card",
               draw: drawThumbCard,
-              extraKeys: thumbCardKeys(false)
+              extraKeys: thumbCardKeys(false),
             }, {
               id: "exercise-card",
               draw: drawThumbCard,
-              extraKeys: thumbCardKeys(false)
+              extraKeys: thumbCardKeys(false),
             }, {
               id: "explore-card",
               draw: drawThumbCard,
-              extraKeys: thumbCardKeys(false)
+              extraKeys: thumbCardKeys(false),
             }, {
               id: "categorization-card",
               draw: card => {
@@ -574,7 +574,7 @@ export default () => {
                   }
                 };
                 const keys: KeyHandlerMap = {
-                  "Tab": () => setAllNo(true)
+                  "Tab": () => setAllNo(true),
                 };
                 let i = 1;
                 while (i <= candidate.categoryIds.length) {
@@ -582,8 +582,8 @@ export default () => {
                   keys[key] = () => toggleYN(key);
                 }
                 return keys;
-              }
-            }
+              },
+            },
           ],
           currentCard: 1,
           nextCard: () => {
@@ -651,11 +651,11 @@ export default () => {
             {
               selector: "app-select-title-edit wf-review-card",
               draw: drawTextEdit,
-              extraKeys: handleTextEditKeys("app-select-title-edit wf-review-card")
+              extraKeys: handleTextEditKeys("app-select-title-edit wf-review-card"),
             }, {
               selector: "app-select-description-edit wf-review-card",
               draw: drawTextEdit,
-              extraKeys: handleTextEditKeys("app-select-description-edit wf-review-card")
+              extraKeys: handleTextEditKeys("app-select-description-edit wf-review-card"),
             }, {
               selector: "app-select-location-edit wf-review-card",
               draw: (card: HTMLElement) => {
@@ -670,11 +670,11 @@ export default () => {
                     const labelMarker = new google.maps.Marker({
                       position: {
                         lat: parseFloat(marker.lat),
-                        lng: parseFloat(marker.lng)
+                        lng: parseFloat(marker.lng),
                       },
                       label: {
                         text: String.fromCharCode(65 + i),
-                        fontWeight: "bold"
+                        fontWeight: "bold",
                       },
                       clickable: false,
                       zIndex: 1000,
@@ -697,8 +697,8 @@ export default () => {
                   };
                 }
                 return keys;
-              }
-            }
+              },
+            },
           ].filter(ch => !!document.querySelector(ch.selector)),
           markers: [],
           currentCard: 0,
@@ -717,7 +717,7 @@ export default () => {
               context.extraKeys = context.cards[context.currentCard].extraKeys;
               updateKeybindsEdit(candidate);
             }
-          }
+          },
         };
         if (context.cards.length > 0) {
           context.extraKeys = context.cards[context.currentCard].extraKeys;
@@ -796,7 +796,7 @@ export default () => {
         const keys: KeyHandlerMap = {
           "Tab": () => acceptAll!.click(),
           "Enter": () => handleEnterNew(),
-          "+Space": () => skip()
+          "+Space": () => skip(),
         };
         for (let i = 0; i < context.cards.length; i++) {
           const card = context.cards[i];
@@ -937,7 +937,7 @@ export default () => {
           "ArrowRight": () => !isDialogOpen() && context.navigable && context.nextCard(),
           "ArrowLeft": () => !isDialogOpen() && context.navigable && context.prevCard(),
           "Enter": () => handleEnterNew(),
-          ...context.extraKeys!()
+          ...context.extraKeys!(),
         }));
       };
 
@@ -951,7 +951,7 @@ export default () => {
           "ArrowLeft": () => context.navigable && context.prevCard(),
           "Enter": () => handleEnterNew(),
           "+Space": () => skip(),
-          ...context.extraKeys!()
+          ...context.extraKeys!(),
         }));
       };
 
@@ -1020,24 +1020,24 @@ export default () => {
       };
 
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", initKeyboardCtrl);
-    }
+    },
   });
 };
 
 const isDialogOpen = (diag?: string) => {
   return !!document.querySelector(
-    "mat-dialog-container" + (diag ? ` > ${diag}` : "")
+    "mat-dialog-container" + (diag ? ` > ${diag}` : ""),
   );
 };
 
 const isDialogClosing = (diag?: string) => {
   return !!document.querySelector(
-    "mat-dialog-container.ng-animating" + (diag ? ` > ${diag}` : "")
+    "mat-dialog-container.ng-animating" + (diag ? ` > ${diag}` : ""),
   );
 };
 
 const waitForDialog = () => unilTruthy(
-  () => document.querySelector("mat-dialog-container > *")
+  () => document.querySelector("mat-dialog-container > *"),
 );
 
 const checkDialogBox = (parent: HTMLElement | null, text: string | null) => new Promise<void>((resolve, reject) => {

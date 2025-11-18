@@ -25,15 +25,15 @@ app.use((err: unknown, _req: Request, _res: Response, _next: NextFunction) => {
 });
 
 app.use("/", express.static(
-  resolve(fileURLToPath(import.meta.url), `../../../${outputDir}`)
+  resolve(fileURLToPath(import.meta.url), `../../../${outputDir}`),
 ));
 
 app.use("/", express.static(
-  resolve(fileURLToPath(import.meta.url), "../../../")
+  resolve(fileURLToPath(import.meta.url), "../../../"),
 ));
 
 app.use("/assets", express.static(
-  resolve(fileURLToPath(import.meta.url), "../../../assets/")
+  resolve(fileURLToPath(import.meta.url), "../../../assets/"),
 ));
 
 app.listen(devServerPort, "0.0.0.0", () => {

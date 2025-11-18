@@ -37,7 +37,7 @@ export default () => {
       toolbox.interceptOpenJson("GET", "/api/v1/vault/home", injectShowcase);
       toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", injectNominations);
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", injectReview);
-    }
+    },
   });
 };
 
@@ -85,128 +85,128 @@ interface Provider {
 const providers: Provider[] = [
   {
     label: "Google",
-    url: "https://maps.google.com/maps?q=%lat%,%lng%"
+    url: "https://maps.google.com/maps?q=%lat%,%lng%",
   },
   {
     label: "OpenStreetMap",
-    url: "https://www.openstreetmap.org/?mlat=%lat%&mlon=%lng%#map=18/%lat%/%lng%"
+    url: "https://www.openstreetmap.org/?mlat=%lat%&mlon=%lng%#map=18/%lat%/%lng%",
   },
   {
     label: "Intel",
-    url: "https://intel.ingress.com/intel?ll=%lat%,%lng%&z=18"
+    url: "https://intel.ingress.com/intel?ll=%lat%,%lng%&z=18",
   },
   {
     label: "Bing",
-    url: "https://www.bing.com/maps?cp=%lat%~%lng%&lvl=17&style=h"
+    url: "https://www.bing.com/maps?cp=%lat%~%lng%&lvl=17&style=h",
   },
   {
     label: "Yandex",
-    url: "https://yandex.ru/maps/?l=sat%2Cskl&ll=%lng%%2C%lat%&mode=whatshere&whatshere%5Bpoint%5D=%lng%%2C%lat%&whatshere%5Bzoom%5D=17&z=17"
+    url: "https://yandex.ru/maps/?l=sat%2Cskl&ll=%lng%%2C%lat%&mode=whatshere&whatshere%5Bpoint%5D=%lng%%2C%lat%&whatshere%5Bzoom%5D=17&z=17",
   },
   {
     // Austria
     label: "eBOD",
     url: "https://bodenkarte.at/#/center/%lng%,%lat%/zoom/19",
-    regions: ["AT"]
+    regions: ["AT"],
   },
   {
     // Australia (New South Wales)
     label: "NSW Imagery",
     url: "https://www.arcgis.com/home/webmap/viewer.html?url=http%3A%2F%2Fmaps.six.nsw.gov.au%2Farcgis%2Frest%2Fservices%2Fpublic%2FNSW_Imagery%2FMapServer&source=sd&center=%lng%,%lat%&level=20&mapOnly=true",
-    regions: ["AU_NSW"]
+    regions: ["AU_NSW"],
   },
   {
     // Australia (South Australia)
     label: "Location SA Viewer",
     url: "https://location.sa.gov.au/viewer/?map=hybrid&x=%lng%&y=%lat%&z=18&uids=&pinx=%lng%&piny=%lat%&pinTitle=%title%&pinText=%desc%",
-    regions: ["AU_SA"]
+    regions: ["AU_SA"],
   },
   {
     // Australia (Western Australia)
     label: "Landgate Map Viewer Plus",
     url: "https://map-viewer-plus.app.landgate.wa.gov.au/index.html?center=%lng%,%lat%&level=15",
-    regions: ["AU_WA"]
+    regions: ["AU_WA"],
   },
   {
     // Belgium
     label: "NGI/IGN",
     url: "https://topomapviewer.ngi.be/?l=en&baselayer=ngi.ortho&x=%lng%&y=%lat%&zoom=12",
     projection: "EPSG:3812",
-    regions: ["BE"]
+    regions: ["BE"],
   },
   {
     // Switzerland
     label: "Admin.ch",
     url: "https://map.geo.admin.ch/?lang=en&topic=ech&bgLayer=ch.swisstopo.swissimage&layers=ch.swisstopo.zeitreihen,ch.bfs.gebaeude_wohnungs_register,ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege,ch.astra.wanderland-sperrungen_umleitungen&layers_opacity=1,1,1,0.8,0.8&layers_visibility=false,false,false,false,false&layers_timestamp=18641231,,,,&E=%lng%&N=%lat%&zoom=17",
     projection: "EPSG:2056",
-    regions: ["CH", "LI"]
+    regions: ["CH", "LI"],
   },
   {
     // China (PRC)
     label: "高德",
     url: "https://uri.amap.com/marker?position=%lng%,%lat%&coordinate=wgs84&name=%title%",
-    regions: ["CN"]
+    regions: ["CN"],
   },
   {
     // China (PRC)
     label: "百度",
     url: "http://api.map.baidu.com/marker?location=%lat%,%lng%&title=%title%&content=.&output=html&coord_type=wgs84",
-    regions: ["CN"]
+    regions: ["CN"],
   },
   {
     // Czech Republic and Slovakia
     label: "Mapy.cz",
     url: "https://en.mapy.cz/zakladni?x=%lng%&y=%lat%&z=18&base=ophoto",
-    regions: ["CZ", "SK"]
+    regions: ["CZ", "SK"],
   },
   {
     // Germany (Bavaria)
     label: "BayernAtlas",
     url: "https://geoportal.bayern.de/bayernatlas/?lang=de&topic=ba&bgLayer=atkis&catalogNodes=11&E=%lng%&N=%lat%&zoom=14&layers=luftbild,luftbild_parz,tk_by,d0e7d4ea-62d8-46a0-a54a-09654530beed,bcce5127-a233-4bea-ad08-c0e4c376bccf,e528a2a8-44e7-46e9-9069-1a8295b113b5,6e2f5825-4a89-4942-a464-c88ec41bb734,86e82390-1739-4d21-bf78-e8b189c1a35d,22a00a49-82fc-4562-8176-00bf4a41e587&layers_visibility=false,true,false,true,true,true,true,true,true&crosshair=marker",
     projection: "EPSG:25832",
-    regions: ["DE_BY"]
+    regions: ["DE_BY"],
   },
   {
     // Germany (Berlin)
     label: "FIS-Broker",
     url: "https://fbinter.stadt-berlin.de/fb/index.jsp?loginkey=zoomStart&mapId=k_luftbild2011_20@senstadt&bbox=%lng%,%lat%,%lng%,%lat%",
     projection: "EPSG:25833",
-    regions: ["DE_BE"]
+    regions: ["DE_BE"],
   },
   {
     // Germany (Bremen)
     label: "GeoPortal Bremen",
     url: "https://geoportal.bremen.de/geoportal/?layerIDs=410_1,400_1,11,17_1&visibility=true,true,true,true&transparency=0,0,0,0&center=%lng%,%lat%&zoomlevel=11",
     projection: "EPSG:25832",
-    regions: ["DE_HB"]
+    regions: ["DE_HB"],
   },
   {
     // Germany (Schleswig-Holstein)
     label: "DigitalAtlasNord",
     url: "https://danord.gdi-sh.de/viewer/resources/apps/Anonym/index.html?lang=de&c=%lng%%2C%lat%&vm=2D&s=1500&bm=DOP20&r=0&#/",
     projection: "EPSG:25832",
-    regions: ["DE_HB", "DE_HH", "DE_SH"]
+    regions: ["DE_HB", "DE_HH", "DE_SH"],
   },
   {
     // Germany (Bremen, Hamburg, Schleswig-Holstein)
     label: "Hamburg Geo-Online",
     url: "https://geoportal-hamburg.de/geo-online/?Map/layerIds=12883,12884,16101,19968,94&visibility=true,true,true,true,true&transparency=0,0,0,0,0&Map/center=[%lng%,%lat%]&Map/zoomLevel=9",
     projection: "EPSG:25832",
-    regions: ["DE_HB", "DE_HH", "DE_SH"]
+    regions: ["DE_HB", "DE_HH", "DE_SH"],
   },
   {
     // Germany (Bremen, Hamburg)
     label: "Geoportal der Metropolregion Hamburg",
     url: "https://geoportal.metropolregion.hamburg.de/mrhportal/index.html?Map/layerIds=19101,8012&visibility=true,true&transparency=0,0&Map/center=[%lng%,%lat%]&Map/zoomLevel=11",
     projection: "EPSG:25832",
-    regions: ["DE_HB", "DE_HH"]
+    regions: ["DE_HB", "DE_HH"],
   },
   {
     // Germany (Mecklenburg-Western Pomerania)
     label: "ORKa.MV",
     url: "https://www.orka-mv.de/app/#!/map=8/%lng%/%lat%/EPSG:25833/S",
     projection: "EPSG:25833",
-    regions: ["DE_MV"]
+    regions: ["DE_MV"],
   },
   {
     // Germany (Mecklenburg-Western Pomerania)
@@ -214,135 +214,135 @@ const providers: Provider[] = [
     url: "https://www.gaia-mv.de/gaia/login.php?page=gaia.php&profil=inet_basis&mapext=%lnga%%20%lata%%20%lngb%%20%latb%&target_prj=epsg:5650&target_prj_display_koords=epsg:5650&target_prj_display_koords_format=m&layers=dopmv%20copyright",
     projection: "EPSG:5650",
     cornerOffsets: 10,
-    regions: ["DE_MV"]
+    regions: ["DE_MV"],
   },
   {
     // Germany (Lower Saxony)
     label: "GeobasisdatenViewer Niedersachsen",
     url: "https://www.geobasis.niedersachsen.de/?x=%lng%&y=%lat%&z=14&m=lglnDop",
-    regions: ["DE_NI"]
+    regions: ["DE_NI"],
   },
   {
     // Germany (Rhineland-Palatinate)
     label: "GeoBasisViewer RLP",
     url: "https://maps.rlp.de/?layerIDs=7&visibility=true&transparency=0&center=%lng%,%lat%&zoomlevel=11",
     projection: "EPSG:25832",
-    regions: ["DE_RP"]
+    regions: ["DE_RP"],
   },
   {
     // Germany (Saxony-Anhalt)
     label: "Sachsen-Anhalt-Viewer",
     url: "https://www.geodatenportal.sachsen-anhalt.de/mapapps/resources/apps/viewer_v40/index.html?lang=de&vm=2D&s=500&r=0&c=%lng%%2C%lat%&bm=orthophotos&l=~bauleit(~6%7Bt%3A50%7D%2C~7%7Bt%3A50%7D)",
     projection: "EPSG:25832",
-    regions: ["DE_ST"]
+    regions: ["DE_ST"],
   },
   {
     // Germany (Thuringia)
     label: "Thüringen Viewer",
     url: "https://thueringenviewer.thueringen.de/thviewer/?layerIDs=2800&visibility=true&transparency=0&center=%lng%,%lat%&zoomlevel=13",
     projection: "EPSG:25832",
-    regions: ["DE_TH"]
+    regions: ["DE_TH"],
   },
   {
     // Denmark
     label: "SDFE Skråfoto",
     url: "https://skraafoto.kortforsyningen.dk/oblivisionjsoff/index.aspx?project=Denmark&lon=%lng%&lat=%lat%",
-    regions: ["DK"]
+    regions: ["DK"],
   },
   {
     // Denmark
     label: "Krak",
     url: "https://map.krak.dk/?c=%lat%,%lng%&z=18&l=aerial&g=%lat%,%lng%",
-    regions: ["DK"]
+    regions: ["DK"],
   },
   {
     // Denmark
     label: "Find vej",
     url: "https://findvej.dk/%lat%,%lng%",
-    regions: ["DK"]
+    regions: ["DK"],
   },
   {
     // Estonia
     label: "Maainfo",
     url: "https://xgis.maaamet.ee/maps/XGis?app_id=UU82A&user_id=at&LANG=1&WIDTH=959&HEIGHT=1305&zlevel=11,%lng%,%lat%",
     projection: "EPSG:3301",
-    regions: ["EE"]
+    regions: ["EE"],
   },
   {
     // Estonia
     label: "Maa-amet Fotoladu",
     url: "https://fotoladu.maaamet.ee/?basemap=hybriidk&zlevel=15,%lng%,%lat%&overlay=tyhi",
-    regions: ["EE"]
+    regions: ["EE"],
   },
   {
     // Spain
     label: "Iberpix",
     url: "https://www.ign.es/iberpix2/visor/?center=%lng%,%lat%&zoom=20",
-    regions: ["ES", "GI", "EA", "IC"]
+    regions: ["ES", "GI", "EA", "IC"],
   },
   {
     // Spain
     label: "Fototeca Digital",
     url: "https://fototeca.cnig.es/fototeca/?center=%lng%,%lat%&zoom=20",
-    regions: ["ES", "GI", "EA", "IC"]
+    regions: ["ES", "GI", "EA", "IC"],
   },
   {
     // Finland
     label: "Maanmittauslaitos",
     url: "https://asiointi.maanmittauslaitos.fi/karttapaikka/?lang=fi&share=customMarker&n=%lat%&e=%lng%&title=%title%&desc=%desc%&zoom=13&layers=%5B%7B%22id%22:4,%22opacity%22:35%7D,%7B%22id%22:3,%22opacity%22:100%7D%5D",
     projection: "EPSG:5048",
-    regions: ["FI", "AX"]
+    regions: ["FI", "AX"],
   },
   {
     // Finland
     label: "Paikkatietoikkuna",
     url: "https://kartta.paikkatietoikkuna.fi/?zoomLevel=13&coord=%lng%_%lat%&mapLayers=24+100+default&markers=2|1|ff4712|%lng%_%lat%|%title%&noSavedState=true&showIntro=false",
     projection: "EPSG:5048",
-    regions: ["FI", "AX"]
+    regions: ["FI", "AX"],
   },
   {
     // Faroe Islands
     label: "Føroyakort",
     url: "https://kort.foroyakort.fo/kort/?center=%lng%,%lat%&zoom=13",
-    regions: ["FO"]
+    regions: ["FO"],
   },
   {
     // Faroe Islands
     label: "Flogmyndir",
     url: "https://umhvorvi.maps.arcgis.com/apps/webappviewer/index.html?id=4c79f18f83c045e181ac87858cb11641&center=%lng%,%lat%&zoom=13",
-    regions: ["FO"]
+    regions: ["FO"],
   },
   {
     // France with overseas territories
     label: "Mappy",
     url: "https://fr.mappy.com/plan#/%lat%,%lng%",
-    regions: ["FR", "PM", "BL", "SX", "MF", "GP", "MQ", "GF", "YT", "RE", "WF", "MC"]
+    regions: ["FR", "PM", "BL", "SX", "MF", "GP", "MQ", "GF", "YT", "RE", "WF", "MC"],
   },
   {
     // Croatia
     label: "Geoportal DGU",
     url: "https://geoportal.dgu.hr/#/?lng=%lng%&lat=%lat%&zoom=11",
-    regions: ["HR"]
+    regions: ["HR"],
   },
   {
     // Indonesia
     label: "Badan Informasi Geospasial",
     url: "https://geoservices.big.go.id/portal/apps/webappviewer/index.html?id=e3509402ccf34c61a44d0f06f952af96&center=%lng%,%lat%&level=18",
-    regions: ["ID"]
+    regions: ["ID"],
   },
   {
     // Israel, West Bank
     label: "Govmap",
     url: "https://www.govmap.gov.il/?c=%lng%,%lat%&z=10&b=2",
     projection: "EPSG:2039",
-    regions: ["IL", "PS_WB"]
+    regions: ["IL", "PS_WB"],
   },
   {
     // Iceland - street view
     label: "Já.is Götusýn",
     url: "https://ja.is/kort/?x=%lng%&y=%lat%&nz=17.00&type=aerial&ja360=1",
     projection: "EPSG:3057",
-    regions: ["IS"]
+    regions: ["IS"],
   },
   {
     // Iceland
@@ -362,164 +362,164 @@ const providers: Provider[] = [
     // Iceland
     label: "Samsýn",
     url: "https://kort.samsyn.is/gagnavefsja/?center=%lng%,%lat%&level=11",
-    regions: ["IS"]
+    regions: ["IS"],
   },
   {
     // South Korea
     label: "Kakao",
     url: "https://map.kakao.com/?map_type_skyview&map_hybrid=true&q=%lat%%2C%lng%",
-    regions: ["KR"]
+    regions: ["KR"],
   },
   {
     // South Korea
     label: "Naver",
     url: "http://map.naver.com/?menu=location&lat=%lat%&lng=%lng%&dLevel=14&title=%title%",
-    regions: ["KR"]
+    regions: ["KR"],
   },
   {
     // Liechtenstein
     label: "Geodatenportal der LLV",
     url: "https://geodaten.llv.li/geoportal/public.html?zoombox=%lng%,%lat%,%lng%,%lat%",
     projection: "EPSG:2056",
-    regions: ["LI"]
+    regions: ["LI"],
   },
   {
     // Lithuania
     label: "Maps.lt",
     url: "https://maps.lt/map/?lang=en#obj=%lng%;%lat%;%title%;&xy=%lng%,%lat%&z=1000&lrs=orthophoto,hybrid_overlay,vector_2_5d,stops,zebra",
     projection: "EPSG:3346",
-    regions: ["LT"]
+    regions: ["LT"],
   },
   {
     // Lithuania
     label: "Geoportal.lt",
     url: "https://www.geoportal.lt/map/mapgen/map2.html#x=%lng%&y=%lat%&l=13&olid=ORT10_2020",
     projection: "EPSG:3346",
-    regions: ["LT"]
+    regions: ["LT"],
   },
   {
     // Luxembourg
     label: "Geoportal Luxembourg",
     url: "https://map.geoportail.lu/theme/main?version=3&zoom=19&X=%lng%&Y=%lat%&lang=fr&rotation=0&layers=&opacities=&bgLayer=streets_jpeg&crosshair=true",
     projection: "EPSG:3857",
-    regions: ["LU"]
+    regions: ["LU"],
   },
   {
     // Latvia
     label: "LĢIA Kartes",
     url: "https://kartes.lgia.gov.lv/karte/?x=%lat%&y=%lng%&zoom=11&basemap=hibridkarte&bookmark=true",
     projection: "EPSG:3059",
-    regions: ["LV"]
+    regions: ["LV"],
   },
   {
     // Latvia and Estonia
     label: "BalticMaps",
     url: "https://www.balticmaps.eu/en/c___%lat%-%lng%-18/w___driving-%lat%,%lng%/bl___pl/labels",
-    regions: ["LV", "EE"]
+    regions: ["LV", "EE"],
   },
   {
     // Netherlands
     label: "Kaarten van Nederland",
     url: "https://www.kaartenvannederland.nl/#?geometry.x=%lng%&geometry.y=%lat%&zoomlevel=14",
     projection: "EPSG:28992",
-    regions: ["NL"]
+    regions: ["NL"],
   },
   {
     // Netherlands
     label: "Map5 NLTopo",
     url: "https://app.map5.nl/nltopo/#rd/openlufo/14/%lng%/%lat%",
     projection: "EPSG:28992",
-    regions: ["NL"]
+    regions: ["NL"],
   },
   {
     // Norway
     label: "Finn.no kart",
     url: "https://kart.finn.no/?lng=%lng%&lat=%lat%&zoom=18&mapType=norortho&showPin=1",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // Norway
     label: "1881.no",
     url: "https://kart.1881.no/?lat=%lat%&lon=%lng%&z=18&v=1&r=&o=&layer=",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // Norway
     label: "Gule Sider",
     url: "https://kart.gulesider.no/?c=%lat%,%lng%&z=18&l=aerial&g=%lat%,%lng%",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // Norway
     label: "Norgeskart",
     url: "https://www.norgeskart.no/#!?project=norgeskart&layers=1003&zoom=17&lat=%lat%&lon=%lng%&markerLat=%lat%&markerLon=%lng%",
     projection: "EPSG:5973",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // Norway
     label: "Se eiendom",
     url: "https://www.norgeskart.no/#!?project=seeiendom&layers=1003,1013,1014,1015&zoom=17&lat=%lat%&lon=%lng%&markerLat=%lat%&markerLon=%lng%&panel=Seeiendom&showSelection=true&p=Seeiendom",
     projection: "EPSG:5973",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // Norway
     label: "Norge i bilder",
     url: "https://www.norgeibilder.no/?x=%lng%&y=%lat%&level=17&utm=32",
     projection: "EPSG:5972",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // Norway
     label: "UT.no",
     url: "https://ut.no/kart#17/%lat%/%lng%",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // Norway
     label: "Kommunekart",
     url: "https://www.kommunekart.com/?funksjon=Vispunkt&x=%lat%&y=%lng%&zoom=17&markering=1",
-    regions: ["NO"]
+    regions: ["NO"],
   },
   {
     // New Zealand
     label: "Land Information NZ",
     url: "https://basemaps.linz.govt.nz/#@%lat%,%lng%,z19",
-    regions: ["NZ_1", "NZ_2"]
+    regions: ["NZ_1", "NZ_2"],
   },
   {
     // Poland
     label: "Geoportal",
     url: "https://mapy.geoportal.gov.pl/mobile/?bbox=%lng%,%lat%,%lng%,%lat%#composition=ortofoto",
     projection: "EPSG:2180",
-    regions: ["PL"]
+    regions: ["PL"],
   },
   {
     // Serbia
     label: "МРЕ Србије",
     url: "https://gis.mre.gov.rs/smartPortal/Srbija?extent=xmin=%lng%,ymin=%lat%,xmax=%lng%,ymax=%lat%",
     projection: "EPSG:3857",
-    regions: ["RS", "XK"]
+    regions: ["RS", "XK"],
   },
   {
     // Sweden
     label: "Lantmäteriet",
     url: "https://minkarta.lantmateriet.se/?e=%lng%&n=%lat%&z=14&profile=fastighetskarta&background=1&boundaries=true",
     projection: "EPSG:3006",
-    regions: ["SE"]
+    regions: ["SE"],
   },
   {
     // Sweden
     label: "Eniro",
     url: "https://kartor.eniro.se/?c=%lat%,%lng%&z=18&l=aerial&g=%lat%,%lng%",
-    regions: ["SE"]
+    regions: ["SE"],
   },
   {
     // Svalbard
     label: "TopoSvalbard",
     url: "https://toposvalbard.npolar.no/?lat=%lat%&long=%lng%&zoom=13&layer=aerial",
-    regions: ["SJ_SV"]
+    regions: ["SJ_SV"],
   },
 ];
 

@@ -37,7 +37,7 @@ export default () => {
         const activeAddonsBody = makeChildNode(activeAddonsBox, "div");
         activeAddonsBody.classList.add("settings-item__description");
         const refreshReminder = makeChildNode(activeAddonsBody, "p",
-          "Please refresh the page for changes in active addons to take effect."
+          "Please refresh the page for changes in active addons to take effect.",
         );
         refreshReminder.classList.add("oprtcore-refresh-reminder");
 
@@ -75,7 +75,7 @@ export default () => {
       };
 
       toolbox.interceptOpenJson("GET", "/api/v1/vault/settings", renderOprtSettings);
-    }
+    },
   });
 };
 

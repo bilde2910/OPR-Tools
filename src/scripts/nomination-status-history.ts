@@ -181,7 +181,7 @@ export default () => {
         if (submissions.length < saved.length) {
           toolbox.notify({
             color: "red",
-            message: `${saved.length - submissions.length} of ${saved.length} contributions are missing!`
+            message: `${saved.length - submissions.length} of ${saved.length} contributions are missing!`,
           });
         }
 
@@ -218,7 +218,7 @@ export default () => {
                 toolbox.notify({
                   color,
                   message: title + message,
-                  icon: createNotificationIcon(nom.type)
+                  icon: createNotificationIcon(nom.type),
                 });
               }
             }
@@ -406,6 +406,6 @@ export default () => {
       // TODO:
       // toolbox.interceptSendJson("/api/v1/vault/manage/withdraw", simplePostHandler(ContributionStatus.WITHDRAWN));
       toolbox.interceptSendJson("/api/v1/vault/manage/appeal", simplePostHandler(ContributionStatus.APPEALED));
-    }
+    },
   });
 };

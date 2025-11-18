@@ -32,7 +32,7 @@ export default () => {
     sessionData: {},
     initialize: (toolbox, _config) => {
       toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", parseContributions);
-    }
+    },
   });
 };
 
@@ -104,7 +104,7 @@ const addNominationDetails = async (subs: AnyContribution[]) => {
     for (const editType of [
       "EDIT",
       ContributionType.NOMINATION,
-      ContributionType.PHOTO
+      ContributionType.PHOTO,
     ]) {
       counts["TOTAL"][typ] += counts[editType][typ] ?? 0;
     }

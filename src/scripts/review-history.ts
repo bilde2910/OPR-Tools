@@ -51,7 +51,7 @@ const REJECTION_MAP: Record<string, string> = {
   SENSITIVE: "Sensitive location",
   EMERGENCY: "Obstructs emergency operations",
   GENERIC: "Generic business",
-  "": "(Blank)"
+  "": "(Blank)",
 };
 
 const FLOW_CHANGE_TIME = 1698674400000;
@@ -168,7 +168,7 @@ export default () => {
             downloadAsFile(
               JSON.stringify(result),
               "application/json",
-              `reviewHistory-${toolbox.userHash}.json`
+              `reviewHistory-${toolbox.userHash}.json`,
             );
           });
 
@@ -176,7 +176,7 @@ export default () => {
           .addEventListener("click", async () => {
             if (!confirm(
               "Importing will overwrite all currently stored data, " +
-              "are you sure you want to clear your currently saved review history?"
+              "are you sure you want to clear your currently saved review history?",
             )) return;
             const contents = await readFile(".json", "application/json");
             if (typeof contents !== "string") {
@@ -284,14 +284,14 @@ export default () => {
         const tables = [
           {
             label: "Nomination Reviews",
-            table: renderNewTable(searchBox, rhNew)
+            table: renderNewTable(searchBox, rhNew),
           }, {
             label: "Edit Reviews",
             table: renderEditsTable(searchBox, rhEdits),
           }, {
             label: "Photo Reviews",
             table: renderPhotosTable(searchBox, rhPhotos),
-          }
+          },
         ];
         const selector = renderTableSelector(searchBox, tables);
         parent.appendChild(selector);
@@ -465,6 +465,6 @@ export default () => {
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", handleIncomingReview);
       toolbox.interceptOpenJson("GET", "/api/v1/vault/profile", handleProfile);
       toolbox.interceptSendJson("/api/v1/vault/review", handleSubmittedReview);
-    }
+    },
   });
 };

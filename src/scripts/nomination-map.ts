@@ -39,7 +39,7 @@ export default () => {
     initialize: (toolbox, config) => {
       config.setUserEditable("loadFirst", {
         label: "Load first wayspot detail automatically",
-        editor: new CheckboxEditor()
+        editor: new CheckboxEditor(),
       });
 
       let countText: HTMLElement | null = null;
@@ -173,15 +173,15 @@ export default () => {
         nominationMarkers = nominations!.map(n => {
           const ll = {
             lat: n.lat,
-            lng: n.lng
+            lng: n.lng,
           };
           const marker = new google.maps.Marker({
             map: nominationMap,
             position: ll,
             title: n.title,
             icon: {
-              url: getIconUrl(n)
-            }
+              url: getIconUrl(n),
+            },
           });
           marker.addListener("click", () => {
             const inputs = document.querySelectorAll("input[type=text]");

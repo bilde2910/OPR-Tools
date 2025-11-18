@@ -66,6 +66,6 @@ export default () => {
       toolbox.interceptOpenJson("GET", "/api/v1/vault/home", injectCounter);
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", injectCounter);
       toolbox.interceptSendJson("/api/v1/vault/review", incrementCounter);
-    }
+    },
   });
 };

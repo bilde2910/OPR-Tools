@@ -61,7 +61,7 @@ module.exports = defineConfig([{
     }],
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "@stylistic/comma-dangle": ["error", "only-multiline"],
+    "@stylistic/comma-dangle": ["error", "always-multiline"],
     "no-misleading-character-class": "off",
     "prefer-rest-params": "off",
   },
