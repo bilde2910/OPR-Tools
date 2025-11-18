@@ -10,22 +10,31 @@ export interface BaseSchema {
 }
 
 export class IDBStoreConnection<T extends BaseSchema> {
-  #tx: IDBTransaction;
+  #tx: IDBTransaction | null;
   #completeHandlers: (() => void)[];
-  #objectStore: IDBObjectStore;
+  #objectStoreName: string;
   #db: IDBDatabase;
+  #mode: IDBTransactionMode;
   constructor(db: IDBDatabase, objectStoreName: string, mode: IDBTransactionMode) {
     this.#db = db;
-    this.#tx = db.transaction([objectStoreName], mode);
     this.#completeHandlers = [];
-    this.#tx.oncomplete = () => {
-      for (const handler of this.#completeHandlers) handler();
-    };
-    this.#objectStore = this.#tx.objectStore(objectStoreName);
+    this.#tx = null;
+    this.#objectStoreName = objectStoreName;
+    this.#mode = mode;
   }
 
   [Symbol.dispose]() {
     this.#db.close();
+  }
+
+  get #objectStore() {
+    if (this.#tx === null) {
+      this.#tx = this.#db.transaction([this.#objectStoreName], this.#mode);
+      this.#tx.oncomplete = () => {
+        for (const handler of this.#completeHandlers) handler();
+      };
+    }
+    return this.#tx.objectStore(this.#objectStoreName);
   }
 
   get(query: IDBValidKey) {
@@ -80,6 +89,9 @@ export class IDBStoreConnection<T extends BaseSchema> {
   }
 
   commit() {
-    this.#tx.commit();
+    if (this.#tx !== null) {
+      this.#tx.commit();
+      this.#tx = null;
+    }
   }
 }
