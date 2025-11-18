@@ -61,20 +61,20 @@ const NEW_COLUMNS = [...BASE_COLUMNS, "imageUrl", "statement", "supportingImageU
 const EDIT_COLUMNS = [...BASE_COLUMNS, "descriptionEdits", "titleEdits", "locationEdits"] as const;
 const PHOTO_COLUMNS = [...BASE_COLUMNS, "newPhotos"] as const;
 
-type FilteredNewReview = Pick<NewReview, typeof NEW_COLUMNS[number]>
+type FilteredNewReview = Pick<NewReview, typeof NEW_COLUMNS[number]>;
 type StoredNewReview = FilteredNewReview &
-  { review: SubmittedNewReview | null, ts: number }
+  { review: SubmittedNewReview | null, ts: number };
 
-type FilteredEditReview = Pick<EditReview, typeof EDIT_COLUMNS[number]>
+type FilteredEditReview = Pick<EditReview, typeof EDIT_COLUMNS[number]>;
 type StoredEditReview = FilteredEditReview &
-  { review: SubmittedEditReview | null, ts: number }
+  { review: SubmittedEditReview | null, ts: number };
 
-type FilteredPhotoReview = Pick<PhotoReview, typeof PHOTO_COLUMNS[number]>
+type FilteredPhotoReview = Pick<PhotoReview, typeof PHOTO_COLUMNS[number]>;
 type StoredPhotoReview = FilteredPhotoReview &
-  { review: SubmittedPhotoReview | null, ts: number }
+  { review: SubmittedPhotoReview | null, ts: number };
 
-type FilteredReview = FilteredNewReview | FilteredEditReview | FilteredPhotoReview
-type StoredReview = StoredNewReview | StoredEditReview | StoredPhotoReview
+type FilteredReview = FilteredNewReview | FilteredEditReview | FilteredPhotoReview;
+type StoredReview = StoredNewReview | StoredEditReview | StoredPhotoReview;
 
 interface IdbStores {
   history: StoredReview,

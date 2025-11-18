@@ -9,11 +9,6 @@ export type RollupArgs = Partial<{
   "config-suffix": string;
 }>;
 
-/** Configuration object for the script */
-export type ScriptConfig = {
-  // add data here
-};
-
 export type Zone = keyof typeof geofenceJson;
 export type GeofenceMap = Record<Zone, number[][]>;
 
@@ -170,7 +165,7 @@ type EditContributionType =
   ContributionType.EDIT_TITLE |
   ContributionType.EDIT_DESCRIPTION |
   ContributionType.EDIT_LOCATION |
-  ContributionType.PHOTO
+  ContributionType.PHOTO;
 
 export enum ContributionStatus {
   ACCEPTED = "ACCEPTED",
@@ -236,7 +231,7 @@ export interface Nomination extends Contribution {
   poiData: never[],
 }
 
-export type AnyContribution = EditContribution | Nomination
+export type AnyContribution = EditContribution | Nomination;
 
 //#region Incoming reviews
 

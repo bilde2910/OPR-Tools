@@ -187,7 +187,7 @@ ${devDirectives ? "\n" + devDirectives : ""}
     console.info(`Userscript URL: \x1b[34m\x1b[4m${devServerUserscriptUrl}\x1b[0m`);
     console.info();
 
-    ringBell && process.stdout.write("\u0007");
+    if (ringBell) process.stdout.write("\u0007");
 
     const buildStatsNew: BuildStats = {
       sizeKiB,
@@ -324,8 +324,8 @@ async function getRequireDirectives() {
   for(const entry of require) {
     if("link" in entry && entry.link === true)
       continue;
-    "pkgName" in entry && directives.push(getRequireEntry(entry));
-    "url" in entry && directives.push(`// @require           ${entry.url}`);
+    if ("pkgName" in entry) directives.push(getRequireEntry(entry));
+    if ("url" in entry) directives.push(`// @require           ${entry.url}`);
   }
 
   return directives.length > 0 ? directives.join("\n") : undefined;
@@ -362,9 +362,9 @@ function getResourceUrl(path: string, buildToken?: string) {
 }
 
 /** Returns the value of a CLI argument (in the format `--arg=<value>`) or the value of `defaultVal` if it doesn't exist */
-function getCliArg<TReturn extends string = string>(name: string, defaultVal: TReturn | (string & {})): TReturn
+function getCliArg<TReturn extends string = string>(name: string, defaultVal: TReturn | (string & {})): TReturn;
 /** Returns the value of a CLI argument (in the format `--arg=<value>`) or undefined if it doesn't exist */
-function getCliArg<TReturn extends string = string>(name: string, defaultVal?: TReturn | (string & {})): TReturn | undefined
+function getCliArg<TReturn extends string = string>(name: string, defaultVal?: TReturn | (string & {})): TReturn | undefined;
 /** Returns the value of a CLI argument (in the format `--arg=<value>`) or the value of `defaultVal` if it doesn't exist */
 function getCliArg<TReturn extends string = string>(name: string, defaultVal?: TReturn | (string & {})): TReturn | undefined {
   const arg = process.argv.find((v) => v.trim().match(new RegExp(`^(--)?${name}=.+$`, "i")));

@@ -13,7 +13,7 @@ const enableLogging = false;
 
 const app = express();
 
-enableLogging &&
+if (enableLogging)
   app.use((_req, _res, next) => {
     process.stdout.write("*");
     next();

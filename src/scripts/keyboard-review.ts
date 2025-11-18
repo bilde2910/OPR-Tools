@@ -60,8 +60,8 @@ const ThumbCards = {
   ),
 };
 
-type KeyHandler = (e: KeyboardEvent) => void
-type KeyHandlerMap = Record<string, KeyHandler>
+type KeyHandler = (e: KeyboardEvent) => void;
+type KeyHandlerMap = Record<string, KeyHandler>;
 
 enum RenderContextType {
   NULL = "NULL",
@@ -113,7 +113,7 @@ interface PhotoRenderContext extends RenderContext {
   navigable: false,
 }
 
-type AnyRenderContext = NullRenderContext | NewRenderContext | EditRenderContext | PhotoRenderContext
+type AnyRenderContext = NullRenderContext | NewRenderContext | EditRenderContext | PhotoRenderContext;
 
 export default () => {
   register()({

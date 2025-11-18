@@ -32,7 +32,7 @@ const CONTRIB_DATE_SELECTOR = "app-submissions app-details-pane app-submission-t
 const RIGHT_TRIANGLE = "\uFE0E\u25B6";
 const DOWN_TRIANGLE = "\u25BC";
 
-type HistoryEntryStatus = ContributionStatus | "UPGRADE"
+type HistoryEntryStatus = ContributionStatus | "UPGRADE";
 
 const STATE_MAP: Record<HistoryEntryStatus, string> = {
   ACCEPTED: "Accepted",
@@ -51,13 +51,13 @@ type StatusHistoryEntry = {
   timestamp: number,
   status: HistoryEntryStatus,
   verified?: boolean,
-}
+};
 
-type FilteredContribution = Pick<AnyContribution, typeof FILTER_COLUMNS[number]>
+type FilteredContribution = Pick<AnyContribution, typeof FILTER_COLUMNS[number]>;
 type StoredContribution = FilteredContribution & {
   poiData?: OriginalPoiData,
   statusHistory: StatusHistoryEntry[],
-}
+};
 
 interface IdbStores {
   history: StoredContribution,

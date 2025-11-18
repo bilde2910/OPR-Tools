@@ -7,10 +7,10 @@ const CORE_ADDON_ID = "opr-tools-core";
 let userHash = 0;
 let language = "en";
 
-type UnspecAddon = Addon<any, any, any>
+type UnspecAddon = Addon<any, any, any>;
 type IDBStoreDeclaration<T> = {
   [ P in keyof T ]: BaseSchema
-}
+};
 
 const addons = <UnspecAddon[]>[];
 let initialized = false;
@@ -159,7 +159,7 @@ interface InternalEditableOption<T, Ti> extends UserEditableOption<Ti> {
 type SetUserEditableCallable<T> = <Tk extends keyof T>(
   key: Tk,
   options: InternalEditableOption<T, T[Tk]>,
-) => void
+) => void;
 
 class AddonSettings<T> {
   storage: Storage;
@@ -272,7 +272,7 @@ export interface SanitizedAddon {
   url?: string,
 }
 
-export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown"
+export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown";
 
 class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
   #addon: Addon<Tcfg, Tidb, Tsess>;
