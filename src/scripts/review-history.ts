@@ -118,7 +118,7 @@ export default () => {
         }
         if (filtered !== null) {
           const saveData: StoredReview = { ...filtered, ts: Date.now(), review: null };
-          const idb = await toolbox.openIDB("history", "readwrite");
+          using idb = await toolbox.openIDB("history", "readwrite");
           idb.put(saveData);
           idb.commit();
         } else {
@@ -129,7 +129,7 @@ export default () => {
       const handleSubmittedReview = async (review: AnySubmittedReview, result: string) => {
         toolbox.log("handleSubmittedReview");
         if (result === "api.review.post.accepted" && !!review.id) {
-          const idb = await toolbox.openIDB("history", "readwrite");
+          using idb = await toolbox.openIDB("history", "readwrite");
           const assigned = await idb.get(review.id);
           if (assigned.type === "NEW" && review.type === "NEW") {
             idb.put({ ...assigned, review });
@@ -163,7 +163,7 @@ export default () => {
         makeChildNode(outer, "p", "Review history:");
         makeChildNode(outer, "button", "Export")
           .addEventListener("click", async () => {
-            const idb = await toolbox.openIDB("history", "readonly");
+            using idb = await toolbox.openIDB("history", "readonly");
             const result = await idb.getAll();
             downloadAsFile(
               JSON.stringify(result),
@@ -217,7 +217,7 @@ export default () => {
                   failed++;
                 }
               }
-              const idb = await toolbox.openIDB("history", "readwrite");
+              using idb = await toolbox.openIDB("history", "readwrite");
               idb.clear();
               idb.put(...toStore);
               idb.commit();
@@ -237,7 +237,7 @@ export default () => {
         makeChildNode(outer, "button", "Clear")
           .addEventListener("click", async () => {
             if (confirm("Are you sure you want to clear your review history?")) {
-              const idb = await toolbox.openIDB("history", "readwrite");
+              using idb = await toolbox.openIDB("history", "readwrite");
               await idb.clear();
               alert("Cleared all saved review history.");
               location.reload();
@@ -268,7 +268,7 @@ export default () => {
         const rhEdits: StoredEditReview[] = [];
         const rhPhotos: StoredPhotoReview[] = [];
 
-        const idb = await toolbox.openIDB("history", "readonly");
+        using idb = await toolbox.openIDB("history", "readonly");
         const reviews = await idb.getAll();
         for (const review of reviews) {
           if (review.type === "NEW") rhNew.push(review);

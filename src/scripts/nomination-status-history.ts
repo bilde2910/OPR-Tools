@@ -120,7 +120,7 @@ export default () => {
               // continue immediately. When ready, that means the previous connection was closed, so we
               // open a new connection here to fetch data for the selected nomination.
               await unilTruthy(() => ready);
-              const idb = await toolbox.openIDB("history", "readonly");
+              using idb = await toolbox.openIDB("history", "readonly");
               const savedNom = await idb.get(nomId);
 
               // Create an option for initial nomination; this may not be stored in the IDB history,
@@ -171,7 +171,7 @@ export default () => {
 
       const checkNominationChanges = async (submissions: AnyContribution[]) => {
         const start = Date.now();
-        const idb = await toolbox.openIDB("history", "readwrite");
+        using idb = await toolbox.openIDB("history", "readwrite");
         idb.on("complete", () => {
           console.log(`Contribution changes processed in ${Date.now() - start} msec.`);
           ready = true;
@@ -372,7 +372,7 @@ export default () => {
       };
 
       const addManualStatusChange = async (id: string, status: ContributionStatus, historyOnly = false, extras: Partial<StoredContribution> = {}) => {
-        const idb = await toolbox.openIDB("history", "readwrite");
+        using idb = await toolbox.openIDB("history", "readwrite");
         const nom = await idb.get(id);
         const history = nom.statusHistory;
         const oldStatus = history.length ? history[history.length - 1].status : null;

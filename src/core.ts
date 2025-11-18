@@ -1,3 +1,4 @@
+import { BaseSchema, IDBStoreConnection } from "./idb";
 import { ApiResult, Requests, Responses } from "./types";
 import { unilTruthy, cyrb53, iterObject, makeChildNode } from "./utils";
 
@@ -7,6 +8,9 @@ let userHash = 0;
 let language = "en";
 
 type UnspecAddon = Addon<any, any, any>
+type IDBStoreDeclaration<T> = {
+  [ P in keyof T ]: BaseSchema
+}
 
 const addons = <UnspecAddon[]>[];
 let initialized = false;
@@ -270,7 +274,7 @@ export interface SanitizedAddon {
 
 export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown"
 
-class AddonToolbox<Tcfg, Tidb, Tsess> {
+class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
   #addon: Addon<Tcfg, Tidb, Tsess>;
   constructor(addon: Addon<Tcfg, Tidb, Tsess>) {
     this.#addon = addon;
@@ -398,46 +402,7 @@ class AddonToolbox<Tcfg, Tidb, Tsess> {
   public async openIDB<Tk extends keyof Tidb & string>(objectStoreName: Tk, mode: "readonly" | "readwrite") {
     const scopedOSN = `${this.#addon.id}-${objectStoreName}`;
     const db = await getIDBInstance(scopedOSN);
-    const tx = db.transaction([scopedOSN], mode);
-    const completeHandlers: (() => void)[] = [];
-    tx.oncomplete = () => {
-      db.close();
-      for (const handler of completeHandlers) handler();
-    };
-
-    const get = (query: IDBValidKey | IDBKeyRange) => new Promise<Tidb[Tk]>((resolve, reject) => {
-      const store = tx.objectStore(scopedOSN);
-      const req = store.get(query);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject();
-    });
-
-    const getAll = () => new Promise<Tidb[Tk][]>((resolve, reject) => {
-      const store = tx.objectStore(scopedOSN);
-      const req = store.getAll();
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject();
-    });
-
-    const put = (...values: Tidb[Tk][]) => {
-      const store = tx.objectStore(scopedOSN);
-      for (const value of values) store.put(value);
-    };
-
-    const clear = () => new Promise<void>((resolve, reject) => {
-      const store = tx.objectStore(scopedOSN);
-      const req = store.clear();
-      req.onsuccess = () => resolve();
-      req.onerror = () => reject();
-    });
-
-    const on = (event: "complete", callback: () => void) => {
-      if (event === "complete") completeHandlers.push(callback);
-    };
-
-    const commit = () => tx.commit();
-
-    return { on, get, getAll, put, clear, commit };
+    return new IDBStoreConnection<Tidb[Tk]>(db, scopedOSN, mode);
   }
 
   public get session() {
@@ -450,7 +415,7 @@ class AddonToolbox<Tcfg, Tidb, Tsess> {
   }
 }
 
-export interface Addon<Tcfg, Tidb, Tsess> extends SanitizedAddon {
+export interface Addon<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> extends SanitizedAddon {
   defaultConfig: Tcfg,
   sessionData: Tsess,
   initialize: (toolbox: AddonToolbox<Tcfg, Tidb, Tsess>, config: AddonSettings<Tcfg>) => void,
@@ -461,7 +426,7 @@ interface AddonOptionsEntry {
   options: Record<PropertyKey, InternalEditableOption<any, any>>,
 }
 
-export const register = <Tidb>() => <Tcfg, Tsess>(addon: Addon<Tcfg, Tidb, Tsess>) => addons.push(addon);
+export const register = <Tidb extends IDBStoreDeclaration<Tidb>>() => <Tcfg, Tsess>(addon: Addon<Tcfg, Tidb, Tsess>) => addons.push(addon);
 export const initializeAllAddons = () => {
   if (initialized) {
     throw new Error("Addons have already been initialized!");
