@@ -195,7 +195,7 @@ export default () => {
             pano.setPov({ heading, pitch: 0 });
             pano.setPosition(svLocation);
             pano.setVisible(true);
-          } catch (ex) {
+          } catch {
             const warningBox = document.createElement("p");
             warningBox.classList.add("oprrmm-warning-box");
             warningBox.textContent = "No Street View found within a close radius";

@@ -3,13 +3,10 @@ import { dirname, join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { exec } from "node:child_process";
-import { createWriteStream } from "node:fs";
-import zlib from "node:zlib";
 import "dotenv/config";
 import { outputDir as rollupCfgOutputDir, outputFile as rollupCfgOutputFile } from "../../rollup.config.mjs";
 import pkg from "../../package.json" with { type: "json" };
-import type { GeofenceMap, RollupArgs } from "../types";
-import { Readable } from "node:stream";
+import type { RollupArgs } from "../types";
 
 type CliArg<TName extends keyof Required<RollupArgs>> = Required<RollupArgs>[TName];
 
@@ -208,7 +205,7 @@ ${devDirectives ? "\n" + devDirectives : ""}
   }
 })();
 
-async function convertGeofences() {
+/*async function convertGeofences() {
   console.log("Compressing geofence data...");
   const rootPath = join(dirname(fileURLToPath(import.meta.url)), "../../");
   const inPath = join(rootPath, assetFolderPath, "geofences.json");
@@ -234,7 +231,7 @@ async function convertGeofences() {
   const stream = Readable.from(buffer).pipe(compress).pipe(writeStream);
   await new Promise<void>((resolve) => stream.on("finish", resolve));
   console.log("Compression done.");
-}
+}*/
 
 /** Replaces tokens in the format `#{{key}}` or `/⋆#{{key}}⋆/` of the `replacements` param with their respective value */
 function insertValues(userscript: string, replacements: Record<string, Stringifiable>) {
@@ -282,8 +279,7 @@ async function exists(path: string, mode = fsconst.R_OK | fsconst.W_OK) {
   try {
     await access(path, mode);
     return true;
-  }
-  catch(err) {
+  } catch {
     return false;
   }
 }

@@ -59,7 +59,7 @@ export default () => {
         + stats.progress + config.get("offsetAgreements");
 
       toolbox.interceptOpenJson("GET", "/api/v1/vault/profile", parseStats);
-    }
+    },
   });
 };
 
