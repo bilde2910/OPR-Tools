@@ -281,10 +281,8 @@ export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "
 
 class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
   #addon: Addon<Tcfg, Tidb, Tsess, unknown>;
-  #internalLogger: Logger;
   constructor(addon: Addon<Tcfg, Tidb, Tsess, unknown>) {
     this.#addon = addon;
-    this.#internalLogger = new Logger(`core:toolbox/${addon.id}`);
   }
 
   public interceptOpen(method: string, url: string, callback: (e: Event) => void) {
@@ -309,7 +307,8 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
         if (json.captcha) return;
         callback(json.result);
       } catch (e) {
-        this.#internalLogger.error(e);
+        const logger = new Logger("core:toolbox");
+        logger.error(e);
       }
     }
     this.interceptOpen(method, url, handle);
@@ -339,7 +338,8 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
         if (jRecv.captcha) return;
         callback(jSent, jRecv.result);
       } catch (e) {
-        this.#internalLogger.error(e);
+        const logger = new Logger("core:toolbox");
+        logger.error(e);
       }
     }
     this.interceptSend(url, handle);
