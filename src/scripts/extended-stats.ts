@@ -33,7 +33,7 @@ export default () => {
       offsetAgreements: 0,
     },
     sessionData: {},
-    initialize: (toolbox, config) => {
+    initialize: (toolbox, _logger, config) => {
       const parseStats = async (profile: Profile) => {
         const parentRef = await unilTruthy(() => document.querySelector(".wf-profile-stats__section-title"));
 
