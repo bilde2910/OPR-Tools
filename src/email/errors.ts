@@ -36,7 +36,7 @@ export class HeaderNotFoundError extends EmailImportError {
 export class UnsupportedSenderError extends EmailImportError {
   constructor(message?: string) {
     super(message);
-    this.name = "HeaderNotFoundError";
+    this.name = "UnsupportedSenderError";
   }
 }
 

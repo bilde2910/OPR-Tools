@@ -3,6 +3,8 @@ import { ApiResult, Requests, Responses } from "./types";
 import { unilTruthy, cyrb53, iterObject, makeChildNode, Logger } from "./utils";
 import { CorePluginAPI } from "./scripts/opr-tools-core";
 
+import ImportIcon from "../assets/import.svg";
+
 const CORE_ADDON_ID = "opr-tools-core";
 const ADDON_APIS: {
   [CORE_ADDON_ID]?: CorePluginAPI,
@@ -247,7 +249,7 @@ const getIDBInstance = (objectStoreName: string, version?: number) => new Promis
     if (!db.objectStoreNames.contains(objectStoreName)) {
       db.close();
       logger.info(`Database does not contain column ${objectStoreName}. Closing and incrementing version.`);
-      getIDBInstance(objectStoreName, dbVer + 1).then(resolve);
+      getIDBInstance(objectStoreName, dbVer + 1).then(resolve).catch(reject);
     } else {
       resolve(db);
     }
@@ -269,6 +271,49 @@ const getNotificationDiv = () => {
   return nc;
 };
 
+interface SidebarMenuItem {
+  imageUrl: string,
+  label: string,
+  callback: () => void,
+}
+
+interface Importer {
+  title: string,
+  description: string,
+  callback: () => void,
+  icon?: string,
+}
+
+const sidebarItems: Record<string, SidebarMenuItem> = {};
+const importers: Importer[] = [];
+
+const createSidebarItems = (sidebar: Node) => {
+  for (const [id, item] of iterObject(sidebarItems)) {
+    const elId = `oprtcore-sidebar-item-${id}`;
+    if (document.getElementById(elId) === null) {
+      const div = makeChildNode(sidebar, "div");
+      div.id = elId;
+      const anchor = makeChildNode(div, "a");
+      anchor.classList.add("sidebar-link");
+      anchor.title = item.label;
+      anchor.addEventListener("click", () => item.callback());
+      const img = makeChildNode(anchor, "img") as HTMLImageElement;
+      img.classList.add("sidebar-link__icon", "oprtcore-sidebar-icon");
+      img.src = item.imageUrl;
+      makeChildNode(anchor, "span", item.label);
+    }
+  }
+};
+
+const addSidebarItem = async (id: string, item: SidebarMenuItem) => {
+  if (id in sidebarItems) {
+    throw new Error(`Tried to add already existing sidebar item ${id}`);
+  }
+  sidebarItems[id] = item;
+  const sidebar = await unilTruthy(() => document.querySelector("app-sidebar-link"));
+  createSidebarItems(sidebar.parentNode!);
+};
+
 export interface SanitizedAddon {
   id: string,
   name: string,
@@ -277,7 +322,7 @@ export interface SanitizedAddon {
   url?: string,
 }
 
-export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown";
+export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown" | "dark-gray";
 
 class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
   #addon: Addon<Tcfg, Tidb, Tsess, unknown>;
@@ -358,26 +403,75 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
   public notify(options: {
     color: NotificationColor,
     message: string | Node,
-    icon?: Element,
+    icon?: string,
+    dismissable?: boolean,
   }) {
     const div = getNotificationDiv();
     const message = typeof options.message === "string" ? document.createTextNode(options.message) : options.message;
 
     const notification = makeChildNode(div, "div");
     notification.classList.add("oprtcore-notification", `oprtcore-nbg-${options.color}`);
-    notification.addEventListener("click", () => div.removeChild(notification));
+    if (options.dismissable ?? true) {
+      notification.addEventListener("click", () => notification.remove());
+    }
     const contentWrapper = makeChildNode(notification, "div");
     contentWrapper.classList.add("oprtcore-notify-content-wrapper");
 
     if (typeof options.icon !== "undefined") {
       const iconWrapper = makeChildNode(contentWrapper, "div");
       iconWrapper.classList.add("oprtcore-notify-icon-wrapper");
-      iconWrapper.appendChild(options.icon);
+      const img = makeChildNode(iconWrapper, "img") as HTMLImageElement;
+      img.src = options.icon;
     }
 
     const content = makeChildNode(contentWrapper, "p");
     content.appendChild(message);
     return notification;
+  }
+
+  public addSidebarItem(id: string, item: SidebarMenuItem) {
+    void addSidebarItem(`addon-${this.#addon.id}-${id}`, item);
+  }
+
+  public async createModal(...cssClasses: string[]) {
+    const body = await unilTruthy(() => document.querySelector("body"));
+    const outer = makeChildNode(body, "div");
+    outer.classList.add("oprtcore-fullscreen-overlay");
+    const inner = makeChildNode(outer, "div");
+    inner.classList.add("oprtcore-fullscreen-inner", ...cssClasses);
+    return {
+      container: inner,
+      dismiss: () => outer.remove(),
+    };
+  }
+
+  public addImporter(importer: Importer) {
+    importers.push(importer);
+    if (!("oprtcore-importer" in sidebarItems)) {
+      void addSidebarItem("core-importer", {
+        imageUrl: ImportIcon,
+        label: "Import Data",
+        callback: async () => {
+          const { container, dismiss } = await this.createModal("oprtcore-modal-common", "oprtcore-import-options");
+          makeChildNode(container, "h1", "Import data to OPR Tools");
+          makeChildNode(container, "p", "Please select the kind of data you want to import.");
+          for (const method of importers) {
+            const btn = makeChildNode(container, "div");
+            btn.classList.add("oprtcore-import-method");
+            if (typeof method.icon !== "undefined") {
+              btn.style.paddingLeft = "60px";
+              btn.style.backgroundImage = `url(${method.icon})`;
+            }
+            makeChildNode(btn, "p", method.title).classList.add("oprtcore-import-method-title");
+            makeChildNode(btn, "p", method.description).classList.add("oprtcore-import-method-desc");
+            btn.addEventListener("click", () => {
+              dismiss();
+              method.callback();
+            });
+          }
+        },
+      });
+    }
   }
 
   public get userHash() {

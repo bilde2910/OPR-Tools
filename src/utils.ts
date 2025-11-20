@@ -11,7 +11,7 @@ export type ResourceKey = keyof typeof resources;
  * Falls back to a `raw.githubusercontent.com` URL or base64-encoded data URI if the resource is not available in the GM resource cache.  
  * ⚠️ Requires the directive `@grant GM.getResourceUrl`
  */
-export async function getResourceUrl(name: string) {
+export async function getResourceUrl(name: ResourceKey) {
   const logger = new Logger("utils:resources");
   let url = await GM.getResourceUrl(name);
   if(!url || url.length === 0) {
@@ -253,6 +253,17 @@ export const readFile = (...accept: readonly string[]) => new Promise<string | A
   input.click();
 });
 
+export const readFiles = (...accept: readonly string[]) => new Promise<File[]>((resolve) => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.multiple = true;
+  if (accept.length > 0) input.accept = accept.join(",");
+  input.addEventListener("change", () => {
+    resolve([...(input.files ?? [])]);
+  });
+  input.click();
+});
+
 export const haversine = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const toRad = (x: number) => x * Math.PI / 180;
   const R = 6371; // km
@@ -282,6 +293,10 @@ export class Logger {
   #subsystem: string;
   constructor(subsystem: string) {
     this.#subsystem = subsystem;
+  }
+
+  debug(...data: any) {
+    console.debug("[D]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
   }
   
   info(...data: any) {

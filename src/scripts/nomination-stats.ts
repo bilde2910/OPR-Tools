@@ -38,8 +38,8 @@ export default () => {
 
 const parseContributions = (data: SubmissionsResult) => {
   if (!data.submissions) return;
-  addNominationDetails(data.submissions);
-  addExportButtons(data.submissions);
+  void addNominationDetails(data.submissions);
+  void addExportButtons(data.submissions);
 };
 
 const addNominationDetails = async (subs: AnyContribution[]) => {

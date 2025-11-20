@@ -13,6 +13,7 @@ import extendedStats from "./scripts/extended-stats";
 import nominationStatusHistory from "./scripts/nomination-status-history";
 import reviewMapMods from "./scripts/review-map-mods";
 import reviewCounter from "./scripts/review-counter";
+import emlImporter from "./scripts/eml-importer";
 
 const availableAddons = [
   oprToolsCore,
@@ -26,18 +27,17 @@ const availableAddons = [
   nominationStatusHistory,
   reviewMapMods,
   reviewCounter,
+  emlImporter,
 ];
 
 /** Runs when the userscript is loaded initially */
-async function init() {
-  if(domLoaded)
-    run();
-  else
-    document.addEventListener("DOMContentLoaded", run);
+function init() {
+  if (domLoaded) run();
+  else document.addEventListener("DOMContentLoaded", run);
 }
 
 /** Runs after the DOM is available */
-async function run() {
+function run() {
   const logger = new Logger("setup");
   try {
     logger.info(`Initializing ${scriptInfo.name} v${scriptInfo.version} (#${buildNumber})...`);
@@ -46,7 +46,7 @@ async function run() {
       for (const addon of availableAddons) addon();
       logger.info("Addons registered.");
       initializeAllAddons();
-    });
+    }).catch(logger.error);
 
     // post-build these double quotes are replaced by backticks (because if backticks are used here, the bundler converts them to double quotes)
     addStyle("#{{GLOBAL_STYLE}}");

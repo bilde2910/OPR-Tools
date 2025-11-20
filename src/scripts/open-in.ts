@@ -544,14 +544,14 @@ const injectShowcase = async (result: Showcase) => {
     box = nBox;
   });
 
-  render();
+  await render();
   const paginators = document.getElementsByClassName("showcase-gallery__button");
   if (paginators.length === 2) {
     paginators[0].addEventListener("click", () => {
-      index = (index - 1 + count) % count; render();
+      index = (index - 1 + count) % count; void render();
     });
     paginators[1].addEventListener("click", () => {
-      index = (index + 1 + count) % count; render();
+      index = (index + 1 + count) % count; void render();
     });
   }
 };
@@ -590,14 +590,14 @@ const injectReview = async (candidate: AnyReview) => {
       addrBox.textContent = candidate.streetAddress;
       insertAfter(ref.firstChild!, addrBox);
     }
-    addOpenButtons(ref.firstChild!, candidate);
+    await addOpenButtons(ref.firstChild!, candidate);
   } else if (candidate.type === "EDIT") {
     const ref = await unilTruthy(() => document.querySelector(".review-edit-info .review-edit-info__info"));
-    addOpenButtons(ref, candidate);
+    await addOpenButtons(ref, candidate);
   } else if (candidate.type === "PHOTO") {
     const pref = await unilTruthy(() => document.querySelector("app-review-photo"));
     const ref = await unilTruthy(() => pref.querySelector(".review-photo__info > div > div:nth-child(2)"));
-    addOpenButtons(ref, candidate);
+    await addOpenButtons(ref, candidate);
   }
 };
 

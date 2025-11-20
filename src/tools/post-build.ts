@@ -88,7 +88,7 @@ const assetFolderPath = "./assets/";
 /** Whether to trigger the bell sound in some terminals when the code has finished compiling */
 const ringBell = Boolean(env.RING_BELL && (env.RING_BELL.length > 0 && env.RING_BELL.trim().toLowerCase() === "true"));
 
-(async () => {
+void (async () => {
   // Binary encoding of geofence data
   // Disabled because apparently this is VERY SLOW on browsers
   // await convertGeofences();

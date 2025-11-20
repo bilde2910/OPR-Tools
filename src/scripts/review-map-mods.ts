@@ -85,7 +85,7 @@ export default () => {
         if (candidate.type === "NEW") {
           const gmap: any = await unilTruthy(() => document.querySelector("#check-duplicates-card nia-map"));
           mapCtx = gmap.__ngContext__[gmap.__ngContext__.length - 1];
-          modifyNewReviewMap(gmap, candidate, mapCtx);
+          await modifyNewReviewMap(gmap, candidate, mapCtx);
         } else if (candidate.type === "EDIT" && candidate.locationEdits.length > 0) {
           const gmap: any = await unilTruthy(() => document.querySelector("app-select-location-edit"));
           mapCtx = gmap.__ngContext__[gmap.__ngContext__.length - 1].niaMap;
@@ -95,7 +95,7 @@ export default () => {
           logger.info(mapCtx);
           const map = mapCtx.componentRef.map as google.maps.Map;
           if (config.get("renderCloseCircle")) drawCloseCircle(map, candidate);
-          addLocationChangeBtnListener(map, mapCtx, candidate);
+          void addLocationChangeBtnListener(map, mapCtx, candidate);
           addLocationResetChangeBtnListener(map, mapCtx, candidate);
         }
       };
@@ -118,7 +118,7 @@ export default () => {
             map.setZoom(17);
             if (config.get("renderCloseCircle")) drawCloseCircle(map, candidate);
             if (config.get("renderMoveCircle")) drawMoveCircle(map, null);
-            addLocationChangeBtnListener(map, mapCtx, candidate);
+            void addLocationChangeBtnListener(map, mapCtx, candidate);
             addLocationResetChangeBtnListener(map, mapCtx, candidate);
           });
         }
@@ -202,7 +202,7 @@ export default () => {
             ref.parentElement!.insertBefore(warningBox, ref);
           }
         }
-        addNearbyTooltips(candidate, mapCtx);
+        await addNearbyTooltips(candidate, mapCtx);
       };
 
       const addNearbyTooltips = async (candidate: AnyReview, mapCtx: any) => {

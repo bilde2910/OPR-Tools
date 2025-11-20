@@ -1,4 +1,4 @@
-import geofenceJson from "../assets/geofences.json" with { type: "json" };
+import geofenceJson from "../resources/geofences.json" with { type: "json" };
 
 /** Custom CLI args passed to rollup */
 export type RollupArgs = Partial<{

@@ -102,9 +102,10 @@ export class EmailAPI {
     const email = parseMIME(file.contents);
     const emailAddress = extractEmail(email.getFirstHeaderValue("From"));
     if (!SUPPORTED_SENDERS.includes(emailAddress)) {
-      throw new UnsupportedSenderError(
+      return "ignored";
+      /*throw new UnsupportedSenderError(
         `Sender ${emailAddress} was not recognized as a valid Niantic Wayfarer or OPR-related email address.`,
-      );
+      );*/
     }
     const emailDate = new Date(email.getFirstHeaderValue("Date"));
     if (emailAddress === "hello@pokemongolive.com" && emailDate.getUTCFullYear() <= 2018) {
@@ -131,7 +132,7 @@ export class EmailAPI {
         };
         idb.put(hybrid);
         idb.commit();
-        dispatch(new WayfarerEmail(hybrid), "replaced");
+        await dispatch(new WayfarerEmail(hybrid), "replaced");
         return "replaced";
       } else {
         idb.put({
@@ -145,7 +146,7 @@ export class EmailAPI {
       if (ex instanceof KeyNotFoundError) {
         idb.put(toSave);
         idb.commit();
-        dispatch(new WayfarerEmail(toSave), "inserted");
+        await dispatch(new WayfarerEmail(toSave), "inserted");
         return "inserted";
       } else {
         throw ex;
@@ -160,9 +161,12 @@ export class EmailAPI {
    */
   async *iterate() {
     using idb = await this.#openIDB("readonly");
+    this.#logger.debug("Starting email iterator");
     for await (const email of idb.iterate()) {
+      this.#logger.debug("Yielding email from iterator");
       yield new WayfarerEmail(email);
     }
+    this.#logger.debug("Exhausted email iterator");
   }
 
   listen(listener: ImportListener) {

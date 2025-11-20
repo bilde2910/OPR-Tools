@@ -143,6 +143,11 @@ input.oprtcore-ui-large-input {
   width: 30px;
 }
 
+.oprtcore-notify-icon-wrapper > img {
+  width: 20px;
+  height: 20px;
+}
+
 .oprtcore-nbg-red {
   background-color: hsl(0, 100%, 40%);
 }
@@ -173,4 +178,80 @@ input.oprtcore-ui-large-input {
 
 .oprtcore-nbg-brown {
   background-color: hsl(30, 38%, 33%);
+}
+
+.oprtcore-nbg-dark-gray {
+  background-color: hsl(0, 0%, 40%);
+}
+
+.oprtcore-sidebar-icon {
+  width: 24px;
+}
+
+.oprtcore-fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  width: 100dvw;
+  background-color: rgba(0,0,0,0.5);
+  z-index: 100000;
+}
+
+.oprtcore-fullscreen-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  overflow-x: hidden;
+  overflow-y: scroll;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 900px;
+  max-height: 500px;
+}
+.oprtcore-modal-common {
+  width: calc(100vw - 50px);
+  height: calc(100vh - 50px);
+}
+.oprtcore-modal-common h3 {
+  font-weight: bold;
+  margin: 10px auto;
+}
+.oprtcore-modal-common > p {
+  margin: 10px auto;
+}
+
+.dark .oprtcore-fullscreen-inner {
+  background-color: #333;
+}
+
+.oprtcore-import-options {
+  max-width: 500px;
+  height: initial;
+}
+
+.oprtcore-import-method {
+  background-color: #e5e5e5;
+  border: none;
+  padding: 10px 10px;
+  cursor: pointer;
+  width: 100%;
+  background-size: 30px;
+  background-position: 15px;
+  background-repeat: no-repeat;
+  margin-bottom: 10px;
+}
+.oprtcore-import-method .oprtcore-import-method-title {
+  color: #ff4713;
+  font-size: 16px;
+}
+.oprtcore-import-method .oprtcore-import-method-desc {
+  font-size: 12px;
+}
+.dark .oprtcore-import-method {
+  background-color: #404040;
+}
+.dark .oprtcore-import-method .oprtcore-import-method-title {
+  color: #20B8E3;
 }

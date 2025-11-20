@@ -52,7 +52,7 @@ export default () => {
         }
       };
 
-      const incrementCounter = async (_review: AnySubmittedReview, result: string) => {
+      const incrementCounter = (_review: AnySubmittedReview, result: string) => {
         if (result === "api.review.post.accepted") {
           const count = toolbox.session.get("reviews") + 1;
           toolbox.session.set("reviews", count);

@@ -33,6 +33,7 @@ module.exports = defineConfig([{
       ecmaFeatures: {
         jsx: true,
       },
+      projectService: true,
     },
   },
 
@@ -54,6 +55,7 @@ module.exports = defineConfig([{
       "ignoredNodes": ["VariableDeclaration[declarations.length=0]"],
       "SwitchCase": 1,
     }],
+    "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-unused-vars": ["warn", {
       "ignoreRestSiblings": true,

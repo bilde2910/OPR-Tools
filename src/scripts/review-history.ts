@@ -151,8 +151,8 @@ export default () => {
       };
 
       const handleProfile = () => {
-        addRHButtons();
-        renderReviewHistory();
+        void addRHButtons();
+        void renderReviewHistory();
       };
 
       const addRHButtons = async () => {
@@ -218,7 +218,7 @@ export default () => {
                 }
               }
               using idb = await toolbox.openIDB("history", "readwrite");
-              idb.clear();
+              await idb.clear();
               idb.put(...toStore);
               idb.commit();
             } catch (error) {

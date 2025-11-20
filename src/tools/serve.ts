@@ -33,7 +33,7 @@ app.use("/", express.static(
 ));
 
 app.use("/assets", express.static(
-  resolve(fileURLToPath(import.meta.url), "../../../assets/"),
+  resolve(fileURLToPath(import.meta.url), "../../../resources/"),
 ));
 
 app.listen(devServerPort, "0.0.0.0", () => {

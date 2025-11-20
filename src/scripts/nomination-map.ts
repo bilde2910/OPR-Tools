@@ -51,10 +51,10 @@ export default () => {
       const parseContributions = (data: SubmissionsResult) => {
         if (!data.submissions) return;
         nominations = data.submissions;
-        addCounter();
-        initPrimaryListener();
-        initNominationMap();
-        checkAutoLoad();
+        void addCounter();
+        void initPrimaryListener();
+        void initNominationMap();
+        void checkAutoLoad();
       };
 
       const clickFirst = async () => {
@@ -93,9 +93,9 @@ export default () => {
         });
       };
       
-      const checkAutoLoad = () => {
+      const checkAutoLoad = async () => {
         if (config.get("loadFirst")) {
-          clickFirst();
+          await clickFirst();
         }
       };
 

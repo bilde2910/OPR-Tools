@@ -32,8 +32,8 @@ jobs:
     - name: Upload assets
       uses: actions/upload-artifact@v5
       with:
-        name: assets
-        path: assets/*
+        name: resources
+        path: resources/*
         overwrite: true
 
   deploy:
@@ -48,8 +48,8 @@ jobs:
     - name: Download assets
       uses: actions/download-artifact@v5
       with:
-        name: assets
-        path: assets
+        name: resources
+        path: resources
     - name: Publish scripts and assets
       env:
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
@@ -61,4 +61,4 @@ jobs:
         echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
         chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
         scp dist/* "${SSH_TARGET}:dist/"
-        scp assets/* "${SSH_TARGET}:assets/"
+        scp resources/* "${SSH_TARGET}:assets/"

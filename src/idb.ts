@@ -23,7 +23,7 @@ export class IDBStoreConnection<T extends BaseSchema> {
   constructor(db: IDBDatabase, objectStoreName: string, mode: IDBTransactionMode) {
     this.#logger = new Logger("idb:connection");
     activeConns++;
-    this.#logger.info(`Active IDB connections: ${activeConns} (+1)`);
+    this.#logger.debug(`Active IDB connections: ${activeConns} (+1, ${objectStoreName})`);
     this.#db = db;
     this.#completeHandlers = [];
     this.#tx = null;
@@ -34,13 +34,14 @@ export class IDBStoreConnection<T extends BaseSchema> {
   [Symbol.dispose]() {
     this.#db.close();
     activeConns--;
-    this.#logger.info(`Active IDB connections: ${activeConns} (-1)`);
+    this.#logger.debug(`Active IDB connections: ${activeConns} (-1; ${this.#objectStoreName})`);
   }
 
   get #objectStore() {
     if (this.#tx === null) {
       this.#tx = this.#db.transaction([this.#objectStoreName], this.#mode);
       this.#tx.oncomplete = () => {
+        this.#logger.debug(`IDB transaction completed (${this.#mode}:${this.#objectStoreName}).`);
         for (const handler of this.#completeHandlers) handler();
       };
     }
@@ -52,7 +53,7 @@ export class IDBStoreConnection<T extends BaseSchema> {
       const req = this.#objectStore.get(query);
       req.onsuccess = () => {
         if (typeof req.result !== "undefined") resolve(req.result);
-        else throw new KeyNotFoundError(`Key not found: ${query}`);
+        else reject(new KeyNotFoundError(`Key not found: ${query}`));
       };
       req.onerror = () => reject();
     });
@@ -77,7 +78,9 @@ export class IDBStoreConnection<T extends BaseSchema> {
   async *iterate() {
     const keys = await this.keys();
     for (const key of keys) {
-      yield await this.get(key);
+      const next = await this.get(key);
+      this.commit();
+      yield next;
     }
   }
 

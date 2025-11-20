@@ -3,6 +3,7 @@ import pluginNodeResolve from "@rollup/plugin-node-resolve";
 import pluginJson from "@rollup/plugin-json";
 import pluginScss from "rollup-plugin-scss";
 import pluginExecute from "rollup-plugin-execute";
+import pluginUrl from "@rollup/plugin-url";
 import typescript from "typescript";
 
 import pkg from "./package.json" with { type: "json" };
@@ -51,6 +52,7 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
           outDir: outputDir,
         },
       }),
+      pluginUrl(),
       pluginJson(),
       pluginScss({
         fileName: "global.css",

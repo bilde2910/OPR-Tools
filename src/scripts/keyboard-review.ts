@@ -148,7 +148,7 @@ export default () => {
         }
         if (candidate.type === "NEW") initForNew(candidate);
         else if (candidate.type === "EDIT") initForEdit(candidate);
-        else if (candidate.type === "PHOTO") initForPhoto(candidate);
+        else if (candidate.type === "PHOTO") void initForPhoto(candidate);
       };
 
       const makeKeyMap = (map: KeyHandlerMap) => (e: KeyboardEvent) => {
@@ -239,7 +239,7 @@ export default () => {
             if (isDialogOpen()) return;
             findKeyBtnInCard("2")!.click();
             if (!dialog) context.nextCard();
-            else waitForDialog().then(() => redrawUI());
+            else waitForDialog().then(() => redrawUI()).catch(logger.error);
           },
           "3": () => {
             if (context.type !== RenderContextType.NEW) throw new InvalidContextError();
@@ -257,7 +257,7 @@ export default () => {
             if (isDialogOpen()) return;
             const help = findKeyBtnInCard("H");
             if (help) help.click();
-            waitForDialog().then(() => redrawUI());
+            waitForDialog().then(() => redrawUI()).catch(logger.error);
           },
         });
 
@@ -272,7 +272,7 @@ export default () => {
             if (context.type !== RenderContextType.NEW) throw new InvalidContextError();
             if (isDialogOpen()) {
               if (isDialogClosing()) {
-                unilTruthy(() => !isDialogClosing()).then(() => redrawUI());
+                unilTruthy(() => !isDialogClosing()).then(() => redrawUI()).catch(logger.error);
                 return;
               } else if (ThumbCards.APPROPRIATE.isDialogOpen()) {
                 const btns = document.querySelectorAll("mat-dialog-container mat-radio-button");
@@ -409,7 +409,7 @@ export default () => {
                   block: 'center'
                 });*/
               } else {
-                unilTruthy(() => document.getElementById(cc.id)).then(() => redrawUI());
+                unilTruthy(() => document.getElementById(cc.id)).then(() => redrawUI()).catch(logger.error);
               }
             }
           },
@@ -477,7 +477,7 @@ export default () => {
                       for (const dupeBtn of dupeBtns) {
                         if (dupeBtn && dupeBtn.closest("body")) {
                           dupeBtn.click();
-                          unilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => redrawUI());
+                          unilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => redrawUI()).catch(logger.error);
                           break;
                         }
                       }
@@ -489,7 +489,7 @@ export default () => {
                     if (isDialogOpen("app-confirm-duplicate-modal")) {
                       const cancelBtn = document.querySelector<HTMLElement>("mat-dialog-container .mat-dialog-actions button.wf-button");
                       cancelBtn!.click();
-                      unilTruthy(() => !isDialogOpen()).then(() => redrawUI());
+                      unilTruthy(() => !isDialogOpen()).then(() => redrawUI()).catch(logger.error);
                     }
                   },
                 };
@@ -501,7 +501,7 @@ export default () => {
                     unilTruthy(() => document.activeElement!.tagName === "IMG").then(() => {
                       (document.activeElement! as HTMLImageElement).blur();
                       redrawUI();
-                    });
+                    }).catch(logger.error);
                   };
                   dupKeys[`+[${key}`] = () => window.open(`${img.src}=s0`);
                 }
@@ -848,7 +848,7 @@ export default () => {
             unilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => {
               redrawUI();
               resolve();
-            });
+            }).catch(logger.error);
             return;
           }
         }
