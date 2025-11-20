@@ -507,7 +507,7 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
 
   public addImporter(importer: Importer) {
     importers.push(importer);
-    if (!("oprtcore-importer" in sidebarItems)) {
+    if (!("core-importer" in sidebarItems)) {
       void addSidebarItem("core-importer", {
         imageUrl: ImportIcon,
         label: "Import Data",
