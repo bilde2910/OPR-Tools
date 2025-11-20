@@ -123,7 +123,7 @@ export default () => {
     description: "Add keyboard review to OPR",
     defaultConfig: {},
     sessionData: {},
-    initialize: (toolbox, _config) => {
+    initialize: (toolbox, logger, _config) => {
       let kdEvent: KeyHandler | null = null;
       let keySequence: string | null = null;
       let context: AnyRenderContext = {
@@ -143,7 +143,7 @@ export default () => {
 
       const initKeyboardCtrl = (candidate: AnyReview) => {
         if (kdEvent) {
-          toolbox.warn("Keydown event was not freed!");
+          logger.warn("Keydown event was not freed!");
           freeHandler();
         }
         if (candidate.type === "NEW") initForNew(candidate);
@@ -736,7 +736,7 @@ export default () => {
           draw: () => {
             if (context.type !== RenderContextType.PHOTO) throw new InvalidContextError();
             const infoCard = document.querySelector("app-review-photo .review-photo__info div");
-            toolbox.log(infoCard);
+            logger.info(infoCard);
             if (infoCard === null) {
               setTimeout(() => redrawUI(), 250);
               return;
@@ -808,7 +808,7 @@ export default () => {
 
       const handleEnterNew = () => {
         let btn = null;
-        toolbox.log("handleEnterNew");
+        logger.info("handleEnterNew");
         if (isDialogOpen() && !isDialogClosing()) {
           btn = document.getElementById("oprtmr-ssmb-r");
           if (!btn) btn = document.getElementById("oprtmr-ssmb-d");

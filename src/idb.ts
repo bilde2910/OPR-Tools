@@ -1,3 +1,5 @@
+import { Logger } from "./utils";
+
 export class KeyNotFoundError extends Error {
   constructor(message?: string) {
     super(message);
@@ -9,13 +11,19 @@ export interface BaseSchema {
   id: IDBValidKey,
 }
 
+let activeConns = 0;
+
 export class IDBStoreConnection<T extends BaseSchema> {
   #tx: IDBTransaction | null;
   #completeHandlers: (() => void)[];
   #objectStoreName: string;
   #db: IDBDatabase;
   #mode: IDBTransactionMode;
+  #logger: Logger;
   constructor(db: IDBDatabase, objectStoreName: string, mode: IDBTransactionMode) {
+    this.#logger = new Logger("idb:connection");
+    activeConns++;
+    this.#logger.info(`Active IDB connections: ${activeConns} (+1)`);
     this.#db = db;
     this.#completeHandlers = [];
     this.#tx = null;
@@ -25,6 +33,8 @@ export class IDBStoreConnection<T extends BaseSchema> {
 
   [Symbol.dispose]() {
     this.#db.close();
+    activeConns--;
+    this.#logger.info(`Active IDB connections: ${activeConns} (-1)`);
   }
 
   get #objectStore() {

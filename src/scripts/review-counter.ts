@@ -32,7 +32,7 @@ export default () => {
     sessionData: {
       reviews: 0,
     },
-    initialize: (toolbox, _config) => {
+    initialize: (toolbox, _logger, _config) => {
       const injectCounter = async () => {
         const container = await unilTruthy(() => document.querySelector("wf-logo")?.parentElement?.parentElement);
         if (document.getElementById("oprrct-counter") === null) {

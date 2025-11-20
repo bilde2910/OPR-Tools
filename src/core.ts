@@ -1,13 +1,17 @@
 import { BaseSchema, IDBStoreConnection } from "./idb";
 import { ApiResult, Requests, Responses } from "./types";
-import { unilTruthy, cyrb53, iterObject, makeChildNode } from "./utils";
+import { unilTruthy, cyrb53, iterObject, makeChildNode, Logger } from "./utils";
+import { CorePluginAPI } from "./scripts/opr-tools-core";
 
 const CORE_ADDON_ID = "opr-tools-core";
+const ADDON_APIS: {
+  [CORE_ADDON_ID]?: CorePluginAPI,
+} = {};
 
 let userHash = 0;
 let language = "en";
 
-type UnspecAddon = Addon<any, any, any>;
+type UnspecAddon = Addon<any, any, any, any>;
 type IDBStoreDeclaration<T> = {
   [ P in keyof T ]: BaseSchema
 };
@@ -234,21 +238,22 @@ const getIDBInstance = (objectStoreName: string, version?: number) => new Promis
     return;
   }
 
+  const logger = new Logger("core:idb");
   const openRequest = indexedDB.open(`opr-tools-${userHash}`, version);
   openRequest.onsuccess = () => {
     const db = openRequest.result;
     const dbVer = db.version;
-    console.log(`IndexedDB initialization complete (database version ${dbVer}).`);
+    logger.info(`IndexedDB initialization complete (database version ${dbVer}).`);
     if (!db.objectStoreNames.contains(objectStoreName)) {
       db.close();
-      console.log(`Database does not contain column ${objectStoreName}. Closing and incrementing version.`);
+      logger.info(`Database does not contain column ${objectStoreName}. Closing and incrementing version.`);
       getIDBInstance(objectStoreName, dbVer + 1).then(resolve);
     } else {
       resolve(db);
     }
   };
   openRequest.onupgradeneeded = () => {
-    console.log("Upgrading database...");
+    logger.info("Upgrading database...");
     const db = openRequest.result;
     if (!db.objectStoreNames.contains(objectStoreName)) {
       db.createObjectStore(objectStoreName, { keyPath: "id" });
@@ -275,8 +280,8 @@ export interface SanitizedAddon {
 export type NotificationColor = "red" | "green" | "blue" | "purple" | "gold" | "gray" | "brown";
 
 class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
-  #addon: Addon<Tcfg, Tidb, Tsess>;
-  constructor(addon: Addon<Tcfg, Tidb, Tsess>) {
+  #addon: Addon<Tcfg, Tidb, Tsess, unknown>;
+  constructor(addon: Addon<Tcfg, Tidb, Tsess, unknown>) {
     this.#addon = addon;
   }
 
@@ -348,18 +353,6 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
     });
   }
 
-  public log(...data: any) {
-    console.log(`OPR-Tools[${this.#addon.id}]:`, ...data);
-  }
-
-  public warn(...data: any) {
-    console.warn(`OPR-Tools[${this.#addon.id}]:`, ...data);
-  }
-
-  public error(...data: any) {
-    console.error(`OPR-Tools[${this.#addon.id}]:`, ...data);
-  }
-
   public notify(options: {
     color: NotificationColor,
     message: string | Node,
@@ -413,12 +406,20 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
       () => {},
     );
   }
+
+  public getAddonAPI<Ti extends keyof typeof ADDON_APIS>(addon: Ti): typeof ADDON_APIS[Ti] {
+    return ADDON_APIS[addon];
+  }
 }
 
-export interface Addon<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> extends SanitizedAddon {
+export interface Addon<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess, Tapi> extends SanitizedAddon {
   defaultConfig: Tcfg,
   sessionData: Tsess,
-  initialize: (toolbox: AddonToolbox<Tcfg, Tidb, Tsess>, config: AddonSettings<Tcfg>) => void,
+  initialize: (
+    toolbox: AddonToolbox<Tcfg, Tidb, Tsess>,
+    logger: Logger,
+    config: AddonSettings<Tcfg>,
+  ) => Tapi,
 }
 
 interface AddonOptionsEntry {
@@ -426,8 +427,9 @@ interface AddonOptionsEntry {
   options: Record<PropertyKey, InternalEditableOption<any, any>>,
 }
 
-export const register = <Tidb extends IDBStoreDeclaration<Tidb>>() => <Tcfg, Tsess>(addon: Addon<Tcfg, Tidb, Tsess>) => addons.push(addon);
+export const register = <Tidb extends IDBStoreDeclaration<Tidb>, Tapi>() => <Tcfg, Tsess>(addon: Addon<Tcfg, Tidb, Tsess, Tapi>) => addons.push(addon);
 export const initializeAllAddons = () => {
+  const logger = new Logger("core:init");
   if (initialized) {
     throw new Error("Addons have already been initialized!");
   }
@@ -442,13 +444,14 @@ export const initializeAllAddons = () => {
     CORE_ADDON_ID,
     ...coreSettings.get("activePlugins").filter(n => n !== CORE_ADDON_ID),
   ];
-  console.log("Preparing to initialize addons", toInitialize);
+  logger.info("Preparing to initialize addons", toInitialize);
   const options: Record<string, AddonOptionsEntry> = {};
   for (const addon of addons) {
     if (toInitialize.includes(addon.id)) {
-      console.log(`Initializing addon ${addon.id}...`);
-      addon.initialize(
+      logger.info(`Initializing addon ${addon.id}...`);
+      const api = addon.initialize(
         new AddonToolbox(addon),
+        new Logger(`addon:${addon.id}`),
         new AddonSettings(
           localStorage,
           addon.id,
@@ -461,17 +464,20 @@ export const initializeAllAddons = () => {
           },
         ),
       );
+      if (api) {
+        ADDON_APIS[addon.id as keyof typeof ADDON_APIS] = api;
+      }
     }
   }
   if (Object.keys(options).length > 0) {
-    console.log("Hooking settings editor...");
+    logger.info("Hooking settings editor...");
     const toolbox = new AddonToolbox({} as any);
     toolbox.interceptOpenJson(
       "GET", "/api/v1/vault/settings",
       renderEditors(Object.values(options)),
     );
   }
-  console.log("Addon initialization done.");
+  logger.info("Addon initialization done.");
 };
 
 const renderEditors = (options: AddonOptionsEntry[]) => async () => {

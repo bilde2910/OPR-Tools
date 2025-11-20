@@ -273,3 +273,24 @@ export const toUtcIsoDate = (d: Date) =>
   `${d.getUTCFullYear()}-` +
   `${(d.getUTCMonth() + 1).toString().padStart(2, "0")}-` +
   `${d.getUTCDate().toString().padStart(2, "0")}`;
+
+//#region Loggnig
+
+export class Logger {
+  #subsystem: string;
+  constructor(subsystem: string) {
+    this.#subsystem = subsystem;
+  }
+  
+  info(...data: any) {
+    console.log("[I]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
+  };
+
+  warn(...data: any) {
+    console.warn("[W]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
+  };
+
+  error(...data: any) {
+    console.error("[E]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
+  };
+}

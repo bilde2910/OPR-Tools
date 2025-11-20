@@ -36,7 +36,7 @@ export default () => {
       maxDelay: 30,
     },
     sessionData: {},
-    initialize: (toolbox, config) => {
+    initialize: (toolbox, _logger, config) => {
       config.setUserEditable("smartSubmit", {
         label: "Enable Smart Submit",
         help: "Smart Submit helps you avoid cooldowns by delaying your submission if you are reviewing quickly.",

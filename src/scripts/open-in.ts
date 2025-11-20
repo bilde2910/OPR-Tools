@@ -32,7 +32,7 @@ export default () => {
     description: "Add open-in buttons to OPR",
     defaultConfig: {},
     sessionData: {},
-    initialize: (toolbox, _config) => {
+    initialize: (toolbox, _logger, _config) => {
       registerProjections();
       toolbox.interceptOpenJson("GET", "/api/v1/vault/home", injectShowcase);
       toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", injectNominations);

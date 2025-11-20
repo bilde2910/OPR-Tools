@@ -81,7 +81,7 @@ interface IdbStores {
 }
 
 export default () => {
-  register<IdbStores>()({
+  register<IdbStores, void>()({
     id: "review-history",
     name: "Review History",
     authors: ["tehstone", "bilde2910"],
@@ -95,7 +95,7 @@ export default () => {
       importWithin: 0,
     },
     sessionData: {},
-    initialize: (toolbox, config) => {
+    initialize: (toolbox, logger, config) => {
       config.setUserEditable("importAfter", {
         label: "Import after date",
         help: "Any reviews in the import file prior to the selected date will not be imported.",
@@ -103,7 +103,7 @@ export default () => {
       });
 
       const handleIncomingReview = async (review: AnyReview) => {
-        toolbox.log("handleIncomingReview");
+        logger.info("handleIncomingReview");
         let filtered: FilteredReview | null = null;
         switch (review.type) {
           case "NEW":
@@ -122,12 +122,12 @@ export default () => {
           idb.put(saveData);
           idb.commit();
         } else {
-          toolbox.error("Unknown review type: " + review.type);
+          logger.error("Unknown review type: " + review.type);
         }
       };
 
       const handleSubmittedReview = async (review: AnySubmittedReview, result: string) => {
-        toolbox.log("handleSubmittedReview");
+        logger.info("handleSubmittedReview");
         if (result === "api.review.post.accepted" && !!review.id) {
           using idb = await toolbox.openIDB("history", "readwrite");
           const assigned = await idb.get(review.id);
@@ -140,9 +140,9 @@ export default () => {
           } else {
             idb.commit();
             const msg = `Attempted to submit a ${review.type} review for a ${assigned.type} assignment`;
-            toolbox.warn();
-            toolbox.warn("Submitted review:", review);
-            toolbox.warn("Assigned review:", assigned);
+            logger.warn();
+            logger.warn("Submitted review:", review);
+            logger.warn("Assigned review:", assigned);
             alert(`${msg}. This should not be possbile. Please see the developer console for more details.`);
             return;
           }
@@ -351,7 +351,7 @@ export default () => {
                   } else if ("duplicate" in oldType) {
                     return "Duplicate";
                   } else {
-                    toolbox.warn("Unknown old-type review", review.review);
+                    logger.warn("Unknown old-type review", review.review);
                   }
                 } else {
                   if ("quality" in review.review) {
@@ -366,7 +366,7 @@ export default () => {
                   } else if ("duplicate" in review.review) {
                     return "Duplicate";
                   } else {
-                    toolbox.warn("Unknown new-type review", review.review);
+                    logger.warn("Unknown new-type review", review.review);
                   }
                 }
               } else {

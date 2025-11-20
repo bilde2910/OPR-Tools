@@ -1,11 +1,21 @@
 import { register } from "src/core";
 import { unilTruthy, makeChildNode } from "src/utils";
 import { UserSettings } from "src/types";
+import { StoredEmail } from "src/email/types";
 
 import "./opr-tools-core.css";
+import { EmailAPI } from "src/email";
+
+export interface CorePluginAPI {
+  email: () => Promise<EmailAPI>,
+}
+
+interface IdbStores {
+  email: StoredEmail,
+}
 
 export default () => {
-  register()({
+  register<IdbStores, CorePluginAPI>()({
     id: "opr-tools-core",
     name: "OPR Tools Core",
     authors: ["bilde2910"],
@@ -15,7 +25,7 @@ export default () => {
       activePlugins: <string[]>[],
     },
     sessionData: {},
-    initialize: (toolbox, config) => {
+    initialize: (toolbox, logger, config): CorePluginAPI => {
       const renderOprtSettings = async (_data: UserSettings) => {
         const ref = await unilTruthy(() => document.querySelector("app-settings"));
         const box = document.createElement("div");
@@ -63,7 +73,7 @@ export default () => {
               if (newState) plugins.push(addon.id);
               else plugins = plugins.filter(n => n !== addon.id);
               config.set("activePlugins", plugins);
-              toolbox.log(addon.id, "was", newState ? "enabled" : "disabled");
+              logger.info(addon.id, "was", newState ? "enabled" : "disabled");
             });
           }
 
@@ -74,9 +84,27 @@ export default () => {
         }
       };
 
+      const setupEmailIDB = async () => {
+        // This scope triggers an open of the database, which in turn makes sure that the email
+        // object store exists. Not performing this check here may lead to deadlocks down the
+        // line. We don't need to actually use the database for anything; simply opening it and
+        // closing it will suffice.
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        using _ = await toolbox.openIDB("email", "readonly");
+      };
+
       toolbox.interceptOpenJson("GET", "/api/v1/vault/settings", renderOprtSettings);
+
+      let emailAPI: EmailAPI | null = null;
+      return {
+        email: async () => {
+          if (emailAPI !== null) return emailAPI;
+          await setupEmailIDB();
+          emailAPI = new EmailAPI((mode) => toolbox.openIDB("email", mode));
+          return emailAPI;
+        },
+      };
     },
   });
 };
-
-

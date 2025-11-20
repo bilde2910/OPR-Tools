@@ -42,7 +42,7 @@ export default () => {
       renderMoveCircle: true,
     },
     sessionData: {},
-    initialize: (toolbox, config) => {
+    initialize: (toolbox, logger, config) => {
       config.setUserEditable("display", {
         label: "Default map view",
         editor: new SelectBoxEditor({
@@ -76,7 +76,7 @@ export default () => {
 
       const addMapMods = async (candidate: AnyReview) => {
         if (typeof google === "undefined") {
-          toolbox.log("addMapMods waiting for google");
+          logger.info("addMapMods waiting for google");
           setTimeout(() => addMapMods(candidate), 200);
           return;
         }
@@ -92,7 +92,7 @@ export default () => {
         }
 
         if (mapCtx !== null) {
-          toolbox.log(mapCtx);
+          logger.info(mapCtx);
           const map = mapCtx.componentRef.map as google.maps.Map;
           if (config.get("renderCloseCircle")) drawCloseCircle(map, candidate);
           addLocationChangeBtnListener(map, mapCtx, candidate);
@@ -103,7 +103,7 @@ export default () => {
       const addLocationChangeBtnListener = async (map: google.maps.Map, mapCtx: any, candidate: AnyReview) => {
         const locationChangeBtn = await unilTruthy(() => document.querySelector("#check-duplicates-card nia-map ~ div button"));
         locationChangeBtn.addEventListener("click", () => {
-          toolbox.log("Location change started");
+          logger.info("Location change started");
           if (config.get("renderCloseCircle")) drawCloseCircle(map, candidate);
           if (config.get("renderMoveCircle")) drawMoveCircle(map, candidate);
           setTimeout(() => addListenerToMarker(map, mapCtx), 500);
@@ -114,7 +114,7 @@ export default () => {
         const resetButton = document.querySelector(RESET_SELECTOR);
         if (resetButton) {
           resetButton.addEventListener("click", () => {
-            toolbox.log("Resetting location change");
+            logger.info("Resetting location change");
             map.setZoom(17);
             if (config.get("renderCloseCircle")) drawCloseCircle(map, candidate);
             if (config.get("renderMoveCircle")) drawMoveCircle(map, null);
@@ -158,7 +158,7 @@ export default () => {
         });
 
       const modifyNewReviewMap = async (ref: HTMLElement, candidate: AnyReview, mapCtx: any) => {
-        toolbox.log("Modifying new review map");
+        logger.info("Modifying new review map");
         const map = mapCtx.componentRef.map as google.maps.Map;
         const markers = mapCtx.componentRef.markers;
 
@@ -191,7 +191,7 @@ export default () => {
             const svLocation = result.data.location!.latLng!;
             const heading = google.maps.geometry.spherical.computeHeading(svLocation, nomLocation);
             pano = sv;
-            toolbox.log(`Setting Street View POV heading to ${heading}`);
+            logger.info(`Setting Street View POV heading to ${heading}`);
             pano.setPov({ heading, pitch: 0 });
             pano.setPosition(svLocation);
             pano.setVisible(true);
@@ -216,7 +216,7 @@ export default () => {
         let closeMarker = false;
         const nearby = mapCtx.markers.nearby;
         if (nearby.markers?.length) {
-          toolbox.log(`Adding tooltips to ${nearby.markers.length} markers`);
+          logger.info(`Adding tooltips to ${nearby.markers.length} markers`);
           for (let i = 0; i < nearby.markers.length; i++) {
             markers[i].title = nearby.markers[i].infoWindowComponentData.title;
             if (!closeMarker) {
@@ -225,7 +225,7 @@ export default () => {
             }
           }
         } else {
-          toolbox.log("No markers to add tooltips to");
+          logger.info("No markers to add tooltips to");
         }
 
         if (closeMarker) {

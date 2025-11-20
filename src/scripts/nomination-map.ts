@@ -36,7 +36,7 @@ export default () => {
       loadFirst: true,
     },
     sessionData: {},
-    initialize: (toolbox, config) => {
+    initialize: (toolbox, logger, config) => {
       config.setUserEditable("loadFirst", {
         label: "Load first wayspot detail automatically",
         editor: new CheckboxEditor(),
@@ -190,7 +190,7 @@ export default () => {
             input.dispatchEvent(new Event("input"));
             setTimeout(clickFirst, 500);
             setTimeout(() => {
-              toolbox.log("Calling updateMap with false");
+              logger.info("Calling updateMap with false");
               updateMap(false);
             }, 500);
           });
@@ -200,7 +200,7 @@ export default () => {
         nominationCluster = new MarkerClusterer({ map: nominationMap, markers: nominationMarkers });
 
         if (reset) {
-          toolbox.log("Resetting bounds");
+          logger.info("Resetting bounds");
           nominationMap.fitBounds(bounds);
         }
       };
