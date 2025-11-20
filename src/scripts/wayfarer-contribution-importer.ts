@@ -143,7 +143,6 @@ export default () => {
         sub.canHold = false;
         sub.canReleaseHold = false;
         sub.isMutable = false;
-        sub.title = `[WF] ${sub.title}`;
         return sub;
       };
 
