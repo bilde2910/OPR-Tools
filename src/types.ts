@@ -18,8 +18,9 @@ export interface Requests {
   "/api/v1/vault/review": AnySubmittedReview,
   "/api/v1/vault/manage/hold": SetHold,
   "/api/v1/vault/manage/releasehold": ReleaseHold,
-  "/api/v1/vault/manage/edit": EditContribution,
+  "/api/v1/vault/manage/edit": ModifyContribution,
   "/api/v1/vault/manage/appeal": SubmitAppeal,
+  "/api/v1/vault/manage/detail": LoadDetails,
   "/api/v1/vault/settings": SaveSettings,
 }
 
@@ -37,6 +38,7 @@ export interface Responses {
     "/api/v1/vault/manage/releasehold": string,
     "/api/v1/vault/manage/edit": string,
     "/api/v1/vault/manage/appeal": string,
+    "/api/v1/vault/manage/detail": AnyContribution,
     "/api/v1/vault/settings": string,
   },
 }
@@ -179,6 +181,11 @@ export enum ContributionStatus {
   WITHDRAWN = "WITHDRAWN",
 }
 
+export enum OriginalPoiState {
+  LIVE = "LIVE",
+  RETIRED = "RETIRED",
+}
+
 interface Contribution {
   id: string,
   type: ContributionType,
@@ -217,12 +224,12 @@ export interface OriginalPoiData {
   lat: number,
   lng: number,
   city: string,
-  state: "LIVE" | "RETIRED",
+  state: OriginalPoiState,
   lastUpdateDate: string,
 }
 
-export interface EditContribution extends Contribution {
-  type: EditContributionType
+export interface EditContribution<T extends EditContributionType> extends Contribution {
+  type: T
   poiData: OriginalPoiData
 }
 
@@ -231,7 +238,9 @@ export interface Nomination extends Contribution {
   poiData: never[],
 }
 
-export type AnyContribution = EditContribution | Nomination;
+export type AnyContribution =
+  EditContribution<EditContributionType> |
+  Nomination;
 
 //#region Incoming reviews
 
@@ -359,7 +368,11 @@ export interface ReleaseHold {
   id: string,
 }
 
-export interface EditContribution {
+export interface LoadDetails {
+  id: string,
+}
+
+export interface ModifyContribution {
   id: string,
   title: string,
   description: string,

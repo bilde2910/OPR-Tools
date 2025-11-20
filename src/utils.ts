@@ -233,33 +233,33 @@ export const downloadAsFile = (data: string, type: string, name: string) => {
   URL.revokeObjectURL(url);
 };
 
-export const readFile = (...accept: readonly string[]) => new Promise<string | ArrayBuffer | null>((resolve, reject) => {
+export const readFile = (...accept: readonly string[]) => new Promise<File>((resolve, reject) => {
   const input = document.createElement("input");
   input.type = "file";
   if (accept.length > 0) {
     input.accept = accept.join(",");
   }
-  input.onchange = () => {
-    const reader = new FileReader();
-    reader.onload = function (e2) {
-      resolve(e2.target!.result);
-    };
-    if (input.files !== null) {
-      reader.readAsText(input.files[0]);
+  input.addEventListener("change", () => {
+    if (input.files !== null && input.files.length >= 1) {
+      resolve(input.files[0]);
     } else {
       reject();
     }
-  };
+  });
   input.click();
 });
 
-export const readFiles = (...accept: readonly string[]) => new Promise<File[]>((resolve) => {
+export const readFiles = (...accept: readonly string[]) => new Promise<File[]>((resolve, reject) => {
   const input = document.createElement("input");
   input.type = "file";
   input.multiple = true;
   if (accept.length > 0) input.accept = accept.join(",");
   input.addEventListener("change", () => {
-    resolve([...(input.files ?? [])]);
+    if (input.files !== null) {
+      resolve([...input.files]);
+    } else {
+      reject();
+    }
   });
   input.click();
 });

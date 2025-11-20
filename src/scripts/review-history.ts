@@ -179,10 +179,7 @@ export default () => {
               "are you sure you want to clear your currently saved review history?",
             )) return;
             const contents = await readFile(".json", "application/json");
-            if (typeof contents !== "string") {
-              throw new Error("Invalid file type.");
-            }
-            const jsonData = JSON.parse(contents);
+            const jsonData = JSON.parse(await contents.text());
             const toStore: StoredReview[] = [];
 
             let imported = 0, failed = 0, filtered = 0;

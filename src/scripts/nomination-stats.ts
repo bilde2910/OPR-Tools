@@ -224,7 +224,7 @@ const exportNominationsCsv = (subs: AnyContribution[]) => {
         const itemKey = header.substring(0, sep) as keyof AnyContribution;
         const subKey = header.substring(sep + 1);
         if (itemKey === "poiData" && item.type !== ContributionType.NOMINATION) {
-          const tsKey = subKey as keyof EditContribution["poiData"];
+          const tsKey = subKey as keyof EditContribution<typeof item.type>["poiData"];
           row += `"${String(item.poiData[tsKey] ?? "").replace(/"/g, "\"\"")}",`;
         } else if (Array.isArray(item[itemKey]) && itemKey === "rejectReasons") {
           row += item[itemKey].map(r => r.reason).includes(subKey) ? "1," : "0,";

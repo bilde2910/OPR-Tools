@@ -14,6 +14,7 @@ import nominationStatusHistory from "./scripts/nomination-status-history";
 import reviewMapMods from "./scripts/review-map-mods";
 import reviewCounter from "./scripts/review-counter";
 import emlImporter from "./scripts/eml-importer";
+import wayfarerContributionImporter from "./scripts/wayfarer-contribution-importer";
 
 const availableAddons = [
   oprToolsCore,
@@ -28,6 +29,8 @@ const availableAddons = [
   reviewMapMods,
   reviewCounter,
   emlImporter,
+  // Uses filterSend, must be loaded last
+  wayfarerContributionImporter,
 ];
 
 /** Runs when the userscript is loaded initially */

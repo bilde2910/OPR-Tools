@@ -359,6 +359,27 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
     this.interceptOpen(method, url, handle);
   }
 
+  public manipulateOpenJson<Tm extends keyof Responses, Tu extends keyof Responses[Tm]>(method: Tm, url: Tu, callback: (obj: Responses[Tm][Tu]) => Responses[Tm][Tu]) {
+    if (typeof url !== "string") throw Error("Invalid URL type");
+    function handle(_event: Event) {
+      try {
+        const resp = this.response;
+        const json: ApiResult<Responses[Tm][Tu]> = JSON.parse(resp);
+        if (!json) return;
+        if (json.captcha) return;
+        const nv = callback(json.result);
+        json.result = nv;
+        Object.defineProperty(this, "response", { writable: true });
+        this.response = JSON.stringify(json);
+        Object.defineProperty(this, "response", { writable: false });
+      } catch (e) {
+        const logger = new Logger("core:toolbox");
+        logger.error(e);
+      }
+    }
+    this.interceptOpen(method, url, handle);
+  }
+
   public interceptSend(url: string, callback: (data: string, request: XMLHttpRequest, response: Event) => void) {
     (function (send) {
       XMLHttpRequest.prototype.send = function (body: string) {
@@ -369,6 +390,31 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
         }, false);
         const args: any = arguments;
         send.apply(this, args);
+      };
+    })(XMLHttpRequest.prototype.send);
+  }
+
+  public filterSend(method: string, url: string, filter: (data: string, request: XMLHttpRequest) => boolean) {
+    const addonId = this.#addon.id;
+    (function (open) {
+      XMLHttpRequest.prototype.open = function (m, u) {
+        this._oprTools = {
+          method: m,
+          url: u,
+        };
+        const args: any = arguments;
+        open.apply(this, args);
+      };
+    })(XMLHttpRequest.prototype.open);
+    (function (send) {
+      XMLHttpRequest.prototype.send = function (body: string) {
+        if (this._oprTools.method !== method || this._oprTools.url !== url || filter(body, this)) {
+          const args: any = arguments;
+          send.apply(this, args);
+        } else {
+          const logger = new Logger("core:toolbox");
+          logger.warn(`OPR Tools addon ${addonId} blocked a ${method} request to ${url}!`);
+        }
       };
     })(XMLHttpRequest.prototype.send);
   }
@@ -388,6 +434,20 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
       }
     }
     this.interceptSend(url, handle);
+  }
+
+  public filterSendJson<Tm extends keyof Responses, Tu extends keyof Requests & keyof Responses[Tm]>(method: Tm, url: Tu, callback: (sent: Requests[Tu]) => boolean) {
+    function handle(data: string) {
+      try {
+        const jSent: Requests[Tu] = JSON.parse(data);
+        return callback(jSent);
+      } catch (e) {
+        const logger = new Logger("core:toolbox");
+        logger.error(e);
+        return true;
+      }
+    }
+    this.filterSend(method, url, handle);
   }
 
   public listAvailableAddons() {

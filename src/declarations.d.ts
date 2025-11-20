@@ -10,6 +10,11 @@ declare module "*.svg" {
   export default content;
 }
 
+declare module "*.png" {
+  const content: string;
+  export default content;
+}
+
 declare module "*.md" {
   interface Exports {
     /** Content of the markdown file, converted to an HTML string */

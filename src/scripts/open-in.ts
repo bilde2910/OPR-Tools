@@ -564,7 +564,8 @@ const injectNominations = async (result: SubmissionsResult) => {
   for (const contribution of result.submissions) {
     if (contribution.imageUrl.length > 0) {
       nomCache[contribution.imageUrl] = contribution;
-    } else if (contribution.type !== ContributionType.NOMINATION) {
+    }
+    if (contribution.type !== ContributionType.NOMINATION) {
       nomCache[contribution.poiData.imageUrl] = contribution;
     }
   }
