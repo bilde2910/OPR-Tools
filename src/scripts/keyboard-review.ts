@@ -958,7 +958,7 @@ export default () => {
       const keyLabel = (btnKey: string) => {
         const label = drawNew("span");
         label.classList.add("oprkr2-key-label");
-        console.log(keySequence, btnKey);
+        logger.info(keySequence, btnKey);
         if (btnKey.includes(",")) {
           if (keySequence && `+${btnKey}`.startsWith(keySequence)) {
             label.textContent = "\u2026" + btnKey.substring(keySequence.length)

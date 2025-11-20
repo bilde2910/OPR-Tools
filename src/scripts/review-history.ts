@@ -448,7 +448,7 @@ export default () => {
       };
 
       const makeDataTable = <T>(searchBox: HTMLInputElement, gridOptions: agGrid.GridOptions<T>) => {
-        console.log(gridOptions);
+        logger.info(gridOptions);
         const container = document.createElement("div");
         container.classList.add("oprrh-table");
         const api = agGrid.createGrid(container, {

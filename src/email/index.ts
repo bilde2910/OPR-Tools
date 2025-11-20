@@ -1,5 +1,5 @@
 import diacritics from "./diacritics.json" with { type: "json" };
-import { iterObject, makeChildNode } from "src/utils";
+import { iterObject, Logger, makeChildNode } from "src/utils";
 import { decodeBodyUsingCTE, extractEmail, parseMIME } from "./parsing";
 import { EmailFile, Header, StoredEmail } from "./types";
 import { DisambiguationFailedError, HeaderNotFoundError, InvalidContentTypeError, NoMatchingTemplateError, UnsupportedSenderError } from "./errors";
@@ -24,17 +24,11 @@ export type ImportListener = () => Promise<ActiveListener>;
 export class EmailAPI {
   #openIDB: IDBConnectionFactory;
   #listeners: ImportListener[];
+  #logger: Logger;
   constructor(idbConn: IDBConnectionFactory) {
     this.#openIDB = idbConn;
     this.#listeners = [];
-  }
-
-  #log(...data: any) {
-    console.log("OPR-Tools-Core[EmailAPI]", ...data);
-  }
-
-  #error(...data: any) {
-    console.error("OPR-Tools-Core[EmailAPI]", ...data);
+    this.#logger = new Logger("api:email");
   }
 
   /**
@@ -52,13 +46,13 @@ export class EmailAPI {
     iterator: AsyncGenerator<EmailFile, unknown, unknown>,
     report?: (result: EmailPutStatus) => void,
   ) {
-    this.#log("Now importing emails from generator!");
-    this.#log(`Invoking ${this.#listeners.length} email listeners...`);
+    this.#logger.info("Now importing emails from generator!");
+    this.#logger.info(`Invoking ${this.#listeners.length} email listeners...`);
     const listeners: ActiveListener[] = [];
     for (const listener of this.#listeners) {
       listeners.push(await listener());
     }
-    this.#log("All email listeners were invoked.");
+    this.#logger.info("All email listeners were invoked.");
     
     const counters: Record<EmailPutStatus, number> = {
       inserted: 0,
@@ -67,40 +61,40 @@ export class EmailAPI {
       ignored: 0,
     };
     {
-      this.#log("Opening email object store for writing...");
+      this.#logger.info("Opening email object store for writing...");
       using idb = await this.#openIDB("readwrite");
-      this.#log(`Email store opened; iterating handlers from ${listeners.length} email listeners...`);
+      this.#logger.info(`Email store opened; iterating handlers from ${listeners.length} email listeners...`);
       const handlers: ImportHandler[] = [];
       for (const listener of listeners) {
         handlers.push((await listener.next()).value);
       }
-      this.#log("All email listeners were iterated.");
+      this.#logger.info("All email listeners were iterated.");
       const dispatcher: ImportHandler = async (e, r) => {
         for (const handler of handlers) {
           try {
             await handler(e, r);
           } catch (ex) {
-            this.#error("Email event listener threw an exception", e, r, ex);
+            this.#logger.error("Email event listener threw an exception", e, r, ex);
           }
         }
       };
-      this.#log("Now iterating emails...");
+      this.#logger.info("Now iterating emails...");
       for await (const file of iterator) {
         const result = await this.#put(file, idb, dispatcher);
         counters[result]++;
         if (typeof report !== "undefined") report(result);
       }
-      this.#log("Email iteration complete; closing object store...");
+      this.#logger.info("Email iteration complete; closing object store...");
     }
-    this.#log("Successfully imported emails", counters);
-    this.#log(`Finally iterating ${listeners.length} email listeners...`);
+    this.#logger.info("Successfully imported emails", counters);
+    this.#logger.info(`Finally iterating ${listeners.length} email listeners...`);
     for (const listener of listeners) {
       const result = await listener.next();
       if (!result.done) {
-        this.#error("Email event listener did not return", result);
+        this.#logger.error("Email event listener did not return", result);
       }
     }
-    this.#log("All email listeners were finally iterated.");
+    this.#logger.info("All email listeners were finally iterated.");
     return counters;
   }
 

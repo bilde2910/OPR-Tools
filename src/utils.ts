@@ -12,9 +12,10 @@ export type ResourceKey = keyof typeof resources;
  * ⚠️ Requires the directive `@grant GM.getResourceUrl`
  */
 export async function getResourceUrl(name: string) {
+  const logger = new Logger("utils:resources");
   let url = await GM.getResourceUrl(name);
   if(!url || url.length === 0) {
-    console.warn(`Couldn't get blob URL nor external URL for @resource '${name}', trying to use base64-encoded fallback`);
+    logger.warn(`Couldn't get blob URL nor external URL for @resource '${name}', trying to use base64-encoded fallback`);
     // @ts-ignore
     url = await GM.getResourceUrl(name, false);
   }
@@ -67,8 +68,9 @@ export class ByteReader {
 
 let geofenceCache: GeofenceMap | null = null;
 export const readGeofences = async () => {
+  const logger = new Logger("utils:geofences");
   if (geofenceCache) return geofenceCache;
-  console.log("Reading geofences...");
+  logger.info("Reading geofences...");
   const resp = await fetch(await getResourceUrl("geofences"));
   geofenceCache = await resp.json() as GeofenceMap;
   // For binary encoded data
@@ -90,10 +92,10 @@ export const readGeofences = async () => {
         geofenceCache[zone].push([ll[0], ll[1]]);
       }
     } catch (e) {
-      console.warn(e);
+      logger.warn(e);
     }
   }*/
-  console.log("Done reading geofences");
+  logger.info("Done reading geofences");
   return geofenceCache;
 };
 

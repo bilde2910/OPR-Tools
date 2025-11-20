@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { NotificationColor, register } from "src/core";
-import { filterObject, iterObject, unilTruthy, indexToMap, makeChildNode, toUtcIsoDate, iterKeys, assignAll } from "src/utils";
+import { filterObject, iterObject, unilTruthy, indexToMap, makeChildNode, toUtcIsoDate, iterKeys, assignAll, Logger } from "src/utils";
 import { AnyContribution, ContributionStatus, ContributionType, Nomination, OriginalPoiData, SubmissionsResult } from "src/types";
 
 import "./nomination-status-history.css";
@@ -236,7 +236,7 @@ export default () => {
           dbEmails: IDBStoreConnection<EmailProcessingRecord>,
         ) {
           if (this.#alreadyProcessed.has(email.messageID)) return;
-          const result = processEmail(email, this.#submissions, this.#statusHistoryMap);
+          const result = processEmail(logger, email, this.#submissions, this.#statusHistoryMap);
           this.#alreadyProcessed.add(email.messageID);
           let status = result.status;
           if (status === EmailProcessingResult.SUCCESS && result.change && result.id) {
@@ -445,7 +445,7 @@ export default () => {
         const start = Date.now();
         using idb = await toolbox.openIDB("history", "readwrite");
         idb.on("complete", () => {
-          console.log(`Contribution changes processed in ${Date.now() - start} msec.`);
+          logger.info(`Contribution changes processed in ${Date.now() - start} msec.`);
           ready = true;
         });
         const saved = await idb.getAll();
@@ -978,7 +978,7 @@ interface ProcessedEmail {
   error: Error | null,
 }
 
-const processEmail = (email: WayfarerEmail, submissions: AnyContribution[], history: Record<string, StatusHistoryEntry[]>): ProcessedEmail => {
+const processEmail = (logger: Logger, email: WayfarerEmail, submissions: AnyContribution[], history: Record<string, StatusHistoryEntry[]>): ProcessedEmail => {
   let change: ProcessedEmail["change"] = null;
   let id: ProcessedEmail["id"] = null;
   let returnStatus: ProcessedEmail["status"] = EmailProcessingResult.SUCCESS;
@@ -1071,13 +1071,13 @@ const processEmail = (email: WayfarerEmail, submissions: AnyContribution[], hist
   } catch (e) {
     except = e as Error;
     if (e instanceof UnresolvableProcessingError) {
-      console.warn(e);
+      logger.warn(e);
       returnStatus = EmailProcessingResult.AMBIGUOUS;
     } else if (e instanceof EmailParsingError) {
-      console.error(e, email);
+      logger.error(e, email);
       returnStatus = EmailProcessingResult.UNSUPPORTED;
     } else {
-      console.error(e, email);
+      logger.error(e, email);
       returnStatus = EmailProcessingResult.FAILURE;
     }
     reason = except.message;

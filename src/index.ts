@@ -1,6 +1,6 @@
 import { buildNumber, scriptInfo } from "./constants";
 import { initializeAllAddons, initializeUserHash } from "./core";
-import { addStyle, domLoaded } from "./utils";
+import { addStyle, domLoaded, Logger } from "./utils";
 
 import oprToolsCore from "./scripts/opr-tools-core";
 import nominationStats from "./scripts/nomination-stats";
@@ -38,12 +38,13 @@ async function init() {
 
 /** Runs after the DOM is available */
 async function run() {
+  const logger = new Logger("setup");
   try {
-    console.log(`Initializing ${scriptInfo.name} v${scriptInfo.version} (#${buildNumber})...`);
+    logger.info(`Initializing ${scriptInfo.name} v${scriptInfo.version} (#${buildNumber})...`);
     initializeUserHash().then((userHash: number) => {
-      console.log(`Initializing OPR Tools for user hash ${userHash}`);
+      logger.info(`Initializing OPR Tools for user hash ${userHash}`);
       for (const addon of availableAddons) addon();
-      console.log("Addons registered.");
+      logger.info("Addons registered.");
       initializeAllAddons();
     });
 
@@ -51,7 +52,7 @@ async function run() {
     addStyle("#{{GLOBAL_STYLE}}");
   }
   catch(err) {
-    console.error("Fatal error:", err);
+    logger.error("Fatal error:", err);
     return;
   }
 }
