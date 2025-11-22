@@ -106,20 +106,6 @@ export const isDarkMode = () => !!document.querySelector("html")?.classList.cont
 export let domLoaded = document.readyState === "complete" || document.readyState === "interactive";
 document.addEventListener("DOMContentLoaded", () => domLoaded = true);
 
-/**
- * Adds a style element to the DOM at runtime.
- * @param css The CSS stylesheet to add
- * @param ref A reference string to identify the style element - defaults to a random 5-character string
- */
-export function addStyle(css: string) {
-  if(!domLoaded)
-    throw new Error("DOM has not finished loading yet");
-  const elem = document.createElement("style");
-  elem.innerHTML = css;
-  document.querySelector("head")?.appendChild(elem);
-  return elem;
-}
-
 export function untilTruthy<T>(listener: () => T | null | undefined) {
   return new Promise<T>((resolve, _reject) => {
     const queryLoop = () => {

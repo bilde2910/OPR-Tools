@@ -1,6 +1,6 @@
-import { buildNumber, scriptInfo } from "./constants";
+import { scriptInfo } from "./constants";
 import { initializeAllAddons, initializeUserHash } from "./core";
-import { addStyle, domLoaded, Logger } from "./utils";
+import { domLoaded, Logger } from "./utils";
 
 import oprToolsCore from "./scripts/opr-tools-core";
 import nominationStats from "./scripts/nomination-stats";
@@ -47,16 +47,13 @@ function init() {
 function run() {
   const logger = new Logger("setup");
   try {
-    logger.info(`Initializing ${scriptInfo.name} v${scriptInfo.version} (#${buildNumber})...`);
+    logger.info(`Initializing ${scriptInfo.name} v${scriptInfo.version}...`);
     initializeUserHash().then((userHash: number) => {
       logger.info(`Initializing OPR Tools for user hash ${userHash}`);
       for (const addon of availableAddons) addon();
       logger.info("Addons registered.");
       initializeAllAddons();
     }).catch(logger.error);
-
-    // post-build these double quotes are replaced by backticks (because if backticks are used here, the bundler converts them to double quotes)
-    addStyle("#{{GLOBAL_STYLE}}");
   }
   catch(err) {
     logger.error("Fatal error:", err);

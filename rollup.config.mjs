@@ -8,6 +8,7 @@ import typescript from "typescript";
 
 import pkg from "./package.json" with { type: "json" };
 import requireJson from "./assets/require.json" with { type: "json" };
+import { makeUserscriptHeader } from "./src/tools/build-utils.mjs";
 
 const globalPkgs = requireJson.reduce((acc, pkg) => {
   acc[pkg.pkgName] = pkg.global;
@@ -38,6 +39,22 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
 
   const linkedPkgs = requireJson.filter((pkg) => pkg.link === true);
 
+  // Make style injection a separate IIFE in the output footer.
+  // The GLOBAL_STYLE is inserted into the script by post-build.ts, and having it be part of the
+  // normal userscript body would mess up sourcemaps, as post-build.ts is not sourcemap-aware.
+  const footerIIFE = `
+(() => {
+  const addStyle = () => {
+    const elem = document.createElement("style");
+    elem.innerHTML = ("#{{GLOBAL_STYLE}}");
+    document.querySelector("head")?.appendChild(elem);
+    return elem;
+  };
+  if (document.readyState === "complete" || document.readyState === "interactive") addStyle();
+  else document.addEventListener("DOMContentLoaded", addStyle);
+})();
+  `;
+
   /** @type {import("rollup").RollupOptions} */
   const config = {
     input: "src/index.ts",
@@ -47,7 +64,7 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
       }),
       pluginTypeScript({
         typescript,
-        sourceMap: mode === "development",
+        sourceMap: true,
         compilerOptions: {
           outDir: outputDir,
         },
@@ -58,6 +75,7 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
       pluginJson(),
       pluginScss({
         fileName: "global.css",
+        outputStyle: "compressed",
       }),
       pluginExecute([
         `npm run --silent post-build -- ${passCliArgsStr}`,
@@ -68,8 +86,10 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
     output: {
       file: `${outputDir}/${getOutputFileName(suffix)}`,
       format: "iife",
-      sourcemap: false, // mode === "development",
-      compact: mode === "development",
+      sourcemap: true,
+      compact: true,
+      banner: await makeUserscriptHeader(),
+      footer: footerIIFE,
       globals: linkedPkgs.length > 0 ? Object.fromEntries(
         Object.entries(globalPkgs).filter(([key]) => !linkedPkgs.some((pkg) => pkg.pkgName === key))
       ) : globalPkgs,
