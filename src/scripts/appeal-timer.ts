@@ -66,13 +66,17 @@ export default () => {
             .filter(a => a.ts >= now - APPEAL_COUNTDOWN_MSEC)
             .sort((a, b) => a.ts - b.ts);
           if (recent.length >= MAX_APPEALS || !result?.canAppeal) {
-            const ttl = ((recent[0].ts + APPEAL_COUNTDOWN_MSEC) - now) / 1000;
-            if (ttl / 86400 >= 1) {
-              counter.textContent = `~${Math.round(ttl / 86400)} days`;
-            } else if (ttl / 3600 >= 1) {
-              counter.textContent = `~${Math.round(ttl / 3600)} hours`;
+            if (recent.length === 0) {
+              counter.textContent = "Unknown";
             } else {
-              counter.textContent = `~${Math.round(ttl / 60)} minutes`;
+              const ttl = ((recent[0].ts + APPEAL_COUNTDOWN_MSEC) - now) / 1000;
+              if (ttl / 86400 >= 1) {
+                counter.textContent = `~${Math.round(ttl / 86400)} days`;
+              } else if (ttl / 3600 >= 1) {
+                counter.textContent = `~${Math.round(ttl / 3600)} hours`;
+              } else {
+                counter.textContent = `~${Math.round(ttl / 60)} minutes`;
+              }
             }
             label!.textContent = UNAVAILABLE_LABEL;
           } else {
