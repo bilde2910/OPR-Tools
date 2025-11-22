@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CheckboxEditor, NotificationColor, register } from "src/core";
-import { filterObject, iterObject, unilTruthy, indexToMap, makeChildNode, toUtcIsoDate, iterKeys, assignAll, Logger, shiftDays } from "src/utils";
+import { filterObject, iterObject, untilTruthy, indexToMap, makeChildNode, toUtcIsoDate, iterKeys, assignAll, Logger, shiftDays } from "src/utils";
 import { AnyContribution, ContributionStatus, ContributionType, EditContribution, Nomination, OriginalPoiData, SubmissionsResult } from "src/types";
 import { EmailAPI, WayfarerEmail } from "src/email";
 import { IDBStoreConnection, KeyNotFoundError } from "src/idb";
@@ -370,7 +370,7 @@ export default () => {
 
         // Add event listener for each element in the nomination list,
         // so we can display the history box for nominations on click.
-        const ref = await unilTruthy(() => document.querySelector("app-submissions-list"));
+        const ref = await untilTruthy(() => document.querySelector("app-submissions-list"));
 
         ref.addEventListener("click", async (e) => {
           // Ensure there is only one selection box.
@@ -382,7 +382,7 @@ export default () => {
             // I don't see a better way to access it.
             const nomId: StoredContribution["id"] = (item as any).__ngContext__[22].id;
             if (nomId) {
-              const dsRef = await unilTruthy(() => document.querySelector(CONTRIB_DATE_SELECTOR));
+              const dsRef = await untilTruthy(() => document.querySelector(CONTRIB_DATE_SELECTOR));
               const box = makeChildNode(dsRef.parentNode!, "div");
               box.classList.add("oprnsh-dropdown");
 
@@ -410,7 +410,7 @@ export default () => {
               // That process sets ready = true when done. If it was already ready, then this will
               // continue immediately. When ready, that means the previous connection was closed, so we
               // open a new connection here to fetch data for the selected nomination.
-              await unilTruthy(() => ready);
+              await untilTruthy(() => ready);
               using idb = await toolbox.openIDB("history", "readonly");
               const savedNom = await idb.get(nomId);
 

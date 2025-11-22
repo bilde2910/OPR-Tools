@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { unilTruthy, insertAfter, iterObject, makeChildNode, readGeofences } from "src/utils";
+import { untilTruthy, insertAfter, iterObject, makeChildNode, readGeofences } from "src/utils";
 import { AnyReview, AnyContribution, Showcase, SubmissionsResult, Zone, ContributionType } from "src/types";
 
 import proj4 from "proj4";
@@ -531,14 +531,14 @@ const registerProjections = () => {
 
 const injectShowcase = async (result: Showcase) => {
   await readGeofences();
-  await unilTruthy(() => document.querySelector(".showcase-item"));
+  await untilTruthy(() => document.querySelector(".showcase-item"));
   const showcase = result.showcase;
   const count = showcase.length;
   let index = 0;
   let box: HTMLElement | null = null;
 
   const renderRef = () => document.getElementsByClassName("showcase-item__map")[0];
-  const render = () => unilTruthy(renderRef).then(async (rref) => {
+  const render = () => untilTruthy(renderRef).then(async (rref) => {
     const nBox = await addOpenButtons(rref, showcase[index]);
     if (box) box.parentElement!.removeChild(box);
     box = nBox;
@@ -557,7 +557,7 @@ const injectShowcase = async (result: Showcase) => {
 };
 
 const injectNominations = async (result: SubmissionsResult) => {
-  const ref = await unilTruthy(() => document.querySelector("app-submissions-list"));
+  const ref = await untilTruthy(() => document.querySelector("app-submissions-list"));
   const nomCache = {} as Record<string, AnyContribution>;
   let box: HTMLElement | null = null;
 
@@ -574,7 +574,7 @@ const injectNominations = async (result: SubmissionsResult) => {
     const item = (e.target! as HTMLElement).closest("app-submissions-list-item") as HTMLElement | null;
     if (item) {
       const nom = nomCache[item.querySelector<HTMLImageElement>(".object-cover")!.src];
-      const rref = await unilTruthy(() => document.querySelector<HTMLElement>("app-details-pane .details-pane__map"));
+      const rref = await untilTruthy(() => document.querySelector<HTMLElement>("app-details-pane .details-pane__map"));
       const nBox = await addOpenButtons(rref, nom);
       if (box) box.parentElement!.removeChild(box);
       box = nBox;
@@ -584,7 +584,7 @@ const injectNominations = async (result: SubmissionsResult) => {
 
 const injectReview = async (candidate: AnyReview) => {
   if (candidate.type === "NEW") {
-    const ref = await unilTruthy(() => document.getElementById("check-duplicates-card"));
+    const ref = await untilTruthy(() => document.getElementById("check-duplicates-card"));
     if (candidate.streetAddress) {
       const addrBox = document.createElement("p");
       addrBox.classList.add("oproi-address");
@@ -593,11 +593,11 @@ const injectReview = async (candidate: AnyReview) => {
     }
     await addOpenButtons(ref.firstChild!, candidate);
   } else if (candidate.type === "EDIT") {
-    const ref = await unilTruthy(() => document.querySelector(".review-edit-info .review-edit-info__info"));
+    const ref = await untilTruthy(() => document.querySelector(".review-edit-info .review-edit-info__info"));
     await addOpenButtons(ref, candidate);
   } else if (candidate.type === "PHOTO") {
-    const pref = await unilTruthy(() => document.querySelector("app-review-photo"));
-    const ref = await unilTruthy(() => pref.querySelector(".review-photo__info > div > div:nth-child(2)"));
+    const pref = await untilTruthy(() => document.querySelector("app-review-photo"));
+    const ref = await untilTruthy(() => pref.querySelector(".review-photo__info > div > div:nth-child(2)"));
     await addOpenButtons(ref, candidate);
   }
 };

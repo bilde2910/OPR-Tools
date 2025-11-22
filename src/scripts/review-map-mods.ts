@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CheckboxEditor, register, SelectBoxEditor } from "src/core";
-import { unilTruthy, haversine } from "src/utils";
+import { untilTruthy, haversine } from "src/utils";
 import { AnyReview } from "src/types";
 
 import "./extended-stats.css";
@@ -83,11 +83,11 @@ export default () => {
 
         let mapCtx: any | null = null;
         if (candidate.type === "NEW") {
-          const gmap: any = await unilTruthy(() => document.querySelector("#check-duplicates-card nia-map"));
+          const gmap: any = await untilTruthy(() => document.querySelector("#check-duplicates-card nia-map"));
           mapCtx = gmap.__ngContext__[gmap.__ngContext__.length - 1];
           await modifyNewReviewMap(gmap, candidate, mapCtx);
         } else if (candidate.type === "EDIT" && candidate.locationEdits.length > 0) {
-          const gmap: any = await unilTruthy(() => document.querySelector("app-select-location-edit"));
+          const gmap: any = await untilTruthy(() => document.querySelector("app-select-location-edit"));
           mapCtx = gmap.__ngContext__[gmap.__ngContext__.length - 1].niaMap;
         }
 
@@ -101,7 +101,7 @@ export default () => {
       };
 
       const addLocationChangeBtnListener = async (map: google.maps.Map, mapCtx: any, candidate: AnyReview) => {
-        const locationChangeBtn = await unilTruthy(() => document.querySelector("#check-duplicates-card nia-map ~ div button"));
+        const locationChangeBtn = await untilTruthy(() => document.querySelector("#check-duplicates-card nia-map ~ div button"));
         locationChangeBtn.addEventListener("click", () => {
           logger.info("Location change started");
           if (config.get("renderCloseCircle")) drawCloseCircle(map, candidate);
@@ -125,7 +125,7 @@ export default () => {
       };
 
       const addListenerToMarker = async (map: google.maps.Map, mapCtx: any) => {
-        const suggested = await unilTruthy(() => mapCtx.markers.suggested);
+        const suggested = await untilTruthy(() => mapCtx.markers.suggested);
         const wrapped = suggested.markerOnDrag;
         suggested.markerOnDrag = function (t?: any) {
           if (t && t.lat) {
@@ -206,7 +206,7 @@ export default () => {
       };
 
       const addNearbyTooltips = async (candidate: AnyReview, mapCtx: any) => {
-        const allMarkers = await unilTruthy(() => document.querySelectorAll("#check-duplicates-card nia-map agm-map div[role=button]"));
+        const allMarkers = await untilTruthy(() => document.querySelectorAll("#check-duplicates-card nia-map agm-map div[role=button]"));
         if (allMarkers.length <= 1) {
           setTimeout(() => addNearbyTooltips(candidate, mapCtx), 500);
           return;

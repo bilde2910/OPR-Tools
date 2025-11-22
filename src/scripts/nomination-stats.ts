@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { unilTruthy, downloadAsFile, iterKeys, iterObject, makeChildNode } from "src/utils";
+import { untilTruthy, downloadAsFile, iterKeys, iterObject, makeChildNode } from "src/utils";
 import { AnyContribution, ContributionStatus, ContributionType, EditContribution, SubmissionsResult } from "src/types";
 
 import "./nomination-stats.css";
@@ -43,7 +43,7 @@ const parseContributions = (data: SubmissionsResult) => {
 };
 
 const addNominationDetails = async (subs: AnyContribution[]) => {
-  const ref = await unilTruthy(() => document.querySelector("app-submissions-list"));
+  const ref = await untilTruthy(() => document.querySelector("app-submissions-list"));
   const counts = <Record<string, Record<string, number>>>{
     "EDIT": {},
     "TOTAL": {},
@@ -170,7 +170,7 @@ const addNominationDetails = async (subs: AnyContribution[]) => {
 };
 
 const addExportButtons = async (subs: AnyContribution[]) => {
-  const ref = await unilTruthy(() => document.querySelector("wf-logo"));
+  const ref = await untilTruthy(() => document.querySelector("wf-logo"));
   if (document.getElementById("oprtns-export") !== null) return;
   const div = makeChildNode(ref.parentElement!.parentElement!, "div");
   div.id = "oprtns-export";

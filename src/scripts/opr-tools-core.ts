@@ -1,5 +1,5 @@
 import { register } from "src/core";
-import { unilTruthy, makeChildNode } from "src/utils";
+import { untilTruthy, makeChildNode } from "src/utils";
 import { UserSettings } from "src/types";
 import { StoredEmail } from "src/email/types";
 
@@ -27,7 +27,7 @@ export default () => {
     sessionData: {},
     initialize: (toolbox, logger, config): CorePluginAPI => {
       const renderOprtSettings = async (_data: UserSettings) => {
-        const ref = await unilTruthy(() => document.querySelector("app-settings"));
+        const ref = await untilTruthy(() => document.querySelector("app-settings"));
         const box = document.createElement("div");
         box.classList.add("max-w-md");
         const mainSettings = document.getElementById("oprtoolsMainPluginSettingsPane");

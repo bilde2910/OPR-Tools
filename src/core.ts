@@ -1,6 +1,6 @@
 import { BaseSchema, IDBStoreConnection } from "./idb";
 import { ApiResult, Requests, Responses } from "./types";
-import { unilTruthy, cyrb53, iterObject, makeChildNode, Logger } from "./utils";
+import { untilTruthy, cyrb53, iterObject, makeChildNode, Logger } from "./utils";
 import { CorePluginAPI } from "./scripts/opr-tools-core";
 
 import ImportIcon from "../assets/import.svg";
@@ -310,7 +310,7 @@ const addSidebarItem = async (id: string, item: SidebarMenuItem) => {
     throw new Error(`Tried to add already existing sidebar item ${id}`);
   }
   sidebarItems[id] = item;
-  const sidebar = await unilTruthy(() => document.querySelector("app-sidebar-link"));
+  const sidebar = await untilTruthy(() => document.querySelector("app-sidebar-link"));
   createSidebarItems(sidebar.parentNode!);
 };
 
@@ -494,7 +494,7 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
   }
 
   public async createModal(...cssClasses: string[]) {
-    const body = await unilTruthy(() => document.querySelector("body"));
+    const body = await untilTruthy(() => document.querySelector("body"));
     const outer = makeChildNode(body, "div");
     outer.classList.add("oprtcore-fullscreen-overlay");
     const inner = makeChildNode(outer, "div");
@@ -637,7 +637,7 @@ export const initializeAllAddons = () => {
 };
 
 const renderEditors = (options: AddonOptionsEntry[]) => async () => {
-  const ref = await unilTruthy(() => document.querySelector("app-settings"));
+  const ref = await untilTruthy(() => document.querySelector("app-settings"));
   const box = makeChildNode(ref, "div");
   box.classList.add("max-w-md");
   box.id = "oprtoolsMainPluginSettingsPane";

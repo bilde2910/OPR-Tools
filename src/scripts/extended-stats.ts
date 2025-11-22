@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { unilTruthy, insertAfter, makeChildNode } from "src/utils";
+import { untilTruthy, insertAfter, makeChildNode } from "src/utils";
 import { Profile } from "src/types";
 
 import "./extended-stats.css";
@@ -35,7 +35,7 @@ export default () => {
     sessionData: {},
     initialize: (toolbox, _logger, config) => {
       const parseStats = async (profile: Profile) => {
-        const parentRef = await unilTruthy(() => document.querySelector(".wf-profile-stats__section-title"));
+        const parentRef = await untilTruthy(() => document.querySelector(".wf-profile-stats__section-title"));
 
         const allAgreements = getTotalAgreementCount(profile) || profile.accepted + profile.rejected + profile.duplicated;
         const percent = ((allAgreements / profile.finished) * 100).toFixed(1);

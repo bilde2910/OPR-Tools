@@ -120,7 +120,7 @@ export function addStyle(css: string) {
   return elem;
 }
 
-export function unilTruthy<T>(listener: () => T | null | undefined) {
+export function untilTruthy<T>(listener: () => T | null | undefined) {
   return new Promise<T>((resolve, _reject) => {
     const queryLoop = () => {
       const ref = listener();

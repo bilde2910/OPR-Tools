@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { unilTruthy } from "src/utils";
+import { untilTruthy } from "src/utils";
 import { AnyReview, EditReview, NewReview, PhotoReview } from "src/types";
 
 import "./keyboard-review.scss";
@@ -272,7 +272,7 @@ export default () => {
             if (context.type !== RenderContextType.NEW) throw new InvalidContextError();
             if (isDialogOpen()) {
               if (isDialogClosing()) {
-                unilTruthy(() => !isDialogClosing()).then(() => redrawUI()).catch(logger.error);
+                untilTruthy(() => !isDialogClosing()).then(() => redrawUI()).catch(logger.error);
                 return;
               } else if (ThumbCards.APPROPRIATE.isDialogOpen()) {
                 const btns = document.querySelectorAll("mat-dialog-container mat-radio-button");
@@ -409,7 +409,7 @@ export default () => {
                   block: 'center'
                 });*/
               } else {
-                unilTruthy(() => document.getElementById(cc.id)).then(() => redrawUI()).catch(logger.error);
+                untilTruthy(() => document.getElementById(cc.id)).then(() => redrawUI()).catch(logger.error);
               }
             }
           },
@@ -477,7 +477,7 @@ export default () => {
                       for (const dupeBtn of dupeBtns) {
                         if (dupeBtn && dupeBtn.closest("body")) {
                           dupeBtn.click();
-                          unilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => redrawUI()).catch(logger.error);
+                          untilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => redrawUI()).catch(logger.error);
                           break;
                         }
                       }
@@ -489,7 +489,7 @@ export default () => {
                     if (isDialogOpen("app-confirm-duplicate-modal")) {
                       const cancelBtn = document.querySelector<HTMLElement>("mat-dialog-container .mat-dialog-actions button.wf-button");
                       cancelBtn!.click();
-                      unilTruthy(() => !isDialogOpen()).then(() => redrawUI()).catch(logger.error);
+                      untilTruthy(() => !isDialogOpen()).then(() => redrawUI()).catch(logger.error);
                     }
                   },
                 };
@@ -498,7 +498,7 @@ export default () => {
                   const img = dupImgs[i];
                   dupKeys[`[${key}`] = () => {
                     img.click();
-                    unilTruthy(() => document.activeElement!.tagName === "IMG").then(() => {
+                    untilTruthy(() => document.activeElement!.tagName === "IMG").then(() => {
                       (document.activeElement! as HTMLImageElement).blur();
                       redrawUI();
                     }).catch(logger.error);
@@ -728,7 +728,7 @@ export default () => {
       };
 
       const initForPhoto = async (_candidate: PhotoReview) => {
-        const acceptAll = await unilTruthy(() => document.querySelector<HTMLElement>("app-review-photo app-accept-all-photos-card .photo-card"));
+        const acceptAll = await untilTruthy(() => document.querySelector<HTMLElement>("app-review-photo app-accept-all-photos-card .photo-card"));
 
         context = {
           type: RenderContextType.PHOTO,
@@ -845,7 +845,7 @@ export default () => {
         for (const btn of btns) {
           if (btn.querySelector("mat-icon")!.textContent === "thumb_down") {
             btn.click();
-            unilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => {
+            untilTruthy(() => document.querySelector("mat-dialog-container > *")).then(() => {
               redrawUI();
               resolve();
             }).catch(logger.error);
@@ -1036,7 +1036,7 @@ const isDialogClosing = (diag?: string) => {
   );
 };
 
-const waitForDialog = () => unilTruthy(
+const waitForDialog = () => untilTruthy(
   () => document.querySelector("mat-dialog-container > *"),
 );
 

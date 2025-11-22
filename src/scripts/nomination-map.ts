@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { CheckboxEditor, NumericInputEditor, register } from "src/core";
-import { unilTruthy, debounce, weightNumericArray } from "src/utils";
+import { untilTruthy, debounce, weightNumericArray } from "src/utils";
 import { AnyContribution, ContributionStatus, SubmissionsResult } from "src/types";
 
 import { Cluster, ClusterStats, Marker, MarkerClusterer, Renderer } from "@googlemaps/markerclusterer";
@@ -64,13 +64,13 @@ export default () => {
       };
 
       const clickFirst = async () => {
-        const ref = await unilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
+        const ref = await untilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
         (ref.children[0] as HTMLElement).click();
       };
 
       const addCounter = async () => {
-        const listEl: any = await unilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
-        const insDiv = await unilTruthy(() => document.querySelector(".mt-2"));
+        const listEl: any = await untilTruthy(() => document.querySelector(".cdk-virtual-scroll-content-wrapper"));
+        const insDiv = await untilTruthy(() => document.querySelector(".mt-2"));
 
         const searchInput = document.querySelector("input.w-full");
         if (searchInput !== undefined) {
@@ -87,7 +87,7 @@ export default () => {
       };
 
       const initPrimaryListener = async () => {
-        const ref = await unilTruthy(() => document.querySelector(".cursor-pointer"));
+        const ref = await untilTruthy(() => document.querySelector(".cursor-pointer"));
         ref.addEventListener("click", function() {
           const modal = document.getElementsByTagName("app-submissions-sort-modal");
           const els = modal[0].getElementsByClassName("wf-button--primary");
@@ -106,7 +106,7 @@ export default () => {
       };
 
       const initNominationMap = async () => {
-        await unilTruthy(() => typeof google !== "undefined" && nominations!.length > 0);
+        await untilTruthy(() => typeof google !== "undefined" && nominations!.length > 0);
         if (nominationMap === null) {
           addMap(createElements());
         } else {

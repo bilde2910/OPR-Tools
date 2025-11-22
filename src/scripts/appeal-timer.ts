@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { unilTruthy, makeChildNode } from "src/utils";
+import { untilTruthy, makeChildNode } from "src/utils";
 import { SubmissionsResult, SubmitAppeal } from "src/types";
 
 import "./appeal-timer.css";
@@ -47,7 +47,7 @@ export default () => {
     sessionData: {},
     initialize: (toolbox, logger, _config) => {
       const updateTimer = async (result?: SubmissionsResult) => {
-        const container = await unilTruthy(() => document.querySelector("wf-logo")?.parentElement?.parentElement);
+        const container = await untilTruthy(() => document.querySelector("wf-logo")?.parentElement?.parentElement);
         const now = Date.now();
         let counter = document.getElementById("oprtat-counter");
         let label = document.getElementById("oprtat-label");

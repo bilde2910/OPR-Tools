@@ -17,7 +17,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 import { register } from "src/core";
-import { unilTruthy, makeChildNode } from "src/utils";
+import { untilTruthy, makeChildNode } from "src/utils";
 import { AnySubmittedReview } from "src/types";
 
 import "./review-counter.css";
@@ -34,7 +34,7 @@ export default () => {
     },
     initialize: (toolbox, _logger, _config) => {
       const injectCounter = async () => {
-        const container = await unilTruthy(() => document.querySelector("wf-logo")?.parentElement?.parentElement);
+        const container = await untilTruthy(() => document.querySelector("wf-logo")?.parentElement?.parentElement);
         if (document.getElementById("oprrct-counter") === null) {
           const div = makeChildNode(container, "div");
           div.classList.add("oprrct-outer");
