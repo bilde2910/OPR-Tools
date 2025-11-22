@@ -293,6 +293,15 @@ export const shiftDays = (date: Date, offset: number) => {
   return nd;
 };
 
+const mergeArraysToObject = <Ta, Tb>(a: Ta[],  b: Tb[]) =>
+  a.map((e, i) => ({ a: e, b: b[i] }));
+
+const weightNumbers = (a: number, b: number, ratio: number) =>
+  a * ratio + b * (1 - ratio);
+
+export const weightNumericArray = (arr1: number[], arr2: number[], ratio: number) =>
+  mergeArraysToObject(arr1, arr2).map(({a, b}) => weightNumbers(a, b, ratio));
+
 //#region Loggnig
 
 export class Logger {

@@ -16,11 +16,11 @@
 // <https://github.com/bilde2910/OPR-Tools/blob/main/LICENSE>
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { CheckboxEditor, register } from "src/core";
-import { unilTruthy, debounce } from "src/utils";
+import { CheckboxEditor, NumericInputEditor, register } from "src/core";
+import { unilTruthy, debounce, weightNumericArray } from "src/utils";
 import { AnyContribution, ContributionStatus, SubmissionsResult } from "src/types";
 
-import { MarkerClusterer } from "@googlemaps/markerclusterer";
+import { Cluster, ClusterStats, Marker, MarkerClusterer, Renderer } from "@googlemaps/markerclusterer";
 
 import "./nomination-map.css";
 
@@ -34,12 +34,18 @@ export default () => {
     description: "Add map of all nominations",
     defaultConfig: {
       loadFirst: true,
+      maxClusteringZoom: 10,
     },
     sessionData: {},
     initialize: (toolbox, logger, config) => {
       config.setUserEditable("loadFirst", {
         label: "Load first wayspot detail automatically",
         editor: new CheckboxEditor(),
+      });
+      config.setUserEditable("maxClusteringZoom", {
+        label: "Max zoom level for marker clustering",
+        help: "Value from 0-20, where higher numbers equal closer zoom. When the map is zoomed in beyond this level, markers will no longer cluster together.",
+        editor: new NumericInputEditor({ min: 0, max: 20 }),
       });
 
       let countText: HTMLElement | null = null;
@@ -197,7 +203,14 @@ export default () => {
           bounds.extend(ll);
           return marker;
         });
-        nominationCluster = new MarkerClusterer({ map: nominationMap, markers: nominationMarkers });
+        nominationCluster = new MarkerClusterer({
+          map: nominationMap,
+          markers: nominationMarkers,
+          renderer: new NominationMapClusterRenderer(),
+          algorithmOptions: {
+            maxZoom: config.get("maxClusteringZoom"),
+          },
+        });
 
         if (reset) {
           logger.info("Resetting bounds");
@@ -222,3 +235,68 @@ export default () => {
     },
   });
 };
+
+interface GradientStop {
+  count: number,
+  color: number[],
+}
+
+class NominationMapClusterRenderer implements Renderer {
+  render(cluster: Cluster, _stats: ClusterStats, _map: google.maps.Map): Marker {
+    const gradient: GradientStop[] = [
+      {
+        count: 1,
+        color: [68, 185, 0], // rgba(68, 185, 0, 1)
+      }, {
+        count: 10,
+        color: [255, 183, 0], // rgba(255, 183, 0, 1)
+      }, {
+        count: 100,
+        color: [224, 0, 0], // rgba(224, 0, 0, 1)
+      }, {
+        count: 1000,
+        color: [186, 0, 233], // rgba(186, 0, 233, 1)
+      }, {
+        count: 10000,
+        color: [48, 168, 224], // rgb(48, 168, 224)
+      },
+    ];
+    let nextStop = 0;
+    while ((++nextStop) < gradient.length - 1 && gradient[nextStop].count < cluster.count);
+    const colorComponents =
+      (cluster.count > gradient[nextStop].count)
+        ? gradient[nextStop].color
+        : weightNumericArray(
+          gradient[nextStop - 1].color,
+          gradient[nextStop].color,
+          1 - (
+            (cluster.count - gradient[nextStop - 1].count) /
+            (gradient[nextStop].count - gradient[nextStop - 1].count)
+          ),
+        );
+      
+
+    const color = `rgb(${colorComponents.map(c => c.toString()).join(", ")})`;
+    const svg = `<svg fill="${color}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="50" height="50">
+<circle cx="120" cy="120" opacity=".6" r="70" />
+<circle cx="120" cy="120" opacity=".3" r="90" />
+<circle cx="120" cy="120" opacity=".2" r="110" />
+<text x="50%" y="50%" style="fill: #fff; font-family: sans-serif; font-weight: bold;" text-anchor="middle" font-size="50" dominant-baseline="middle">${cluster.count}</text>
+</svg>`;
+
+    const title = `Cluster of ${cluster.count} contributions`;
+    // Adjust zIndex to be above other markers
+    const zIndex = Number(google.maps.Marker.MAX_ZINDEX) + cluster.count;
+
+    const clusterOptions = {
+      position: cluster.position,
+      zIndex,
+      title,
+      icon: {
+        url: `data:image/svg+xml;base64,${btoa(svg)}`,
+        anchor: new google.maps.Point(25, 25),
+      },
+    };
+    return new google.maps.Marker(clusterOptions);
+  }
+}
