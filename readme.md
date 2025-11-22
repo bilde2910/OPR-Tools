@@ -10,7 +10,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-compact-card.user.js
 - [ ] wayfarer-contribution-management-layout.user.js
 - [ ] wayfarer-edits-diff.user.js
-- [ ] wayfarer-email-api.user.js
+- [x] wayfarer-email-api.user.js
 - [x] wayfarer-extended-stats.user.js
 - [x] wayfarer-keyboard-review.user.js
 - [ ] wayfarer-localstoragecheck.user.js

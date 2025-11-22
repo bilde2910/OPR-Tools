@@ -63,6 +63,8 @@ export interface SaveSettings {
 
 export interface SubmissionsResult {
   submissions: AnyContribution[],
+  canAppeal: boolean,
+  immediateUpgradeEnabled: boolean,
 }
 
 export interface ShowcasedPortal {

@@ -193,6 +193,7 @@ export default () => {
       const handleContributions = (fromOpr: SubmissionsResult) => {
         oprOriginatingIDs = new Set(fromOpr.submissions.map(v => v.id));
         return {
+          ...fromOpr,
           submissions: mergeContributions(fromOpr.submissions, cache),
         };
       };
