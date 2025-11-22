@@ -35,7 +35,7 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
   };
   const passCliArgsStr = Object.entries(passCliArgs).map(([key, value]) => `--${key}=${value}`).join(" ");
 
-  const { mode, suffix } = passCliArgs;
+  const { suffix } = passCliArgs;
 
   const linkedPkgs = requireJson.filter((pkg) => pkg.link === true);
 

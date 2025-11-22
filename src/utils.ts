@@ -7,8 +7,8 @@ import { GeofenceMap } from "./types";
 export type ResourceKey = keyof typeof resources;
 
 /**
- * Returns the URL of a resource by its name, as defined in `assets/resources.json`, from GM resource cache - [see GM.getResourceUrl docs](https://wiki.greasespot.net/GM.getResourceUrl)  
- * Falls back to a `raw.githubusercontent.com` URL or base64-encoded data URI if the resource is not available in the GM resource cache.  
+ * Returns the URL of a resource by its name, as defined in `assets/resources.json`, from GM resource cache - [see GM.getResourceUrl docs](https://wiki.greasespot.net/GM.getResourceUrl)
+ * Falls back to a `raw.githubusercontent.com` URL or base64-encoded data URI if the resource is not available in the GM resource cache.
  * ⚠️ Requires the directive `@grant GM.getResourceUrl`
  */
 export async function getResourceUrl(name: ResourceKey) {
@@ -161,7 +161,7 @@ export const cyrb53 = function(str: string, seed: number = 0) {
  * Returns an copy of obj containing only the keys specified in the keys array.
  * @param obj The object to remove entries from
  * @param keys The keys to keep
- * @returns 
+ * @returns
  */
 export const filterObject = <T extends Record<K, T[K]>, K extends keyof T & string>(obj: T, keys: readonly K[]): Pick<T, K> =>
   keys
@@ -178,7 +178,7 @@ export const iterObject = <T extends Record<K, T[K]>, K extends keyof T & string
   Object
     .entries(obj)
     .map(([k, v]) => [k as K, v as T[K]]);
- 
+
 /**
  * Type-safe version of Object.keys(). The object must be string-keyed.
  * @param obj The object to get keys from
@@ -299,7 +299,7 @@ export class Logger {
   debug(...data: any) {
     //console.debug("[D]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
   }
-  
+
   info(...data: any) {
     console.log("[I]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
   };

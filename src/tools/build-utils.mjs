@@ -141,8 +141,8 @@ async function getRequireDirectives() {
 }
 
 /**
- * @param {import("./build-types").RequireObjPkg} entry 
- * @returns 
+ * @param {import("./build-types").RequireObjPkg} entry
+ * @returns {string}
  */
 function getRequireEntry(entry) {
   const baseUrl = entry.baseUrl ?? "https://cdn.jsdelivr.net/npm/";

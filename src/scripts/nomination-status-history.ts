@@ -173,7 +173,7 @@ export default () => {
             this.#alreadyProcessed.clear();
             for (const record of records) {
               if (
-                // Reprocess 
+                // Reprocess
                 record.version < EMAIL_PROCESSING_VERSION ||
                 // Reprocess old failures due to bugfixes and template additions
                 record.result === EmailProcessingResult.UNSUPPORTED ||
@@ -697,7 +697,7 @@ export default () => {
           statusHistory: history,
         });
         idb.commit();
-        
+
         const box = document.querySelector(".oprnsh-dropdown");
         if (box) {
           addEventToHistoryDisplay(box, newEntry, oldStatus);
@@ -811,7 +811,7 @@ const determineRejectType = (history: StatusHistoryEntry[], email: WayfarerEmail
     }
   }
   throw new AmbiguousRejectionError(
-    "This email was rejected because it was not possible to determine how this nomination was " + 
+    "This email was rejected because it was not possible to determine how this nomination was " +
     "rejected (expected status REJECTED or DUPLICATE, but observed " +
     `${history[history.length - 1].status}).`,
   );
@@ -1167,7 +1167,7 @@ const processEmail = (logger: Logger, email: WayfarerEmail, submissions: AnyCont
         );
       }
       // TODO: Edit/photo handling
-      
+
       let sub: AnyContribution | null = null;
       switch (template.type) {
         case EmailType.NOMINATION_APPEAL_DECIDED:

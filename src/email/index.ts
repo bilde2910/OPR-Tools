@@ -54,7 +54,7 @@ export class EmailAPI {
       listeners.push(await listener());
     }
     this.#logger.info("All email listeners were invoked.");
-    
+
     const counters: Record<EmailPutStatus, number> = {
       inserted: 0,
       replaced: 0,
@@ -442,7 +442,7 @@ export class WayfarerEmail extends Email {
   get originatingFilename() {
     return this.#dbObject.filename;
   }
-  
+
   /**
    * Returns the ID of this email. The ID can be passed to API.get() to return this email. The ID
    * is based on the Message-ID header of the email and is globally unique.

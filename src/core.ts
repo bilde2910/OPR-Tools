@@ -229,8 +229,7 @@ class AddonSettings<T> {
  * IT IS YOUR RESPONSIBILITY TO CLOSE THE RETURNED DATABASE CONNECTION WHEN YOU ARE DONE WITH IT.
  * THIS FUNCTION DOES NOT DO THIS FOR YOU - YOU HAVE TO CALL db.close()!
  * @param objectStoreName The name of the object store to open
- * @param version 
- * @returns 
+ * @param version
  */
 const getIDBInstance = (objectStoreName: string, version?: number) => new Promise<IDBDatabase>((resolve, reject) => {
   "use strict";

@@ -99,7 +99,7 @@ export default () => {
           void updateTimer();
         }
       };
-      
+
       toolbox.interceptOpenJson("GET", "/api/v1/vault/manage", updateTimer);
       toolbox.interceptSendJson("/api/v1/vault/manage/appeal", handleSubmittedAppeal);
     },

@@ -248,7 +248,7 @@ export default () => {
           pano = null;
         }
       };
-      
+
       toolbox.interceptOpenJson("GET", "/api/v1/vault/review", addMapMods);
       toolbox.interceptSendJson("/api/v1/vault/review", unloadPano);
     },

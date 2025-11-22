@@ -49,6 +49,7 @@ module.exports = defineConfig([{
     "@stylistic/quotes": ["error", "double"],
     "@stylistic/semi": ["error", "always"],
     "@stylistic/eol-last": ["error", "always"],
+    "@stylistic/no-trailing-spaces": "error",
     "no-async-promise-executor": "off",
     "no-cond-assign": "off",
     "@stylistic/indent": ["error", 2, {

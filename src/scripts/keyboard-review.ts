@@ -791,7 +791,7 @@ export default () => {
           },
           cards: document.querySelectorAll<HTMLElement>("app-review-photo app-photo-card .photo-card"),
         };
-        
+
         if (context.type !== RenderContextType.PHOTO) throw new InvalidContextError();
         const keys: KeyHandlerMap = {
           "Tab": () => acceptAll!.click(),

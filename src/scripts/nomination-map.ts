@@ -12,7 +12,7 @@
 // GNU General Public License for more details.
 
 // You can find a copy of the GNU General Public License in the root
-// directory of this script's GitHub repository: 
+// directory of this script's GitHub repository:
 // <https://github.com/bilde2910/OPR-Tools/blob/main/LICENSE>
 // If not, see <https://www.gnu.org/licenses/>.
 
@@ -98,7 +98,7 @@ export default () => {
           }
         });
       };
-      
+
       const checkAutoLoad = async () => {
         if (config.get("loadFirst")) {
           await clickFirst();
@@ -274,7 +274,6 @@ class NominationMapClusterRenderer implements Renderer {
             (gradient[nextStop].count - gradient[nextStop - 1].count)
           ),
         );
-      
 
     const color = `rgb(${colorComponents.map(c => c.toString()).join(", ")})`;
     const svg = `<svg fill="${color}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="50" height="50">

@@ -321,7 +321,7 @@ export default () => {
         for (const other of hide) other.style.display = "none";
         table.style.display = "block";
       };
-      
+
       interface RendererParams<T> { value: T }
 
       const locationRenderer = (params: RendererParams<{ lat: number, lng: number }>) => `
