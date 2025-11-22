@@ -16,6 +16,7 @@ import reviewCounter from "./scripts/review-counter";
 import emlImporter from "./scripts/eml-importer";
 import wayfarerContributionImporter from "./scripts/wayfarer-contribution-importer";
 import gmailGasImporter from "./scripts/gmail-gas-importer";
+import appealTimer from "./scripts/appeal-timer";
 
 const availableAddons = [
   oprToolsCore,
@@ -31,6 +32,7 @@ const availableAddons = [
   reviewCounter,
   emlImporter,
   gmailGasImporter,
+  appealTimer,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];

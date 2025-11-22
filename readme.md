@@ -6,7 +6,7 @@ This repository is still very much a work in progress. The goal is to port most 
   <summary>Current script porting progress</summary>
 
 - [ ] wayfarer-achievements.user.js
-- [ ] wayfarer-appeal-info.user.js
+- [x] wayfarer-appeal-info.user.js
 - [ ] wayfarer-compact-card.user.js
 - [ ] wayfarer-contribution-management-layout.user.js
 - [ ] wayfarer-edits-diff.user.js
