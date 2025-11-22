@@ -239,7 +239,10 @@ export interface Nomination extends Contribution {
 }
 
 export type AnyContribution =
-  EditContribution<EditContributionType> |
+  EditContribution<ContributionType.EDIT_LOCATION> |
+  EditContribution<ContributionType.EDIT_DESCRIPTION> |
+  EditContribution<ContributionType.EDIT_TITLE> |
+  EditContribution<ContributionType.PHOTO> |
   Nomination;
 
 //#region Incoming reviews

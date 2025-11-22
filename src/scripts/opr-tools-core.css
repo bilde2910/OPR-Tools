@@ -93,6 +93,7 @@ input.oprtcore-ui-large-input {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
+  cursor: pointer;
 }
 
 .oprtcore-ui-button:hover {

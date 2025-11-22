@@ -18,7 +18,7 @@
 
 import { register, UnixTimestampDateOnlyEditor } from "src/core";
 import { filterObject, iterKeys, readFile } from "src/utils";
-import { AnyContribution, ContributionStatus, ContributionType, Nomination, OriginalPoiState, SubmissionsResult, SubmitAppeal } from "src/types";
+import { AnyContribution, ContributionStatus, ContributionType, Nomination, OriginalPoiState, SubmissionsResult } from "src/types";
 
 import WayfarerLogo from "../../assets/wayfarer-logo.png";
 
@@ -152,12 +152,6 @@ export default () => {
           .map(sub => validateAsOprCompatible(sub))
           .filter(sub => typeof sub !== "undefined")
           .map(sub => flagAsUneditable(sub));
-        /*.filter(sub => [
-            ContributionStatus.ACCEPTED,
-            ContributionStatus.REJECTED,
-            ContributionStatus.DUPLICATE,
-            ContributionStatus.WITHDRAWN,
-          ].includes(sub.status));*/
 
       const mergeContributions = (orig: AnyContribution[], insert: AnyContribution[]) => {
         orig.sort((a, b) => a.order - b.order);

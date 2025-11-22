@@ -287,6 +287,12 @@ export const toUtcIsoDate = (d: Date) =>
   `${(d.getUTCMonth() + 1).toString().padStart(2, "0")}-` +
   `${d.getUTCDate().toString().padStart(2, "0")}`;
 
+export const shiftDays = (date: Date, offset: number) => {
+  const nd = new Date(date);
+  nd.setUTCDate(nd.getUTCDate() + offset);
+  return nd;
+};
+
 //#region Loggnig
 
 export class Logger {
@@ -296,7 +302,7 @@ export class Logger {
   }
 
   debug(...data: any) {
-    console.debug("[D]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
+    //console.debug("[D]", "[opr-tools]", `[${this.#subsystem}]`, ...data);
   }
   
   info(...data: any) {

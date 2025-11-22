@@ -15,6 +15,7 @@ import reviewMapMods from "./scripts/review-map-mods";
 import reviewCounter from "./scripts/review-counter";
 import emlImporter from "./scripts/eml-importer";
 import wayfarerContributionImporter from "./scripts/wayfarer-contribution-importer";
+import gmailGasImporter from "./scripts/gmail-gas-importer";
 
 const availableAddons = [
   oprToolsCore,
@@ -29,6 +30,7 @@ const availableAddons = [
   reviewMapMods,
   reviewCounter,
   emlImporter,
+  gmailGasImporter,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];

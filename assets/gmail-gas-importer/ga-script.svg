@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   version="1.1"
+   width="456.13925"
+   height="360.8085"
+   id="svg22"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs26" />
+  <rect
+     fill="#ea4335"
+     x="0"
+     y="253.53038"
+     width="373"
+     height="107"
+     rx="53.5"
+     id="rect2" />
+  <rect
+     fill="#fbbc04"
+     x="-492.90594"
+     y="-114.04733"
+     width="373"
+     height="107"
+     rx="53.5"
+     transform="rotate(-144)"
+     id="rect4" />
+  <rect
+     fill="#34a853"
+     x="71.084625"
+     y="-263.68692"
+     width="373"
+     height="107"
+     rx="53.5"
+     transform="rotate(72)"
+     id="rect6" />
+  <rect
+     fill="#4285f4"
+     x="-246.0011"
+     y="345.94373"
+     width="373"
+     height="107"
+     rx="53.5"
+     transform="rotate(-72)"
+     id="rect8" />
+  <g
+     fill="#ffffff"
+     id="g20"
+     transform="translate(-27.530001,-75.369613)">
+    <circle
+       cx="265.84"
+       cy="129.28"
+       r="26.700001"
+       id="circle10" />
+    <circle
+       cx="131.44"
+       cy="225.44"
+       r="26.700001"
+       id="circle12" />
+    <circle
+       cx="81.360001"
+       cy="382.60001"
+       r="26.700001"
+       id="circle14" />
+    <circle
+       cx="348.22"
+       cy="381.64001"
+       r="26.700001"
+       id="circle16" />
+    <circle
+       cx="430.67001"
+       cy="127.89"
+       r="26.700001"
+       id="circle18" />
+  </g>
+</svg>

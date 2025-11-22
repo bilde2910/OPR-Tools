@@ -52,7 +52,9 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
           outDir: outputDir,
         },
       }),
-      pluginUrl(),
+      pluginUrl({
+        include: ["assets/**/*"],
+      }),
       pluginJson(),
       pluginScss({
         fileName: "global.css",

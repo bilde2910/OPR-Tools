@@ -47,6 +47,12 @@ const TEMPLATES: AnyEmailTemplate[] = [
     language: "en",
   },
   {
+    subject: /^Global Challenge Rewards$/,
+    type: Type.CHALLENGE_REWARD,
+    style: Style.WAYFARER,
+    language: "en",
+  },
+  {
     subject: /^Your Wayspot submission for/,
     type: Type.NOMINATION_DECIDED,
     style: Style.LIGHTSHIP,
@@ -65,6 +71,48 @@ const TEMPLATES: AnyEmailTemplate[] = [
     language: "en",
   },
   //  ---------------------------------------- ENGLISH [en] ----------------------------------------
+  {
+    subject: /^Thanks! Niantic Spatial Wayspot nomination received for/,
+    type: Type.NOMINATION_RECEIVED,
+    style: Style.RECON,
+    language: "en",
+  },
+  {
+    subject: /^Thanks! Niantic Spatial Wayspot edit suggestion received for/,
+    type: Type.EDIT_RECEIVED,
+    style: Style.RECON,
+    language: "en",
+  },
+  {
+    subject: /^Niantic Spatial Wayspot edit suggestion decided for/,
+    type: Type.EDIT_DECIDED,
+    style: Style.RECON,
+    language: "en",
+  },
+  {
+    subject: /^Thanks! Niantic Spatial Wayspot Photo received for/,
+    type: Type.PHOTO_RECEIVED,
+    style: Style.RECON,
+    language: "en",
+  },
+  {
+    subject: /^Thanks! Niantic Spatial Wayspot location edit appeal received for/,
+    type: Type.EDIT_APPEAL_RECEIVED,
+    style: Style.RECON,
+    language: "en",
+  },
+  {
+    subject: /^Thanks! Niantic Spatial location report received for/,
+    type: Type.REPORT_RECEIVED,
+    style: Style.RECON,
+    language: "en",
+  },
+  {
+    subject: /^Niantic Spatial location report decided for/,
+    type: Type.REPORT_DECIDED,
+    style: Style.RECON,
+    language: "en",
+  },
   {
     subject: /^Thanks! Niantic Wayspot nomination received for/,
     type: Type.NOMINATION_RECEIVED,
@@ -92,6 +140,18 @@ const TEMPLATES: AnyEmailTemplate[] = [
   {
     subject: /^Your Niantic Wayspot appeal has been decided for/,
     type: Type.NOMINATION_APPEAL_DECIDED,
+    style: Style.WAYFARER,
+    language: "en",
+  },
+  {
+    subject: /^Thanks! Niantic Wayspot (location|title|description) edit {2}appeal received for/,
+    type: Type.EDIT_APPEAL_RECEIVED,
+    style: Style.WAYFARER,
+    language: "en",
+  },
+  {
+    subject: /^Your Niantic Wayspot (location|title|description) edit appeal has been decided for/,
+    type: Type.EDIT_APPEAL_DECIDED,
     style: Style.WAYFARER,
     language: "en",
   },
@@ -216,13 +276,13 @@ const TEMPLATES: AnyEmailTemplate[] = [
     language: "en",
   },
   {
-    subject: /^Thanks! Niantic Wayspot report received for/,
+    subject: /^Thanks! Niantic (Wayspot|location) report received for/,
     type: Type.REPORT_RECEIVED,
     style: Style.WAYFARER,
     language: "en",
   },
   {
-    subject: /^Niantic Wayspot report decided for/,
+    subject: /^Niantic (Wayspot|location) report decided for/,
     type: Type.REPORT_DECIDED,
     style: Style.WAYFARER,
     language: "en",

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>GAS Setup Guide</title>
+  <style>
+    * {
+      font-family: sans-serif;
+    }
+
+    code,
+    textarea {
+      font-family: monospace;
+    }
+
+    img {
+      box-shadow: 0 0 10px black;
+    }
+
+    body {
+      background: #ccc;
+    }
+
+    #content {
+      max-width: 800px;
+      margin: auto;
+      padding: 0 30px 30px 30px;
+      border: 1px solid black;
+      background: #fff;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="content">
+    <h1>Email Importer: GAS Setup Guide</h1>
+    <p>This user manual will explain how to set up semi-automatic email imports from Gmail using Google Apps Script. If
+      you have previously set up the Wayfarer Planner addon, the steps are similar.</p>
+    <p>Note: The layout of the Google Apps Script website is subject to change. Please reach out to the developer of the
+      script if you are unsure how to proceed with the setup, or if the guide below is no longer accurate.</p>
+    <h2>Step 1: Create a Google Apps Script project</h2>
+    <p><a href="https://script.google.com/home" target="_blank">Click here</a> to open Google Apps Script. Sign in to
+      your Google account, if you aren't already.</p>
+    <p>Click on the "New Project" button in the top left corner:</p>
+    <img src="https://i.imgur.com/a8CicNr.png">
+    <p>The new project will look like this:</p>
+    <img src="https://i.imgur.com/98mlmxj.png">
+    <p>Click on "Untitled project" at the top, and give it a name so that you can easily recognize it later. I suggest
+      "OPR Email Importer".</p>
+    <hr>
+    <h2>Step 2: Copy and paste the importer code</h2>
+    <p>Copy the current Importer Script source code below:</p>
+    <textarea id="gas-importer-script" readonly></textarea>
+    <p>The Google Apps Script page has a large text area that currently contains <code>function myFunction()</code> and
+      some brackets. Select all of this text, delete it, and press <code>Ctrl+V</code> to replace it with the code you
+      just copied above.</p>
+    <p>Then save the file by pressing <code>Ctrl+S</code>.</p>
+    <hr>
+    <h2>Step 3: Limit the script's permissions</h2>
+    <p>By default, the script you have pasted will try to get full read and write access to your Gmail account. This
+      level of permission is not necessary, and for the safety of your account, it is recommended that you limit the
+      permissions of the script so that it cannot write or delete emails. This step is <u>optional</u>, but it is
+      <u>highly recommended</u>.</p>
+    <p>Click on the cog wheel icon (1) to access project settings, then ensure that "Show appsscript.json manifest file"
+      is <u>checked</u>, like in this picture:</p>
+    <img src="https://i.imgur.com/Q7h200M.png">
+    <p>Next, return to the script editor by pressing the "Editor" button (1), and click on the new "appsscript.json"
+      file that appears in the file list (2):</p>
+    <img src="https://i.imgur.com/eB5hred.png">
+    <p>Copy the correct manifest contents from below:</p>
+    <textarea readonly>{
+  "timeZone": "Etc/UTC",
+  "dependencies": {},
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/gmail.readonly"
+  ]
+}</textarea>
+    <p>Then, overwrite the contents of the file by deleting all the contents, then pressing <code>Ctrl+V</code> to paste
+      the contents you just copied. Save the file using <code>Ctrl+S</code>.</p>
+    <hr>
+    <h2>Step 4: Authorizing the script to access emails</h2>
+    <p>Return to the "Code.gs" file (1). In the function dropdown, ensure "setup" is selected (2), then press "Run" (3):
+    </p>
+    <img src="https://i.imgur.com/VFx9Wgs.png">
+    <p>You will see an authorization prompt, like the screenshot below. Click on "Review permissions" when it appears.
+    </p>
+    <img src="https://i.imgur.com/sReSttx.png">
+    <p>A popup will appear. Click on "Advanced" (1), then "Go to OPR Email Importer (unsafe)" (or the name of your
+      script) (2). This warning screen shows because the script used by the email importer has not been verified by
+      Google. It is completely safe to use - the source code of the script is what you just pasted earlier.</p>
+    <img src="https://i.imgur.com/3wSTjPy.png">
+    <p>The following screen will then appear, asking permission to view your emails. Click on Allow.</p>
+    <img src="https://i.imgur.com/QHiZLc4.png">
+    <hr>
+    <h2>Step 5: Copy the access token</h2>
+    <p>You will be returned to the main Apps Script window, where a new "Execution log" will appear. After a few
+      seconds, an access token will appear in this pane.</p>
+    <img src="https://i.imgur.com/WUAMGLR.png">
+    <p>Copy this value, and paste it in the "Access token" box that you are asked for on the "Import using Google Apps
+      Script" window on OPR.</p>
+    <p><b>It is very important that you do not share this token with <u>anyone</u>. Keep it completely secret.</b></p>
+    <p>P.S. The input box for the access token will hide its contents to prevent accidental leakage through screenshots.
+      If you ever need it again, for example on another device, you can return to the Google Apps Script and click "Run"
+      using the "setup" function again. If your token is ever accidentally disclosed, you can reset it by running the
+      "resetScriptData" function, and the "setup" again to generate a new token.</p>
+    <hr>
+    <h2>Step 6: Deploy the script</h2>
+    <p>In the top right corner of the Google Apps Script page, there is a blue "Deploy" button. Click on it, and then
+      click "New deployment".</p>
+    <img src="https://i.imgur.com/WNiIMwf.png">
+    <p>In the window that appears, click the gear icon, then select "Web app".</p>
+    <img src="https://i.imgur.com/tmvBq3E.png">
+    <p>Some settings will appear. Leave "Execute as" set to "Me", but make sure that "Who has access" is set to "Anyone"
+      (1). Then, click "Deploy" (2).</p>
+    <img src="https://i.imgur.com/a8LPFaM.png">
+    <p>When the deployment has completed, you will be shown a web app URL. Copy this URL, and paste it into the "Script
+      URL" box in the "Import using Google Apps Script" window on OPR.</p>
+    <img src="https://i.imgur.com/2ydKg9H.png">
+    <hr>
+    <h2>Step 7: First import</h2>
+    <p>Congratulations, the setup is now complete! Here are a few things to keep in mind that specifically apply to the
+      <u>first time</u> you use the importer:</p>
+    <ul>
+      <li>The first time you import emails, the process can take a very long time, as it has to import all of your
+        emails. This can take many minutes.</li>
+      <li>If you have previously and recently used the manual *.eml file importer function, you may not have any changes
+        detected. It is very important that even if you have no changes detected, you click on "Import 0 change(s)" this
+        time, because this will mark all the emails you just imported as processed, so that it does not have to process
+        every single one of them again the next time you run the importer.</li>
+    </ul>
+  </div>
+</body>
+
+</html>

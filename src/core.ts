@@ -484,7 +484,7 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
       img.src = options.icon;
     }
 
-    const content = makeChildNode(contentWrapper, "p");
+    const content = makeChildNode(contentWrapper, "div");
     content.appendChild(message);
     return notification;
   }

@@ -2,18 +2,19 @@ import diacritics from "./diacritics.json" with { type: "json" };
 import { iterObject, Logger, makeChildNode } from "src/utils";
 import { decodeBodyUsingCTE, extractEmail, parseMIME } from "./parsing";
 import { EmailFile, Header, StoredEmail } from "./types";
-import { DisambiguationFailedError, HeaderNotFoundError, InvalidContentTypeError, NoMatchingTemplateError, UnsupportedSenderError } from "./errors";
+import { DisambiguationFailedError, HeaderNotFoundError, InvalidContentTypeError, NoMatchingTemplateError } from "./errors";
 import { IDBStoreConnection, KeyNotFoundError } from "src/idb";
 import emailTemplates, { EmailTemplate } from "./templates";
 
 type IDBConnectionFactory = (mode: "readonly" | "readwrite") => Promise<IDBStoreConnection<StoredEmail>>;
 
 const SUPPORTED_SENDERS: string[] = [
+  "notices@recon.nianticspatial.com",
   "notices@wayfarer.nianticlabs.com",
   "nominations@portals.ingress.com",
   "hello@pokemongolive.com",
-  "ingress-support@google.com",
   "ingress-support@nianticlabs.com",
+  "ingress-support@google.com",
 ] as const;
 
 type EmailPutStatus = "inserted" | "replaced" | "retained" | "ignored";
@@ -43,7 +44,7 @@ export class EmailAPI {
   }
 
   async import(
-    iterator: AsyncGenerator<EmailFile, unknown, unknown>,
+    iterator: AsyncGenerator<EmailFile>,
     report?: (result: EmailPutStatus) => void,
   ) {
     this.#logger.info("Now importing emails from generator!");
@@ -108,8 +109,13 @@ export class EmailAPI {
       );*/
     }
     const emailDate = new Date(email.getFirstHeaderValue("Date"));
+    const scopelySplitDate = new Date(1748023200000);
     if (emailAddress === "hello@pokemongolive.com" && emailDate.getUTCFullYear() <= 2018) {
       // Newsletters used this email address for some time up until late 2018, which was before this game got Wayfarer/OPR access.
+      return "ignored";
+    }
+    if (emailAddress !== "notices@recon.nianticspatial.com" && emailDate > scopelySplitDate) {
+      // Ignore any emails post-Scopely split
       return "ignored";
     }
     const toSave: StoredEmail = {
@@ -152,6 +158,19 @@ export class EmailAPI {
         throw ex;
       }
     }
+  }
+
+  async getProcessedIDs() {
+    const pids = new Set<string>();
+    using idb = await this.#openIDB("readonly");
+    this.#logger.debug("Iterating emails to find processed IDs");
+    for await (const email of idb.iterate()) {
+      for (const pid of email.pids) {
+        pids.add(pid);
+      }
+    }
+    this.#logger.debug("Email iteration completed.");
+    return pids;
   }
 
   /**
@@ -227,9 +246,10 @@ export class Email {
     const alts: Record<string, string> = {};
     const ct = this.#parseContentType(this.getFirstHeaderValue("Content-Type"));
     if (ct.type === "multipart/alternative") {
-      const parts = this.body.split(`--${ct.params.boundary}`);
+      const parts = this.body.split(`--${ct.params.boundary}`).filter(part => part !== "");
       for (const part of parts) {
-        const partMime = parseMIME(part);
+        if (!part.startsWith("\r\n") || !part.endsWith("\r\n")) continue;
+        const partMime = parseMIME(part.substring(2, part.length - 2));
         if (partMime.body.trim().length === 0) continue;
         const partCTHdr = partMime.getFirstHeaderValue("Content-Type", null);
         if (partCTHdr === null) continue;
@@ -401,8 +421,11 @@ td:first-child {
 }
 
 export class WayfarerEmail extends Email {
-  createDebugBundle(): unknown {
-    throw new Error("Method not implemented.");
+  /**
+   * @deprecated For internal use only!
+   */
+  createDebugBundle() {
+    return this.#dbObject;
   }
   #dbObject: StoredEmail;
   constructor(dbObject: StoredEmail) {

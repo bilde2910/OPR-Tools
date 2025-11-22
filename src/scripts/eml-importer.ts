@@ -31,10 +31,10 @@ export default () => {
     defaultConfig: {},
     sessionData: {},
     initialize: (toolbox, _logger, _config) => {
-      const createEmailLoader = async () => {
+      const createEmailLoader = async (title: string, body: string) => {
         const modal = await toolbox.createModal("opremli-modal");
-        const header = makeChildNode(modal.container, "h2", "Importing...");
-        const status = makeChildNode(modal.container, "p", "Please wait");
+        const header = makeChildNode(modal.container, "h2", title);
+        const status = makeChildNode(modal.container, "p", body);
         return {
           setTitle: (text: string) => header.textContent = text,
           setStatus: (text: string) => status.textContent = text,
@@ -45,7 +45,7 @@ export default () => {
       const importEmails = async () => {
         const emailAPI = await toolbox.getAddonAPI("opr-tools-core")!.email();
         const files = await readFiles("message/rfc822", "*.eml");
-        const loader = await createEmailLoader();
+        const loader = await createEmailLoader("Importing...", "Please wait");
         const iterator = async function*() {
           for (const file of files) {
             yield {

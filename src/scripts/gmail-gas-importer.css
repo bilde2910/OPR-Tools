@@ -1,0 +1,30 @@
+.opregas-options-modal {
+  max-width: 700px;
+  height: initial;
+}
+
+.opregas-table {
+  width: 100%;
+}
+
+.opregas-table td {
+  border: none;
+}
+
+.opregas-table input {
+  background-color: #ddd;
+  width: 100%;
+  padding: 5px;
+}
+
+.dark .opregas-table input {
+  background-color: #222;
+}
+
+.opregas-cancel-btn {
+  color: #000;
+}
+
+.dark .opregas-cancel-btn {
+  color: #f00;
+}

@@ -15,6 +15,11 @@ declare module "*.png" {
   export default content;
 }
 
+declare module "*.gs" {
+  const content: string;
+  export default content;
+}
+
 declare module "*.md" {
   interface Exports {
     /** Content of the markdown file, converted to an HTML string */

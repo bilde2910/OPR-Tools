@@ -16,12 +16,12 @@
 // <https://github.com/bilde2910/OPR-Tools/blob/main/LICENSE>
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { NotificationColor, register } from "src/core";
-import { filterObject, iterObject, unilTruthy, indexToMap, makeChildNode, toUtcIsoDate, iterKeys, assignAll, Logger } from "src/utils";
-import { AnyContribution, ContributionStatus, ContributionType, Nomination, OriginalPoiData, SubmissionsResult } from "src/types";
+import { CheckboxEditor, NotificationColor, register } from "src/core";
+import { filterObject, iterObject, unilTruthy, indexToMap, makeChildNode, toUtcIsoDate, iterKeys, assignAll, Logger, shiftDays } from "src/utils";
+import { AnyContribution, ContributionStatus, ContributionType, EditContribution, Nomination, OriginalPoiData, SubmissionsResult } from "src/types";
 import { EmailAPI, WayfarerEmail } from "src/email";
 import { IDBStoreConnection, KeyNotFoundError } from "src/idb";
-import { EmailStyle, EmailType } from "src/email/types";
+import { EmailStyle, EmailType, StoredEmail } from "src/email/types";
 
 import "./nomination-status-history.css";
 
@@ -31,8 +31,9 @@ import IconPhoto from "../../assets/nomination-history/photo.svg";
 import IconEditLocation from "../../assets/nomination-history/edit-location.svg";
 import IconEditTitle from "../../assets/nomination-history/edit-title.svg";
 import IconEditDescription from "../../assets/nomination-history/edit-description.svg";
+import { scriptInfo } from "src/constants";
 
-const EMAIL_PROCESSING_VERSION = 1;
+const EMAIL_PROCESSING_VERSION = 2;
 const STRICT_MODE = true;
 
 const FILTER_COLUMNS = ["id", "type", "day", "upgraded", "status", "isNianticControlled", "canAppeal", "isClosed", "canHold", "canReleaseHold"] as const;
@@ -41,10 +42,10 @@ const SUPPORTED_EMAIL_TYPES = [
   EmailType.NOMINATION_DECIDED,
   EmailType.NOMINATION_APPEAL_RECEIVED,
   EmailType.NOMINATION_APPEAL_DECIDED,
-  EmailType.EDIT_RECEIVED,
-  EmailType.EDIT_DECIDED,
   EmailType.PHOTO_RECEIVED,
   EmailType.PHOTO_DECIDED,
+  /*EmailType.EDIT_RECEIVED,
+  EmailType.EDIT_DECIDED,*/
 ];
 
 // If this changes, also update the CSS declaration
@@ -63,7 +64,7 @@ const STATE_MAP: Record<HistoryEntryStatus, string> = {
   VOTING: "Entered voting",
   DUPLICATE: "Rejected as duplicate",
   WITHDRAWN: "Withdrawn",
-  NOMINATED: "Nominated",
+  NOMINATED: "Submitted",
   APPEALED: "Appealed",
   NIANTIC_REVIEW: "Entered Niantic review",
   HELD: "Held",
@@ -100,7 +101,7 @@ interface EmailProcessingRecord {
 }
 
 interface EmailProcessingError {
-  email: unknown,
+  email: StoredEmail,
   error: any,
   stack?: string[],
 }
@@ -116,9 +117,17 @@ export default () => {
     name: "Nomination Status History",
     authors: ["tehstone", "bilde2910", "Tntnnbltn"],
     description: "Track changes to contribution status, and receive alerts when a contribution has changed status.",
-    defaultConfig: {},
+    defaultConfig: {
+      askAboutCrashReports: true,
+    },
     sessionData: {},
-    initialize: (toolbox, logger, _config) => {
+    initialize: (toolbox, logger, config) => {
+      config.setUserEditable("askAboutCrashReports", {
+        label: "Prompt to send crash reports",
+        help: "Enable this to be asked to send crash reports if Nomination Status History crashes while trying to parse an email",
+        editor: new CheckboxEditor(),
+      });
+
       let ready = false;
 
       class EmailProcessor {
@@ -169,6 +178,7 @@ export default () => {
                 // Reprocess old failures due to bugfixes and template additions
                 record.result === EmailProcessingResult.UNSUPPORTED ||
                 record.result === EmailProcessingResult.FAILURE
+                //||record.result===EmailProcessingResult.AMBIGUOUS//DEBUG
               ) {
                 continue;
               }
@@ -308,8 +318,49 @@ export default () => {
           }
 
           this.#processIndicator?.remove();
-          // TODO: Error reporting
+          if (this.#errors.length > 0 && config.get("askAboutCrashReports")) {
+            this.#reportErrors();
+          }
           logger.info("Email processor finalized.");
+        }
+
+        #reportErrors() {
+          const errors = {
+            errors: this.#errors,
+            version: scriptInfo.version,
+          };
+
+          const stopAsking = () => config.set("askAboutCrashReports", false);
+          const doSubmit = () => {
+            if (confirm(
+              "Thank you for helping further the development of the Nomination Status History plugin!\n\n" +
+              "The crash report contains a copy of the email(s) that resulted in parsing errors in the script. These emails may contain identifying information such as your username and email address. Error tracing information included with the report may also include a list of other Wayfarer userscripts you may be using.\n\n" +
+              "All data is sent directly to a server under the developer's control, and will be treated confidentially. Crash reports may be archived for future testing.\n\n" +
+              "Under the terms of the GDPR, you are entitled to a copy of your stored data, as well as deletion of said data, upon request. GDPR inquiries should be directed by email to post(at)varden(dot)info.\n\n" +
+              "Do you wish to continue?\n\n",
+            )) {
+              const xhr = new XMLHttpRequest();
+              xhr.open("POST", "https://api.varden.info/wft/nsh/submit-crash.php", true);
+              xhr.setRequestHeader("Content-Type", "application/json");
+              xhr.onload = () => alert(xhr.response);
+              xhr.send(JSON.stringify(errors));
+            } else {
+              alert("Crash report has been discarded, and no data was submitted.");
+            }
+          };
+
+          const eNotify = document.createElement("div");
+          makeChildNode(eNotify, "p", "Errors occurred during processing of some Wayfarer emails by Nomination Status History. Do you wish to report these errors to the script developer?");
+          const anchorPara = makeChildNode(eNotify, "p");
+          makeChildNode(anchorPara, "a", "Submit report").addEventListener("click", doSubmit);
+          makeChildNode(anchorPara, "span", " - ");
+          makeChildNode(anchorPara, "a", "No thanks");
+          makeChildNode(anchorPara, "span", " - ");
+          makeChildNode(anchorPara, "a", "Don't ask again").addEventListener("click", stopAsking);
+          toolbox.notify({
+            color: "red",
+            message: eNotify,
+          });
         }
       }
 
@@ -707,6 +758,7 @@ type EmailStatusResolver = (doc: Document, history: StatusHistoryEntry[], email:
 type EmailImageResolver<T extends AnyContribution> = (doc: Document, submissions: T[], email: WayfarerEmail) => string | undefined;
 
 interface BaseTemplateResolver<T extends AnyContribution> {
+  type: EmailType,
   status: EmailStatusResolver[],
   image: EmailImageResolver<T>[],
 }
@@ -720,7 +772,16 @@ interface NominationTemplateResolver extends BaseTemplateResolver<Nomination> {
   )
 }
 
-type TemplateResolver = NominationTemplateResolver;
+interface PhotoTemplateResolver extends BaseTemplateResolver<EditContribution<ContributionType.PHOTO>> {
+  type: (
+    EmailType.PHOTO_DECIDED |
+    EmailType.PHOTO_RECEIVED
+  )
+}
+
+type TemplateResolver =
+  NominationTemplateResolver |
+  PhotoTemplateResolver;
 
 const determineRejectType = (history: StatusHistoryEntry[], email: WayfarerEmail) => {
   const [appealed] = history.filter(e => e.status === ContributionStatus.APPEALED);
@@ -775,12 +836,6 @@ const determineAppealRejectType = (history: StatusHistoryEntry[]) => {
   }
 };
 
-const shiftDays = (date: Date, offset: number) => {
-  const nd = new Date(date);
-  nd.setUTCDate(nd.getUTCDate() + offset);
-  return nd;
-};
-
 const MONTHS = {
   ENGLISH:        ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
   BENGALI:        ["জানু", "ফেব", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"],
@@ -805,6 +860,10 @@ const MONTHS = {
 class ImageQuery {
   static imageAny = () => (doc: Document) => doc.querySelector("img")?.src;
   static imageAlt = (alt: string) => (doc: Document) => doc.querySelector<HTMLImageElement>(`img[alt='${alt}']`)?.src;
+  static imageLh3 = () => (doc: Document) => (
+    doc.querySelector<HTMLImageElement>("img[src^='https://lh3.googleusercontent.com/']") ??
+    doc.querySelector<HTMLImageElement>("img[src^='http://lh3.googleusercontent.com/']")
+  )?.src;
   static ingType1 = () => (doc: Document) => doc.querySelector("h2 ~ p:last-of-type")?.lastChild?.textContent?.trim();
   static ingType2 = () => (doc: Document) => doc.querySelector<HTMLImageElement>("h2 ~ p:last-of-type img")?.src;
   static ingType3 = (status: ContributionStatus, regex: RegExp, tooClose?: string) => (doc: Document, submissions: Nomination[], email: WayfarerEmail) => {
@@ -887,7 +946,10 @@ class ImageQuery {
     const dates = [datePrev, date, dateNext];
     const candidates = submissions.filter(e =>
       dates.includes(e.day) &&
-      EmailAPI.stripDiacritics(e.title) == match.groups!.title &&
+      (
+        EmailAPI.stripDiacritics(e.title) == match.groups!.title ||
+        e.title == match.groups!.title
+      ) &&
       [
         ContributionStatus.ACCEPTED,
         ContributionStatus.REJECTED,
@@ -909,6 +971,83 @@ class ImageQuery {
       );
     }
     return candidates[0].imageUrl;
+  };
+  static reconPhotoSubmitted = (regex: RegExp) => (doc: Document, submissions: EditContribution<ContributionType.PHOTO>[], email: WayfarerEmail) => {
+    const match = email.getFirstHeaderValue("Subject").match(regex);
+    if (match === null) throw new Error("Unable to extract the name of the Wayspot from this email.");
+    const date = new Date(email.getFirstHeaderValue("Date"));
+    // Wayfarer is in UTC, but emails are in local time. Work around this by also matching against
+    // the preceding and following dates from the one specified in the email.
+    const dateCur = toUtcIsoDate(date);
+    const dateNext = toUtcIsoDate(shiftDays(date, 1));
+    const datePrev = toUtcIsoDate(shiftDays(date, -1));
+    const dates = [datePrev, dateCur, dateNext];
+    const candidates = submissions.filter(e => dates.includes(e.day) && e.poiData.title.trim() == match.groups!.title);
+    if (!candidates.length) throw new NominationMatchingError(`Unable to find a photo that matches the Wayspot title "${match.groups!.title}" and submission date ${dateCur} on this OPR account.`);
+    if (candidates.length > 1) throw new NominationMatchingError(`Multiple photos on this OPR account match the Wayspot title "${match.groups!.title}" and submission date ${dateCur} specified in the email.`);
+    return candidates[0].imageUrl;
+  };
+  static ingPhoto1 = () => (doc: Document) => {
+    const url = doc.querySelector("h2 ~ p:last-of-type")?.childNodes[2].textContent?.trim();
+    if (url?.match(/^https?:\/\/lh3.googleusercontent.com\//)) return url;
+  };
+  static ingPhoto2 = (status: ContributionStatus, dateRegex: RegExp, monthNames: string[][]) => (doc: Document, submissions: EditContribution<ContributionType.PHOTO>[]) => {
+    const title = doc.querySelector("h2")?.textContent.trim().split("\n")[1]?.trim();
+    const dateText = doc.querySelector("table.container:last-of-type th p:last-of-type")?.textContent.trim().split("\n")[1]?.trim();
+    let month = null;
+    let dateMatch = null;
+    for (let i = 0; i < monthNames.length; i++) {
+      const months = monthNames[i];
+      const mr = new RegExp(dateRegex.source.split("(?<month>)").join(`(?<month>${months.join("|")})`));
+      dateMatch = dateText?.match(mr);
+      if (dateMatch) {
+        month = months.indexOf(dateMatch.groups!.month) + 1;
+        break;
+      }
+    }
+    if (!dateMatch || month === null) return;
+    const date = `${dateMatch.groups!.year}-${month.toString().padStart(2, "0")}-${dateMatch.groups!.day.padStart(2, "0")}`;
+    // OPR is in UTC, but emails are in local time. Work around this by also matching against
+    // the preceding and following dates from the one specified in the email.
+    const dateNext = toUtcIsoDate(shiftDays(new Date(date), 1));
+    const datePrev = toUtcIsoDate(shiftDays(new Date(date), -1));
+    const dates = [datePrev, date, dateNext];
+    const candidates = submissions.filter(e => dates.includes(e.day) && e.poiData.title.trim() === title && e.status === status);
+    if (!candidates.length) throw new NominationMatchingError(`Unable to find a photo that matches the Wayspot title "${title}" and submission date ${date} on this OPR account.`);
+    if (candidates.length > 1) throw new NominationMatchingError(`Multiple photos on this OPR account match the Wayspot title "${title}" and submission date ${date} specified in the email.`);
+    return candidates[0].imageUrl;
+  };
+  static pgoPhotoDecided1 = (status: ContributionStatus, titleRegex: RegExp, dateRegex: RegExp, monthNames: string[][]) => (doc: Document, submissions: EditContribution<ContributionType.PHOTO>[]) => {
+    const text = doc.querySelector(".em_green")?.textContent.split("\n")[0]?.replace(/\s+/g, " ").trim();
+    const titleMatch = text?.match(titleRegex);
+    if (!titleMatch) throw new Error("Unable to extract the name of the Wayspot from this email.");
+    const dateText = doc.querySelectorAll(".em_defaultlink")[2]?.textContent.trim();
+    let month = null;
+    let dateMatch = null;
+    for (let i = 0; i < monthNames.length; i++) {
+      const months = monthNames[i];
+      const mr = new RegExp(dateRegex.source.split("(?<month>)").join(`(?<month>${months.join("|")})`));
+      dateMatch = dateText?.match(mr);
+      if (dateMatch) {
+        month = months.indexOf(dateMatch.groups!.month) + 1;
+        break;
+      }
+    }
+    if (!dateMatch || month === null) return;
+    const date = `${dateMatch.groups!.year}-${month.toString().padStart(2, "0")}-${dateMatch.groups!.day.padStart(2, "0")}`;
+    // OPR is in UTC, but emails are in local time. Work around this by also matching against
+    // the preceding and following dates from the one specified in the email.
+    const dateNext = toUtcIsoDate(shiftDays(new Date(date), 1));
+    const datePrev = toUtcIsoDate(shiftDays(new Date(date), -1));
+    const dates = [datePrev, date, dateNext];
+    const candidates = submissions.filter(e => dates.includes(e.day) && e.poiData.title.trim() === titleMatch.groups!.title && e.status === status);
+    if (!candidates.length) throw new NominationMatchingError(`Unable to find a photo that matches the Wayspot title "${titleMatch.groups!.title}" and submission date ${date} on this OPR account.`);
+    if (candidates.length > 1) throw new NominationMatchingError(`Multiple photos on this OPR account match the Wayspot title "${titleMatch.groups!.title}" and submission date ${date} specified in the email.`);
+    return candidates[0].imageUrl;
+  };
+  static pgoPhotoTextUrl = () => (doc: Document) => {
+    const url = doc.querySelector("tr:nth-child(10)")?.textContent?.trim();
+    if (url?.match(/^https?:\/\/lh3.googleusercontent.com\//)) return url;
   };
 }
 
@@ -942,6 +1081,11 @@ class StatusQuery {
     if (tooCloseText && text?.includes(tooCloseText)) return ContributionStatus.ACCEPTED;
     const query2 = doc.querySelector("p:nth-child(2)");
     if (query2 && dupText2 && query2.textContent.trim().includes(dupText2)) return ContributionStatus.DUPLICATE;
+  };
+  static wfDecidedPhoto = (acceptText?: string, rejectText?: string) => (doc: Document) => {
+    const text = doc.querySelector("tr:nth-child(4) .em_org_u")?.textContent.replace(/\s+/g, " ").trim();
+    if (acceptText && text?.includes(acceptText)) return ContributionStatus.ACCEPTED;
+    if (rejectText && text?.includes(rejectText)) return ContributionStatus.REJECTED;
   };
 }
 
@@ -981,17 +1125,32 @@ const processEmail = (logger: Logger, email: WayfarerEmail, submissions: AnyCont
       }
       // TODO: Edits/photos
       let template: TemplateResolver | null = null;
-      if (emlClass.style === EmailStyle.WAYFARER && emlClass.type === EmailType.NOMINATION_RECEIVED) {
+      if (
+        (emlClass.type === EmailType.NOMINATION_RECEIVED) &&
+        (emlClass.style === EmailStyle.WAYFARER || emlClass.style === EmailStyle.RECON)
+      ) {
         template = {
           type: emlClass.type,
           status: [() => ContributionStatus.NOMINATED],
           image: [ImageQuery.imageAlt("Submission Photo")],
         };
-      } else if (emlClass.style === EmailStyle.WAYFARER && emlClass.type === EmailType.NOMINATION_APPEAL_RECEIVED) {
+      } else if (
+        (emlClass.type === EmailType.NOMINATION_APPEAL_RECEIVED) &&
+        (emlClass.style === EmailStyle.WAYFARER)
+      ) {
         template = {
           type: emlClass.type,
           status: [() => ContributionStatus.APPEALED],
           image: [ImageQuery.imageAlt("Submission Photo")],
+        };
+      } else if (
+        (emlClass.type === EmailType.PHOTO_RECEIVED) &&
+        (emlClass.style === EmailStyle.WAYFARER)
+      ) {
+        template = {
+          type: emlClass.type,
+          status: [() => ContributionStatus.NOMINATED],
+          image: [ImageQuery.imageLh3()],
         };
       } else {
         const subject = email.getFirstHeaderValue("Subject");
@@ -1018,10 +1177,14 @@ const processEmail = (logger: Logger, email: WayfarerEmail, submissions: AnyCont
           sub = processNominationEmail(doc, submissions.filter(s => s.type === ContributionType.NOMINATION), email, template);
           break;
 
+        case EmailType.PHOTO_DECIDED:
+        case EmailType.PHOTO_RECEIVED:
+          sub = processPhotoEmail(doc, submissions.filter(s => s.type === ContributionType.PHOTO), email, template);
+          break;
+
         default:
           throw new UnknownTemplateError(
-            "Failed to find a valid contribution resolver function " +
-            `for email template ${template.type}`,
+            "Failed to find a valid contribution resolver function!",
           );
       }
 
@@ -1077,7 +1240,7 @@ const processNominationEmail = (
   nominations: Nomination[],
   email: WayfarerEmail,
   template: NominationTemplateResolver,
-): Nomination  => {
+): Nomination => {
   let url: string | null = null;
   for (const ir of template.image) {
     url = ir(doc, nominations, email) ?? null;
@@ -1098,6 +1261,38 @@ const processNominationEmail = (
   if (!nom) {
     throw new NominationMatchingError(
       "The nomination that this email refers to cannot be found " +
+      `on this OPR account (failed to match LH3 URL ${url}).`,
+    );
+  }
+  return nom;
+};
+
+const processPhotoEmail = (
+  doc: Document,
+  photos: EditContribution<ContributionType.PHOTO>[],
+  email: WayfarerEmail,
+  template: PhotoTemplateResolver,
+): EditContribution<ContributionType.PHOTO> => {
+  let url: string | null = null;
+  for (const ir of template.image) {
+    url = ir(doc, photos, email) ?? null;
+    if (url !== null) {
+      const match = url.match(/^https?:\/\/lh3.googleusercontent.com\/(.*)$/);
+      if (!match) url = null;
+      else url = match[1];
+    }
+    if (url !== null) break;
+  }
+
+  if (url === null) {
+    throw new MissingDataError(
+      "Could not determine which photo submission this email references.",
+    );
+  }
+  const [nom] = photos.filter(n => n.imageUrl.endsWith(`/${url}`));
+  if (!nom) {
+    throw new NominationMatchingError(
+      "The photo submission that this email refers to cannot be found " +
       `on this OPR account (failed to match LH3 URL ${url}).`,
     );
   }
@@ -1166,6 +1361,31 @@ const EMAIL_PARSERS: ({ subject: RegExp } & TemplateResolver)[] = [
     ],
   },
   {
+    // Photo decided (Wayfarer)
+    subject: /^Niantic Wayspot media submission decided for/,
+    type: EmailType.PHOTO_DECIDED,
+    status: [
+      StatusQuery.wfDecidedPhoto(
+        "has decided to accept your Wayspot Photo submission.",
+        "has decided not to accept your Wayspot Photo submission.",
+      ),
+    ],
+    image: [
+      ImageQuery.imageLh3(),
+    ],
+  },
+  {
+    // Photo received (Recon)
+    subject: /^Thanks! Niantic Spatial Wayspot Photo received for/,
+    type: EmailType.PHOTO_RECEIVED,
+    status: [() => ContributionStatus.NOMINATED],
+    image: [
+      ImageQuery.reconPhotoSubmitted(
+        /^Thanks! Niantic Spatial Wayspot Photo received for (?<title>.*)!$/,
+      ),
+    ],
+  },
+  {
     // Nomination received (Ingress)
     subject: /^Portal submission confirmation:/,
     type: EmailType.NOMINATION_RECEIVED,
@@ -1198,6 +1418,37 @@ const EMAIL_PARSERS: ({ subject: RegExp } & TemplateResolver)[] = [
       ImageQuery.ingType2(),
       ImageQuery.ingType5(),
       ImageQuery.ingType4(),
+    ],
+  },
+  {
+    // Photo received (Ingress)
+    subject: /^Portal photo submission confirmation$/,
+    type: EmailType.PHOTO_RECEIVED,
+    status: [() => ContributionStatus.NOMINATED],
+    image: [
+      ImageQuery.ingPhoto1(),
+      ImageQuery.imageLh3(),
+    ],
+  },
+  {
+    // Photo decided (Ingress)
+    subject: /^Portal photo review complete/,
+    type: EmailType.PHOTO_DECIDED,
+    status: [
+      StatusQuery.ingDecided(
+        "Good work, Agent:",
+        undefined,
+        "decided not to accept it at this time",
+      ),
+    ],
+    image: [
+      ImageQuery.ingPhoto1(),
+      ImageQuery.imageLh3(),
+      ImageQuery.ingPhoto2(
+        ContributionStatus.REJECTED,
+        /^(?<month>) (?<day>\d+), (?<year>\d+)$/,
+        [MONTHS.ENGLISH],
+      ),
     ],
   },
   {
@@ -1282,6 +1533,38 @@ const EMAIL_PARSERS: ({ subject: RegExp } & TemplateResolver)[] = [
     image: [
       ImageQuery.pgoType1(),
       ImageQuery.pgoType2(),
+    ],
+  },
+  {
+    // Photo received (PoGo)
+    subject: /^Photo Submission Received$/,
+    type: EmailType.PHOTO_RECEIVED,
+    status: [() => ContributionStatus.NOMINATED],
+    image: [
+      ImageQuery.pgoPhotoTextUrl(),
+    ],
+  },
+  {
+    // Photo accepted (PoGo)
+    subject: /^Photo Submission Accepted$/,
+    type: EmailType.PHOTO_DECIDED,
+    status: [() => ContributionStatus.ACCEPTED],
+    image: [
+      ImageQuery.pgoPhotoTextUrl(),
+    ],
+  },
+  {
+    // Photo rejected (PoGo)
+    subject: /^Photo Submission Rejected$/,
+    type: EmailType.PHOTO_DECIDED,
+    status: [() => ContributionStatus.REJECTED],
+    image: [
+      ImageQuery.pgoPhotoDecided1(
+        ContributionStatus.REJECTED,
+        /^Photo review complete: (?<title>.*)$/,
+        /^Submission Date: (?<month>) (?<day>\d+), (?<year>\d+)$/,
+        [MONTHS.ENGLISH],
+      ),
     ],
   },
 
