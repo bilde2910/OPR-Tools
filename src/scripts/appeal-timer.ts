@@ -66,18 +66,19 @@ export default () => {
             .filter(a => a.ts >= now - APPEAL_COUNTDOWN_MSEC)
             .sort((a, b) => a.ts - b.ts);
           if (recent.length >= MAX_APPEALS || !result?.canAppeal) {
-            if (recent.length === 0) {
-              counter.textContent = "Unknown";
+            const ttl = ((recent[0].ts + APPEAL_COUNTDOWN_MSEC) - now) / 1000;
+            if (ttl / 86400 >= 1) {
+              counter.textContent = `~${Math.round(ttl / 86400)} days`;
+            } else if (ttl / 3600 >= 1) {
+              counter.textContent = `~${Math.round(ttl / 3600)} hours`;
+            } else if (ttl >= 0) {
+              counter.textContent = `~${Math.round(ttl / 60)} minutes`;
             } else {
-              const ttl = ((recent[0].ts + APPEAL_COUNTDOWN_MSEC) - now) / 1000;
-              if (ttl / 86400 >= 1) {
-                counter.textContent = `~${Math.round(ttl / 86400)} days`;
-              } else if (ttl / 3600 >= 1) {
-                counter.textContent = `~${Math.round(ttl / 3600)} hours`;
-              } else {
-                counter.textContent = `~${Math.round(ttl / 60)} minutes`;
-              }
+              counter.textContent = "Unknown";
             }
+            label!.textContent = UNAVAILABLE_LABEL;
+          } else if (typeof result !== "undefined" && !result.canAppeal) {
+            counter.textContent = "Unknown";
             label!.textContent = UNAVAILABLE_LABEL;
           } else {
             counter.textContent = (MAX_APPEALS - recent.length).toString();
