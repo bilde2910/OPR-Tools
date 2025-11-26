@@ -30,9 +30,9 @@ export default (/**@type {import("./src/types").RollupArgs}*/ args) => (async ()
   const passCliArgs = {
     mode: args["config-mode"] ?? (process.env.NODE_ENV === "production" ? "production" : "development"),
     host: args["config-host"] ?? "github",
-    assetSource: args["config-assetSource"] ?? "github",
     suffix: args["config-suffix"] ?? "",
   };
+
   const passCliArgsStr = Object.entries(passCliArgs).map(([key, value]) => `--${key}=${value}`).join(" ");
 
   const { suffix } = passCliArgs;

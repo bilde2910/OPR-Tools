@@ -14,7 +14,7 @@ export const mode = getCliArg("mode", "development");
  * Where the userscript will be hosted
  * @type {"dev" | "github" | "varden"}
  */
-const host = getCliArg("host", "dev");
+const host = getCliArg("host", "varden");
 
 /**
  * The branch on GitHub to use for various URLs
@@ -84,6 +84,7 @@ export function getLastCommitSha() {
  * @param {string} defaultVal
  */
 function getCliArg(name, defaultVal) {
+  console.log(process.argv);
   const arg = process.argv.find((v) => v.trim().match(new RegExp(`^(--)?${name}=.+$`, "i")));
   const val = arg?.split("=")?.[1];
   return (val && val.length > 0 ? val : defaultVal)?.trim();
