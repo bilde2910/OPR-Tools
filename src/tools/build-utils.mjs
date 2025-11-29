@@ -48,17 +48,17 @@ const requiresFile = "./assets/require.json";
 export const baseUrl = (() => {
   switch(host) {
   case "github":
-    return `https://raw.githubusercontent.com/${repo}/${branch}/dist`;
+    return `https://raw.githubusercontent.com/${repo}/${branch}`;
   case "varden":
-    return "https://static.varden.info/opr-tools/dist";
+    return "https://static.varden.info/opr-tools";
   case "dev":
   default:
     return "http://localhost:8710";
   }
 })();
 
-const scriptUrl = `${baseUrl}/${userscriptDistFile}`;
-const metaUrl = `${baseUrl}/${userscriptMetaFile}`;
+const scriptUrl = `${baseUrl}/dist/${userscriptDistFile}`;
+const metaUrl = `${baseUrl}/dist/${userscriptMetaFile}`;
 const assetBaseUrl = `${baseUrl}/assets`;
 
 /**
