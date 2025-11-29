@@ -216,13 +216,17 @@ export default () => {
         let closeMarker = false;
         const nearby = mapCtx.markers.nearby;
         if (nearby.markers?.length) {
-          logger.info(`Adding tooltips to ${nearby.markers.length} markers`);
-          for (let i = 0; i < nearby.markers.length; i++) {
-            markers[i].title = nearby.markers[i].infoWindowComponentData.title;
-            if (!closeMarker) {
-              const distance = haversine(candidate.lat, candidate.lng, nearby.markers[i].latitude, nearby.markers[i].longitude);
-              if (distance <= 20) closeMarker = true;
+          if (markers.length === nearby.markers.length) {
+            logger.info(`Adding tooltips to ${nearby.markers.length} markers`);
+            for (let i = 0; i < nearby.markers.length; i++) {
+              markers[i].title = nearby.markers[i].infoWindowComponentData.title;
+              if (!closeMarker) {
+                const distance = haversine(candidate.lat, candidate.lng, nearby.markers[i].latitude, nearby.markers[i].longitude);
+                if (distance <= 20) closeMarker = true;
+              }
             }
+          } else {
+            logger.warn(`Cannot add tooltips to markers; there are ${nearby.markers.length} nearby POI, but only ${markers.length} markers on the map`);
           }
         } else {
           logger.info("No markers to add tooltips to");
