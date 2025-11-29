@@ -1,0 +1,97 @@
+img.oprcml-list-image {
+  width: 8rem !important;
+}
+
+.oprcml-details-container {
+  display: flex;
+  /* Allow flex items to wrap to the next line */
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+.oprcml-map-column {
+  flex: 1 1 50%;
+  min-width: 250px;
+}
+
+.oprcml-details-column {
+  flex: 1 1 50%;
+  min-width: 250px;
+}
+
+.oprcml-wayspot-details {
+  background-color: #e4e4e4;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  margin-right: 20px;
+}
+
+.dark .oprcml-wayspot-details {
+  background-color: #444444;
+}
+
+.oprcml-wayspot-title-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.oprcml-wayspot-title-container .oprcml-wd-title {
+  font-weight: bold;
+  /* Adjust margin as needed */
+  margin-right: 10px;
+}
+
+.oprcml-status-live {
+  min-width: 35px;
+}
+
+.oprcml-status-retired {
+  min-width: 60px;
+}
+
+.oprcml-wd-image {
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.oprcml-wd-description {
+  text-align: left;
+}
+
+.oprcml-hidden {
+  display: none;
+}
+
+.oprcml-edits-container {
+  margin-bottom: 24px;
+}
+
+.oprcml-edits-summary-header {
+  font-weight: bold;
+}
+
+.oprcml-edit-summary-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.oprcml-edit-summary-table td:first-child {
+  width: 100px;
+  border: none;
+}
+
+.oprcml-edit-summary-table td:last-child {
+  width: 95px;
+  text-align: right;
+  border: none;
+}
+
+.oprcml-satmap {
+  margin-top: 10px;
+  border-radius: 10px;
+  overflow: "hidden";
+}

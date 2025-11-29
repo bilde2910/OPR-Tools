@@ -165,7 +165,7 @@ export enum ContributionType {
   PHOTO = "PHOTO",
 }
 
-type EditContributionType =
+export type EditContributionType =
   ContributionType.EDIT_TITLE |
   ContributionType.EDIT_DESCRIPTION |
   ContributionType.EDIT_LOCATION |
@@ -240,11 +240,14 @@ export interface Nomination extends Contribution {
   poiData: never[],
 }
 
-export type AnyContribution =
+export type AnyEditContribution =
   EditContribution<ContributionType.EDIT_LOCATION> |
   EditContribution<ContributionType.EDIT_DESCRIPTION> |
   EditContribution<ContributionType.EDIT_TITLE> |
-  EditContribution<ContributionType.PHOTO> |
+  EditContribution<ContributionType.PHOTO>;
+
+export type AnyContribution =
+  AnyEditContribution |
   Nomination;
 
 //#region Incoming reviews

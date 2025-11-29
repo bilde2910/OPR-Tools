@@ -17,6 +17,7 @@ import emlImporter from "./scripts/eml-importer";
 import wayfarerContributionImporter from "./scripts/wayfarer-contribution-importer";
 import gmailGasImporter from "./scripts/gmail-gas-importer";
 import appealTimer from "./scripts/appeal-timer";
+import contributionManagementLayout from "./scripts/contribution-management-layout";
 
 const availableAddons = [
   oprToolsCore,
@@ -33,6 +34,7 @@ const availableAddons = [
   emlImporter,
   gmailGasImporter,
   appealTimer,
+  contributionManagementLayout,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];
