@@ -11,6 +11,7 @@ const ADDON_APIS: {
 } = {};
 
 let userHash = 0;
+let userName = "Agent";
 let language = "en";
 
 type UnspecAddon = Addon<any, any, any, any>;
@@ -31,6 +32,7 @@ export const initializeUserHash = () => new Promise<number>((resolve, reject) =>
       const props = JSON.parse(req.responseText).result;
       if (req.status >= 200 && req.status < 400) {
         userHash = props.socialProfile?.email ? cyrb53(props.socialProfile.email) : 0;
+        userName = props.socialProfile?.username ?? "Agent";
         language = props.language;
         resolve(userHash);
       }
@@ -150,6 +152,35 @@ export class NumericInputEditor implements OptionEditor<number> {
       if (input.value === "") opts.clear();
       else if ((this.options?.step ?? 1) < 1) opts.save(parseFloat(input.value));
       else opts.save(parseInt(input.value));
+    });
+  }
+}
+
+interface TextInputEditorOptions {
+  placeholder?: string,
+}
+
+export class TextInputEditor implements OptionEditor<string> {
+  options?: TextInputEditorOptions;
+  constructor(options?: TextInputEditorOptions) {
+    this.options = options;
+  }
+
+  render(opts: RendererOptions<string>) {
+    const label = makeChildNode(opts.parent, "label", `${opts.label}: `);
+    if (opts.help) {
+      label.title = opts.help;
+      label.classList.add("oprtcore-help-available");
+    }
+    const input = document.createElement("input");
+    input.type = "text";
+    if (typeof this.options?.placeholder !== "undefined") input.placeholder = this.options.placeholder;
+    label.appendChild(input);
+    input.classList.add("oprtcore-fix");
+    input.value = opts.value.toString();
+    input.addEventListener("change", () => {
+      if (input.value === "") opts.clear();
+      else opts.save(input.value);
     });
   }
 }
@@ -485,7 +516,19 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
 
     const content = makeChildNode(contentWrapper, "div");
     content.appendChild(message);
-    return notification;
+    return {
+      dismiss: () => notification.remove(),
+      updateContents: (message: string | Node) => {
+        for (let i = content.childNodes.length - 1; i >= 0; i--) {
+          content.childNodes[i].remove();
+        }
+        content.appendChild(
+          typeof message === "string"
+            ? document.createTextNode(message)
+            : message,
+        );
+      },
+    };
   }
 
   public addSidebarItem(id: string, item: SidebarMenuItem) {
@@ -533,8 +576,8 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
     }
   }
 
-  public get userHash() {
-    return userHash;
+  public get username() {
+    return userName;
   }
 
   public get l10n(): Record<string, string> {

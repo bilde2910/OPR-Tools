@@ -208,6 +208,32 @@ export const assignAll = <Tt extends Record<Kt, Tt[Kt]> & Ts, Kt extends keyof T
 export const indexToMap = <T extends Record<K, T[K]>, K extends keyof T>(arr: T[], index: K): Record<T[K], T> =>
   assignAll({}, ...arr.map(e => ({ [e[index]]: e })));
 
+export const deepEquals = (obj1: any, obj2: any): boolean => {
+  if (typeof obj1 !== typeof obj2) return false;
+  if (typeof obj1 === "object" && typeof obj2 === "object") {
+    if (Array.isArray(obj1) !== Array.isArray(obj2)) return false;
+    if (Array.isArray(obj1) && Array.isArray(obj2)) {
+      if (obj1.length !== obj2.length) return false;
+      for (let i = 0; i < obj1.length; i++) if (!deepEquals(obj1[i], obj2[i])) return false;
+      return true;
+    } else {
+      const k1 = iterKeys(obj1);
+      const k2 = iterKeys(obj2);
+      if (k1.length !== k2.length) return false;
+      for (const k of k1) if (!k2.includes(k)) return false;
+      for (const k of k2) if (!k1.includes(k)) return false;
+      for (const k of k1) if (!deepEquals(obj1[k], obj2[k])) return false;
+      return true;
+    }
+  } else {
+    return obj1 === obj2;
+  }
+};
+
+export const sleep = (ms: number) => new Promise<void>((resolve) => {
+  setTimeout(() => resolve(), ms);
+});
+
 export const downloadAsFile = (data: string, type: string, name: string) => {
   const blob = new Blob([data], { type });
   const url = URL.createObjectURL(blob);

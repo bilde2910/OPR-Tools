@@ -136,14 +136,14 @@ export default () => {
         #alreadyProcessed: Set<string>;
         #stats: Record<EmailProcessingResult, number>;
         #errors: EmailProcessingError[];
-        #processIndicator: HTMLElement | null;
+        #dismissNotification: () => void;
 
         constructor(submissions: AnyContribution[]) {
           this.#submissions = submissions;
           this.#statusHistoryMap = {};
           this.#alreadyProcessed = new Set();
           this.#errors = [];
-          this.#processIndicator = null;
+          this.#dismissNotification = () => {};
           this.#stats = {
             success: 0,
             skipped: 0,
@@ -156,12 +156,12 @@ export default () => {
 
         async prepare() {
           logger.info("Preparing email processor...");
-          this.#processIndicator = toolbox.notify({
+          this.#dismissNotification = () => toolbox.notify({
             color: "dark-gray",
             message: "Processing Email API data, please wait...",
             icon: LoadingWheel,
             dismissable: false,
-          });
+          }).dismiss();
           {
             using idb = await toolbox.openIDB("history", "readonly");
             const history = await idb.getAll();
@@ -317,7 +317,7 @@ export default () => {
             });
           }
 
-          this.#processIndicator?.remove();
+          this.#dismissNotification();
           if (this.#errors.length > 0 && config.get("askAboutCrashReports")) {
             this.#reportErrors();
           }

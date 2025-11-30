@@ -168,7 +168,7 @@ export default () => {
             downloadAsFile(
               JSON.stringify(result),
               "application/json",
-              `reviewHistory-${toolbox.userHash}.json`,
+              `reviewHistory-${toolbox.username}.json`,
             );
           });
 
