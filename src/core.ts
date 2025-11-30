@@ -22,24 +22,17 @@ type IDBStoreDeclaration<T> = {
 const addons = <UnspecAddon[]>[];
 let initialized = false;
 
-export const initializeUserHash = () => new Promise<number>((resolve, reject) => {
+export const initializeUserHash = async () => {
   if (userHash !== 0) {
-    reject("Cannot reconfigure user hash");
+    throw Error("Cannot reconfigure user hash");
   } else {
-    const req = new XMLHttpRequest();
-    req.open("GET", "/api/v1/vault/properties");
-    req.addEventListener("load", () => {
-      const props = JSON.parse(req.responseText).result;
-      if (req.status >= 200 && req.status < 400) {
-        userHash = props.socialProfile?.email ? cyrb53(props.socialProfile.email) : 0;
-        userName = props.socialProfile?.username ?? "Agent";
-        language = props.language;
-        resolve(userHash);
-      }
-    });
-    req.send();
+    const props = await makeRequest("GET", "/api/v1/vault/properties");
+    userHash = props.socialProfile.email ? cyrb53(props.socialProfile.email) : 0;
+    userName = props.socialProfile?.username ?? "Agent";
+    language = props.language;
+    return userHash;
   }
-});
+};
 
 interface OptionMetadata {
   label: string,
@@ -344,6 +337,56 @@ const addSidebarItem = async (id: string, item: SidebarMenuItem) => {
   createSidebarItems(sidebar.parentNode!);
 };
 
+function makeRequest<Tm extends "GET", Tu extends keyof Responses[Tm] & string>(method: Tm, url: Tu): Promise<Responses[Tm][Tu]>;
+function makeRequest<Tm extends "POST", Tu extends keyof Responses[Tm] & keyof Requests & string>(method: Tm, url: Tu, body: Requests[Tu]): Promise<Responses[Tm][Tu]>;
+function makeRequest<Tm extends keyof Responses, Tu extends keyof Responses[Tm] & string>(method: Tm, url: Tu, body?: Tu extends keyof Requests ? Requests[Tu] : undefined): Promise<Responses[Tm][Tu]> {
+  const logger = new Logger("core:toolbox");
+  return new Promise<Responses[Tm][Tu]>((resolve, reject) => {
+    const send = (xsrfCookie?: string) => {
+      const req = new XMLHttpRequest();
+      req.open(method, url, true);
+      req.setRequestHeader("Content-Type", "application/json");
+      req.setRequestHeader("Accept", "application/json, text/plain, */*");
+      req.setRequestHeader("x-angular", "");
+      if (xsrfCookie) req.setRequestHeader("X-CSRF-TOKEN", xsrfCookie);
+      req.addEventListener("load", () => {
+        const data = JSON.parse(req.responseText).result;
+        if (req.status >= 200 && req.status < 400) {
+          resolve(data);
+        } else {
+          reject(new Error(`Error response code ${req.status}: ${req.responseText}`));
+        }
+      });
+      if (typeof body !== "undefined") {
+        req.send(JSON.stringify(body));
+      } else {
+        req.send();
+      }
+    };
+    const parseDocumentCookie = () => {
+      logger.debug("Using document.cookie to access XSRF cookie");
+      const cookies = document.cookie.split(";").map(c => c.trim());
+      for (const cookie of cookies) {
+        const [k, v] = cookie.split("=", 2);
+        if (k === "XSRF-TOKEN") return decodeURIComponent(v);
+      }
+    };
+    if (method === "GET") {
+      // No CSRF header for GET requests
+      send();
+    } else if (window.cookieStore) {
+      logger.debug("Using cookieStore to access XSRF cookie");
+      window.cookieStore.get("XSRF-TOKEN").then(cookie => {
+        send(cookie?.value);
+      }).catch(() => {
+        send(parseDocumentCookie());
+      });
+    } else {
+      send(parseDocumentCookie());
+    }
+  });
+};
+
 export interface SanitizedAddon {
   id: string,
   name: string,
@@ -480,53 +523,7 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
     this.filterSend(method, url, handle);
   }
 
-  public makeRequest<Tm extends keyof Responses, Tu extends keyof Responses[Tm] & string>(method: Tm, url: Tu, body: Tu extends keyof Requests ? Requests[Tu] : void) {
-    const logger = new Logger("core:toolbox");
-    return new Promise<Responses[Tm][Tu]>((resolve, reject) => {
-      const send = (xsrfCookie?: string) => {
-        const req = new XMLHttpRequest();
-        req.open(method, url, true);
-        req.setRequestHeader("Content-Type", "application/json");
-        req.setRequestHeader("Accept", "application/json, text/plain, */*");
-        req.setRequestHeader("x-angular", "");
-        if (xsrfCookie) req.setRequestHeader("X-CSRF-TOKEN", xsrfCookie);
-        req.addEventListener("load", () => {
-          const data = JSON.parse(req.responseText).result;
-          if (req.status >= 200 && req.status < 400) {
-            resolve(data);
-          } else {
-            reject(new Error(`Error response code ${req.status}: ${req.responseText}`));
-          }
-        });
-        if (typeof body !== "undefined") {
-          req.send(JSON.stringify(body));
-        } else {
-          req.send();
-        }
-      };
-      const parseDocumentCookie = () => {
-        logger.debug("Using document.cookie to access XSRF cookie");
-        const cookies = document.cookie.split(";").map(c => c.trim());
-        for (const cookie of cookies) {
-          const [k, v] = cookie.split("=", 2);
-          if (k === "XSRF-TOKEN") return decodeURIComponent(v);
-        }
-      };
-      if (method === "GET") {
-        // No CSRF header for GET requests
-        send();
-      } else if (window.cookieStore) {
-        logger.debug("Using cookieStore to access XSRF cookie");
-        window.cookieStore.get("XSRF-TOKEN").then(cookie => {
-          send(cookie?.value);
-        }).catch(() => {
-          send(parseDocumentCookie());
-        });
-      } else {
-        send(parseDocumentCookie());
-      }
-    });
-  }
+  public makeRequest = makeRequest;
 
   public listAvailableAddons() {
     return addons.map((a: UnspecAddon) => {

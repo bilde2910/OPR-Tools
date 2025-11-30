@@ -31,6 +31,7 @@ export interface Responses {
     "/api/v1/vault/home": Showcase,
     "/api/v1/vault/settings": UserSettings,
     "/api/v1/vault/profile": Profile,
+    "/api/v1/vault/properties": UserProperties,
   },
   "POST": {
     "/api/v1/vault/review": string,
