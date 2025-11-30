@@ -19,6 +19,7 @@ import gmailGasImporter from "./scripts/gmail-gas-importer";
 import appealTimer from "./scripts/appeal-timer";
 import contributionManagementLayout from "./scripts/contribution-management-layout";
 import totalReconExporter from "./scripts/total-recon-exporter";
+import autoHold from "./scripts/auto-hold";
 
 const availableAddons = [
   oprToolsCore,
@@ -37,6 +38,7 @@ const availableAddons = [
   appealTimer,
   contributionManagementLayout,
   totalReconExporter,
+  autoHold,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];
