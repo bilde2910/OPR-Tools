@@ -8,7 +8,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-achievements.user.js
 - [x] wayfarer-appeal-info.user.js
 - [ ] wayfarer-compact-card.user.js
-- [ ] wayfarer-contribution-management-layout.user.js
+- [x] wayfarer-contribution-management-layout.user.js
 - [ ] wayfarer-edits-diff.user.js
 - [x] wayfarer-email-api.user.js
 - [x] wayfarer-extended-stats.user.js
@@ -17,7 +17,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [x] wayfarer-nomination-map.user.js
 - [x] wayfarer-nomination-stats.user.js
 - [x] wayfarer-nomination-status-history.user.js
-- [ ] wayfarer-nomination-streetview.user.js
+- [x] wayfarer-nomination-streetview.user.js
 - [ ] wayfarer-nomination-types.user.js
 - [x] wayfarer-open-in.user.js
 - [ ] wayfarer-prime-portal-links.user.js
@@ -30,10 +30,12 @@ This repository is still very much a work in progress. The goal is to port most 
 - [ ] wayfarer-review-pings.user.js
 - [x] wayfarer-review-timer.user.js
 - [ ] wayfarer-skip-count.user.js
-- [ ] wayfarer-ticket-saver.user.js
+- [ ] ~~wayfarer-ticket-saver.user.js~~\*
 - [ ] wayfarer-translate.user.js
 - [ ] wayfarer-upgrade-percent.user.js
 - [ ] wayfarer-version-display.user.js
+
+\* Not applicable to Recon
 </details>
 
 ## Prerequisites

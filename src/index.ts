@@ -20,6 +20,7 @@ import appealTimer from "./scripts/appeal-timer";
 import contributionManagementLayout from "./scripts/contribution-management-layout";
 import totalReconExporter from "./scripts/total-recon-exporter";
 import autoHold from "./scripts/auto-hold";
+import dynamicMapsEverywhere from "./scripts/dynamic-maps-everywhere";
 
 const availableAddons = [
   oprToolsCore,
@@ -39,6 +40,7 @@ const availableAddons = [
   contributionManagementLayout,
   totalReconExporter,
   autoHold,
+  dynamicMapsEverywhere,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];
