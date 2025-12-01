@@ -585,13 +585,8 @@ const injectNominations = async (result: SubmissionsResult) => {
 const injectReview = async (candidate: AnyReview) => {
   if (candidate.type === "NEW") {
     const ref = await untilTruthy(() => document.getElementById("check-duplicates-card"));
-    if (candidate.streetAddress) {
-      const addrBox = document.createElement("p");
-      addrBox.classList.add("oproi-address");
-      addrBox.textContent = candidate.streetAddress;
-      insertAfter(ref.firstChild!, addrBox);
-    }
-    await addOpenButtons(ref.firstChild!, candidate);
+    const box = await addOpenButtons(ref.firstChild!, candidate);
+    box.classList.add("oproi-dupe-map");
   } else if (candidate.type === "EDIT") {
     const ref = await untilTruthy(() => document.querySelector(".review-edit-info .review-edit-info__info"));
     await addOpenButtons(ref, candidate);
