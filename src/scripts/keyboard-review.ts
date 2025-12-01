@@ -16,7 +16,7 @@
 // <https://github.com/bilde2910/OPR-Tools/blob/main/LICENSE>
 // If not, see <https://www.gnu.org/licenses/>.
 
-import { register } from "src/core";
+import { CheckboxEditor, register } from "src/core";
 import { untilTruthy } from "src/utils";
 import { AnyReview, EditReview, NewReview, PhotoReview } from "src/types";
 
@@ -121,9 +121,17 @@ export default () => {
     name: "Keyboard Review",
     authors: ["tehstone", "bilde2910"],
     description: "Add keyboard review to OPR",
-    defaultConfig: {},
+    defaultConfig: {
+      autoScrollCards: true,
+    },
     sessionData: {},
-    initialize: (toolbox, logger, _config) => {
+    initialize: (toolbox, logger, config) => {
+      config.setUserEditable("autoScrollCards", {
+        label: "Auto-scroll cards when reviewing",
+        help: "Whether to automatically scroll to the focused card when you press keyboard buttons during review",
+        editor: new CheckboxEditor(),
+      });
+
       let kdEvent: KeyHandler | null = null;
       let keySequence: string | null = null;
       let context: AnyRenderContext = {
@@ -404,10 +412,12 @@ export default () => {
               if (card) {
                 restyle(card, "highlighted");
                 cc.draw(card);
-                /*card.scrollIntoView({
-                  behavior: 'smooth',
-                  block: 'center'
-                });*/
+                if (config.get("autoScrollCards")) {
+                  card.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                  });
+                }
               } else {
                 untilTruthy(() => document.getElementById(cc.id)).then(() => redrawUI()).catch(logger.error);
               }
