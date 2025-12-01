@@ -894,6 +894,18 @@ export default () => {
         reject();
       });
 
+      const zoomIn = () => {
+        const gmap: any = document.querySelector("nia-map");
+        const map: google.maps.Map = gmap?.__ngContext__?.[gmap.__ngContext__.length - 1]?.componentRef?.map;
+        map?.setZoom(map.getZoom()! + 1);
+      };
+
+      const zoomOut = () => {
+        const gmap: any = document.querySelector("nia-map");
+        const map: google.maps.Map = gmap?.__ngContext__?.[gmap.__ngContext__.length - 1]?.componentRef?.map;
+        map?.setZoom(map.getZoom()! - 1);
+      };
+
       const updateKeybindsNew = (candidate: NewReview) => {
         const aahqrl10n = toolbox.i18nPrefixResolver("review.new.question.accurateandhighquality.reject.");
         const aahqrl10nReport = toolbox.i18nPrefixResolver("review.report.modal.");
@@ -939,6 +951,8 @@ export default () => {
           "+T": () => thumbDownOpen(ThumbCards.PERMANENT),
           "Q": () => window.open(candidate.imageUrl + "=s0"),
           "E": () => window.open(candidate.supportingImageUrl + "=s0"),
+          "R": () => zoomIn(),
+          "F": () => zoomOut(),
           "+Space": () => !isDialogOpen() && skip(),
           "Tab": () => !isDialogOpen() && context.navigable && context.nextCard(),
           "+Tab": () => !isDialogOpen() && context.navigable && context.prevCard(),
