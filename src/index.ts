@@ -21,6 +21,7 @@ import contributionManagementLayout from "./scripts/contribution-management-layo
 import totalReconExporter from "./scripts/total-recon-exporter";
 import autoHold from "./scripts/auto-hold";
 import dynamicMapsEverywhere from "./scripts/dynamic-maps-everywhere";
+import widescreenReview from "./scripts/widescreen-review";
 
 const availableAddons = [
   oprToolsCore,
@@ -41,6 +42,7 @@ const availableAddons = [
   totalReconExporter,
   autoHold,
   dynamicMapsEverywhere,
+  widescreenReview,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];

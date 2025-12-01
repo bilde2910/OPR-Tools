@@ -1,0 +1,81 @@
+// Copyright 2025 bilde2910
+// This file is part of the OPR Tools collection.
+
+// This script is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// This script is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You can find a copy of the GNU General Public License in the root
+// directory of this script's GitHub repository:
+// <https://github.com/bilde2910/OPR-Tools/blob/main/LICENSE>
+// If not, see <https://www.gnu.org/licenses/>.
+
+import { register } from "src/core";
+import { makeChildNode, untilTruthy } from "src/utils";
+
+import "./widescreen-review.css";
+
+export default () => {
+  register()({
+    id: "widescreen-review",
+    name: "Widescreen Review",
+    authors: ["bilde2910"],
+    description: "Improves the review interface to be more comfortable on desktop by switching to a three-column layout",
+    defaultConfig: {},
+    sessionData: {},
+    initialize: (toolbox, logger, config) => {
+      const setupObserver = async () => {
+        const ref = await untilTruthy(() => document.querySelector("body"));
+        const observer = new MutationObserver((mutations) => {
+          for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+              if (node.nodeName === "APP-REVIEW-NEW-B") {
+                updateView((node as HTMLElement).children[0]);
+              }
+            }
+          }
+        });
+        observer.observe(ref, {
+          childList: true,
+          subtree: true,
+        });
+      };
+
+      const updateView = (ref: Element) => {
+        ref.closest("mat-sidenav-content > .max-w-7xl")?.classList.remove("max-w-7xl");
+        logger.info("ref", ref);
+        console.log(ref.querySelectorAll("div"));
+        const columns = [...ref.children].filter(node => node.tagName === "DIV").map(node => node);
+        logger.info(columns);
+        columns.push(makeChildNode(ref, "div"));
+
+        const [ c1, c2, c3 ] = columns;
+        for (const col of columns) {
+          for (let i = col.children.length - 1; i >= 0; i--) {
+            if (["P", "H4"].includes(col.children[i].tagName)) {
+              col.children[i].remove();
+            }
+          }
+        }
+
+        c1.classList.add("flex", "gap-3");
+        c2.classList.remove("review-questions");
+        c3.classList.add("flex", "flex-col", "gap-3", "review-questions");
+
+        c2.insertAdjacentElement("afterbegin", c1.querySelector("app-title-and-description-b")!);
+        for (const question of c2.querySelectorAll("app-question-card")) {
+          c3.appendChild(question);
+        }
+        c3.appendChild(c2.querySelector("app-review-categorization-b")!);
+      };
+
+      void setupObserver();
+    },
+  });
+};
