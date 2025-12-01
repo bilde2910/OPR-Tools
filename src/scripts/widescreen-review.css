@@ -1,3 +1,16 @@
-app-review-new-b app-photo-b img {
+.oprwsr-root-new app-photo-b img {
   margin: auto;
+}
+
+.oprwsr-root-new .wf-review-card {
+  height: initial;
+  max-height: 380px;
+}
+
+.oprwsr-root-new #check-duplicates-card {
+  max-height: initial;
+}
+
+.oprwsr-root-new .wf-image-modal img {
+  max-height: calc((100dvh - 440px) / 2);
 }
