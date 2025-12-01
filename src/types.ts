@@ -284,14 +284,16 @@ export interface NewReview extends BaseReview {
   categoryIds: string[],
 }
 
+export interface TextEditOption {
+  value: string,
+  hash: string,
+}
+
 export interface EditReview extends BaseReview {
   type: "EDIT",
   imageUrl: string,
-  titleEdits: {
-    value: string,
-    hash: string,
-  }[],
-  descriptionEdits: never[], // TODO
+  titleEdits: TextEditOption[],
+  descriptionEdits: TextEditOption[], // TODO: verify
   locationEdits: {
     value: string,
     hash: string,

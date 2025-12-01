@@ -11,5 +11,9 @@
     "pkgName": "ag-grid-community",
     "path": "dist/ag-grid-community.min.js",
     "global": "agGrid"
+  }, {
+    "pkgName": "diff",
+    "path": "dist/diff.min.js",
+    "global": "Diff"
   }
 ]

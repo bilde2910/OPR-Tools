@@ -22,6 +22,7 @@ import totalReconExporter from "./scripts/total-recon-exporter";
 import autoHold from "./scripts/auto-hold";
 import dynamicMapsEverywhere from "./scripts/dynamic-maps-everywhere";
 import widescreenReview from "./scripts/widescreen-review";
+import betterDiff from "./scripts/better-diff";
 
 const availableAddons = [
   oprToolsCore,
@@ -43,6 +44,7 @@ const availableAddons = [
   autoHold,
   dynamicMapsEverywhere,
   widescreenReview,
+  betterDiff,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];

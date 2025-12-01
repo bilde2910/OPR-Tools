@@ -620,13 +620,14 @@ export default () => {
 
       const initForEdit = (candidate: EditReview) => {
         const drawTextEdit = (card: HTMLElement) => {
+          if (!card.classList.contains("oprkr2-card")) card.classList.add("oprkr2-card");
           const btns = card.querySelectorAll("mat-radio-button");
           for (let i = 0; i < btns.length && i < 9; i++) {
             const btnKey = (i + 1).toString();
             const label = drawNew("span");
             label.classList.add("oprkr2-key-label");
             label.textContent = `[${btnKey}] `;
-            const textNode = btns[i].querySelector(".mat-radio-label-content fragment") ?? btns[i].querySelector(".mat-radio-label-content");
+            const textNode = btns[i].querySelector(".mat-radio-label-content");
             textNode!.insertBefore(label, textNode!.firstChild);
           }
         };
@@ -894,16 +895,35 @@ export default () => {
         reject();
       });
 
-      const zoomIn = () => {
+      const getMap = (): google.maps.Map | undefined => {
         const gmap: any = document.querySelector("nia-map");
-        const map: google.maps.Map = gmap?.__ngContext__?.[gmap.__ngContext__.length - 1]?.componentRef?.map;
-        map?.setZoom(map.getZoom()! + 1);
+        return gmap?.__ngContext__?.[gmap.__ngContext__.length - 1]?.componentRef?.map;
       };
 
-      const zoomOut = () => {
-        const gmap: any = document.querySelector("nia-map");
-        const map: google.maps.Map = gmap?.__ngContext__?.[gmap.__ngContext__.length - 1]?.componentRef?.map;
-        map?.setZoom(map.getZoom()! - 1);
+      const zoomMap = (change: number) => {
+        const map = getMap();
+        map?.setZoom(map.getZoom()! + change);
+      };
+
+      const panHandlers: Record<string, KeyHandler> = {};
+      const panMapTowards = (key: string, x: number, y: number) => {
+        if (key in panHandlers) return;
+        const panFactor = 50;
+        const panInterval = 130;
+        const map = getMap();
+        if (map) {
+          const doPan = () => map.panBy(x * panFactor, y * panFactor);
+          const interval = setInterval(doPan, panInterval);
+          doPan();
+          panHandlers[key] = (e: KeyboardEvent) => {
+            if (e.code === `Key${key}`) {
+              clearInterval(interval);
+              document.removeEventListener("keyup", panHandlers[key]);
+              delete panHandlers[key];
+            }
+          };
+          document.addEventListener("keyup", panHandlers[key]);
+        }
       };
 
       const updateKeybindsNew = (candidate: NewReview) => {
@@ -951,8 +971,12 @@ export default () => {
           "+T": () => thumbDownOpen(ThumbCards.PERMANENT),
           "Q": () => window.open(candidate.imageUrl + "=s0"),
           "E": () => window.open(candidate.supportingImageUrl + "=s0"),
-          "R": () => zoomIn(),
-          "F": () => zoomOut(),
+          "R": () => zoomMap(1),
+          "F": () => zoomMap(-1),
+          "W": () => panMapTowards("W", 0, -1),
+          "A": () => panMapTowards("A", -1, 0),
+          "S": () => panMapTowards("S", 0, 1),
+          "D": () => panMapTowards("D", 1, 0),
           "+Space": () => !isDialogOpen() && skip(),
           "Tab": () => !isDialogOpen() && context.navigable && context.nextCard(),
           "+Tab": () => !isDialogOpen() && context.navigable && context.prevCard(),
