@@ -71,25 +71,6 @@ export default () => {
         editor: new CheckboxEditor(),
       });
 
-      const setupObserver = async () => {
-        await untilTruthy(() => typeof google !== "undefined");
-        const ref = await untilTruthy(() => document.querySelector("body"));
-        const currentMaps = document.querySelectorAll<EnrichedStaticMapElement>("nia-google-static-map");
-        for (const map of currentMaps) replaceMap(map);
-        const observer = new MutationObserver((mutations) => {
-          for (const mutation of mutations) {
-            if (mutation.target.nodeName === "NIA-GOOGLE-STATIC-MAP") {
-              replaceMap(mutation.target as EnrichedStaticMapElement);
-            }
-          }
-        });
-        observer.observe(ref, {
-          attributeFilter: ["style"],
-          childList: true,
-          subtree: true,
-        });
-      };
-
       const replaceMap = (staticMap: EnrichedStaticMapElement) => {
         const bgImageUrl = staticMap.style.backgroundImage.match(/^url\("(?<url>[^"]+)"\)$/)?.groups?.url;
         if (typeof bgImageUrl !== "undefined") {
@@ -121,7 +102,11 @@ export default () => {
         }
       };
 
-      void setupObserver();
+      untilTruthy(() => typeof google !== "undefined").then(() => {
+        const currentMaps = document.querySelectorAll<EnrichedStaticMapElement>("nia-google-static-map");
+        for (const map of currentMaps) replaceMap(map);
+        toolbox.observeNodeAttributeChanges("NIA-GOOGLE-STATIC-MAP", ["style"], replaceMap);
+      }).catch(logger.error);
     },
   });
 };

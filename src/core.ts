@@ -22,6 +22,8 @@ type IDBStoreDeclaration<T> = {
 const addons = <UnspecAddon[]>[];
 let initialized = false;
 
+const observerHandlers: MutationHandler<any>[] = [];
+
 export const initializeUserHash = async () => {
   if (userHash !== 0) {
     throw Error("Cannot reconfigure user hash");
@@ -33,6 +35,11 @@ export const initializeUserHash = async () => {
     return userHash;
   }
 };
+
+interface MutationHandler<T extends Node> {
+  nodeName: string,
+  callback: (node: T) => void,
+}
 
 interface OptionMetadata {
   label: string,
@@ -525,6 +532,25 @@ class AddonToolbox<Tcfg, Tidb extends IDBStoreDeclaration<Tidb>, Tsess> {
 
   public makeRequest = makeRequest;
 
+  public observeAddedNodes<T extends Node>(nodeName: string, callback: (node: T) => void) {
+    observerHandlers.push({ nodeName, callback });
+  }
+
+  public observeNodeAttributeChanges<T extends Node>(nodeName: string, attributeFilter: string[], callback: (node: T) => void) {
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.target.nodeName === nodeName) {
+          callback(mutation.target as T);
+        }
+      }
+    });
+    observer.observe(document, {
+      attributeFilter,
+      childList: true,
+      subtree: true,
+    });
+  }
+
   public listAvailableAddons() {
     return addons.map((a: UnspecAddon) => {
       const copy = {...a} as Partial<UnspecAddon> & SanitizedAddon;
@@ -687,6 +713,22 @@ export const initializeAllAddons = () => {
     CORE_ADDON_ID,
     ...coreSettings.get("activePlugins").filter(n => n !== CORE_ADDON_ID),
   ];
+  logger.info("Creating shared MutationObserver");
+  const observer = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        for (const handler of observerHandlers) {
+          if (node.nodeName === handler.nodeName) {
+            handler.callback(node);
+          }
+        }
+      }
+    }
+  });
+  observer.observe(document, {
+    childList: true,
+    subtree: true,
+  });
   logger.info("Preparing to initialize addons", toInitialize);
   const options: Record<string, AddonOptionsEntry> = {};
   for (const addon of addons) {
