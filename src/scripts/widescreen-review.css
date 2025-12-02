@@ -1,3 +1,7 @@
+.oprwsr-root-new {
+  margin-top: -1rem;
+}
+
 .oprwsr-root-new app-photo-b img {
   margin: auto;
 }
@@ -13,4 +17,28 @@
 
 .oprwsr-root-new .wf-image-modal img {
   max-height: calc((100dvh - 440px) / 2);
+}
+
+.oprwsr-root-new app-question-card .title-and-subtitle-row {
+  display: none !important;
+}
+
+.oprwsr-root-new app-question-card .main-section-container {
+  margin-top: 0.8rem;
+}
+
+.oprwsr-root-new .dont-know-button {
+  width: 180px;
+  margin-left: 0 !important;
+}
+
+.oprwsr-root-new .question-title .question-subtitle-tooltip {
+  margin-left: 0.5rem;
+  line-height: 1.6rem;
+}
+
+.oprwsr-root-new .thumbs-button {
+  border: 1px solid rgb(115, 115, 115) !important;
+  margin-left: -0.5rem;
+  margin-right: 1rem;
 }
