@@ -65,12 +65,19 @@ export default () => {
 
         for (const question of c2.querySelectorAll("app-question-card")) {
           c3.appendChild(question);
+          const thumbsRow = document.createElement("div");
+          thumbsRow.classList.add("oprwsr-thumbs-row");
+          question.querySelector(".action-buttons-row")!.insertAdjacentElement("afterbegin", thumbsRow);
+          for (const thumb of question.querySelectorAll(".thumbs-button")) {
+            thumbsRow.appendChild(thumb);
+          }
           const title = question.querySelector(".question-title")!;
-          const helpText = question.querySelector(".title-and-subtitle-row > div")!;
+          //const helpText = question.querySelector(".title-and-subtitle-row > div")!;
           const tooltip = question.querySelector(".question-subtitle-tooltip");
           if (tooltip) title.appendChild(tooltip);
+          /*
           const container = title.closest(".main-section-container")!;
-          container.parentElement!.insertAdjacentElement("afterbegin", helpText);
+          container.parentElement!.insertAdjacentElement("afterbegin", helpText);*/
         }
         c3.appendChild(c2.querySelector("app-review-categorization-b")!);
       };

@@ -19,17 +19,21 @@
   max-height: calc((100dvh - 440px) / 2);
 }
 
-.oprwsr-root-new app-question-card .title-and-subtitle-row {
-  display: none !important;
+@media (max-width: 2000px) {
+  .oprwsr-root-new .action-buttons-row {
+    flex-direction: column !important;
+    justify-content: initial !important;
+  }
 }
 
-.oprwsr-root-new app-question-card .main-section-container {
-  margin-top: 0.8rem;
+.oprwsr-thumbs-row {
+  display: flex;
+  flex-direction: row;
 }
 
 .oprwsr-root-new .dont-know-button {
-  width: 180px;
   margin-left: 0 !important;
+  padding: 0.375rem !important;
 }
 
 .oprwsr-root-new .question-title .question-subtitle-tooltip {
@@ -37,8 +41,6 @@
   line-height: 1.6rem;
 }
 
-.oprwsr-root-new .thumbs-button {
-  border: 1px solid rgb(115, 115, 115) !important;
-  margin-left: -0.5rem;
-  margin-right: 1rem;
+.oprwsr-root-new app-question-card .main-section-container {
+  justify-content: space-between;
 }

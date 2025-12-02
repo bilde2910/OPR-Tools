@@ -9,7 +9,7 @@ This repository is still very much a work in progress. The goal is to port most 
 - [x] wayfarer-appeal-info.user.js
 - [ ] wayfarer-compact-card.user.js
 - [x] wayfarer-contribution-management-layout.user.js
-- [ ] wayfarer-edits-diff.user.js
+- [x] wayfarer-edits-diff.user.js
 - [x] wayfarer-email-api.user.js
 - [x] wayfarer-extended-stats.user.js
 - [x] wayfarer-keyboard-review.user.js
