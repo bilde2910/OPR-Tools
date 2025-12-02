@@ -1,5 +1,6 @@
 .oprwsr-root-new {
   margin-top: -1rem;
+  grid-gap: 1rem !important;
 }
 
 .oprwsr-root-new app-photo-b img {
