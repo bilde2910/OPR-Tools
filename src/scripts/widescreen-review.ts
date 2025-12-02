@@ -61,7 +61,10 @@ export default () => {
         supportingCard.appendChild(c1.querySelector("app-supporting-info-b .wf-review-card__header")!.cloneNode(true));
         const cardBody = makeChildNode(supportingCard, "div");
         cardBody.classList.add("wf-review-card__body");
-        cardBody.appendChild(c1.querySelector("app-supporting-info-b .wf-review-card__body .wf-image-modal + div")!);
+        cardBody.appendChild(
+          c1.querySelector("app-supporting-info-b .wf-review-card__body .wf-image-modal + div") ??
+          c1.querySelector("app-supporting-info-b .wf-review-card__body div")!,
+        );
 
         for (const question of c2.querySelectorAll("app-question-card")) {
           c3.appendChild(question);
