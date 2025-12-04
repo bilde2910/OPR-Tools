@@ -42,7 +42,7 @@ export default () => {
 
       const formatItem = (item: AppSubmissionsListItemElement) => {
         const data = item.__ngContext__[22];
-        //if (data.type === ContributionType.NOMINATION) updateRejectionLabels(item, data);
+        updateRejectionLabels(item, data);
         item.addEventListener("click", () => interceptDetailsPane(data));
       };
 
@@ -75,16 +75,18 @@ export default () => {
         return blockingNoms;
       };
 
-      const updateRejectionLabels = (item: AppSubmissionsListItemElement, nom: Nomination) => {
-        const blockers = proximityBlockingFor(nom).filter(n => n.status === ContributionStatus.VOTING);
+      const updateRejectionLabels = (item: AppSubmissionsListItemElement, nom: AnyContribution) => {
         // Remove oprtpb-blocked class if already present
         const blockedTags = item.querySelectorAll(".oprtpb-blocked-tag");
         for (let i = blockedTags.length - 1; i >= 0; i--) blockedTags[i].remove();
         const hiddenTags = item.querySelectorAll(".oprtpb-blocked-hidden");
         for (let i = hiddenTags.length - 1; i >= 0; i--) hiddenTags[i].classList.remove("oprtpb-blocked-hidden");
 
-        // If the current Wayspot data is blocked by another in-voting nomination, mark it as "proximity blocked".
+        if (nom.type !== ContributionType.NOMINATION) return;
         if (nom.status !== ContributionStatus.NOMINATED) return;
+
+        // If the current Wayspot data is blocked by another in-voting nomination, mark it as "proximity blocked".
+        const blockers = proximityBlockingFor(nom).filter(n => n.status === ContributionStatus.VOTING);
         if (blockers.length > 0) {
           const nominationTagSet = item.querySelector("app-submission-tag-set");
           if (nominationTagSet) {
