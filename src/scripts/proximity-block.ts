@@ -42,7 +42,7 @@ export default () => {
 
       const formatItem = (item: AppSubmissionsListItemElement) => {
         const data = item.__ngContext__[22];
-        if (data.type === ContributionType.NOMINATION) updateRejectionLabels(item, data);
+        //if (data.type === ContributionType.NOMINATION) updateRejectionLabels(item, data);
         item.addEventListener("click", () => interceptDetailsPane(data));
       };
 
