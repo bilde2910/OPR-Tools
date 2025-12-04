@@ -1,0 +1,23 @@
+.oprtpb-blocked-hidden {
+  display: none;
+}
+
+.oprtpb-header {
+  font-weight: bold;
+}
+
+.oprtpb-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.oprtpb-table td:first-child {
+  width: 100px;
+  border: none;
+}
+
+.oprtpb-table td:last-child {
+  width: 95px;
+  text-align: right;
+  border: none;
+}

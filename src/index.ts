@@ -23,6 +23,7 @@ import autoHold from "./scripts/auto-hold";
 import dynamicMapsEverywhere from "./scripts/dynamic-maps-everywhere";
 import widescreenReview from "./scripts/widescreen-review";
 import betterDiff from "./scripts/better-diff";
+import proximityBlock from "./scripts/proximity-block";
 
 const availableAddons = [
   oprToolsCore,
@@ -45,6 +46,7 @@ const availableAddons = [
   dynamicMapsEverywhere,
   widescreenReview,
   betterDiff,
+  proximityBlock,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];

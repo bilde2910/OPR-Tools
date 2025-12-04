@@ -15,5 +15,9 @@
     "pkgName": "diff",
     "path": "dist/diff.min.js",
     "global": "Diff"
+  }, {
+    "pkgName": "s2-geometry",
+    "path": "src/s2geometry.js",
+    "global": "window"
   }
 ]
