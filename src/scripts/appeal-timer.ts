@@ -23,7 +23,7 @@ import { SubmissionsResult, SubmitAppeal } from "src/types";
 import "./appeal-timer.css";
 
 const MAX_APPEALS = 2;
-const APPEAL_COUNTDOWN_MSEC = 15 * 86400 * 1000;
+const APPEAL_COUNTDOWN_MSEC = 20 * 86400 * 1000;
 
 type StoredAppeal = Partial<SubmitAppeal> & {
   id: string,
