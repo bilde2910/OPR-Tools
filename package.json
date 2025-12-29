@@ -48,6 +48,7 @@
     "@types/google.maps": "^3.58.1",
     "@types/greasemonkey": "^4.0.7",
     "@types/node": "^24.10.1",
+    "@types/s2-geometry": "^1.2.0",
     "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.47.0",
     "concurrently": "^9.2.1",

@@ -24,6 +24,7 @@ import dynamicMapsEverywhere from "./scripts/dynamic-maps-everywhere";
 import widescreenReview from "./scripts/widescreen-review";
 import betterDiff from "./scripts/better-diff";
 import proximityBlock from "./scripts/proximity-block";
+import showcaseTracker from "./scripts/showcase-tracker";
 
 const availableAddons = [
   oprToolsCore,
@@ -47,6 +48,7 @@ const availableAddons = [
   widescreenReview,
   betterDiff,
   proximityBlock,
+  showcaseTracker,
   // Uses filterSend, must be loaded last
   wayfarerContributionImporter,
 ];
